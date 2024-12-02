@@ -1,0 +1,25 @@
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: #343a40; 
+  color: #f8f9fa; 
+  padding: 1rem 0; 
+  font-size: 0.9rem; 
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+footer a {
+  color: #f8f9fa; 
+  text-decoration: none;
+  font-weight: bold;
+}
+
+footer a:hover {
+  color: #ffc107;
+}

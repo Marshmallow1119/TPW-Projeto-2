@@ -1,0 +1,77 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="padding: 0.25rem 0; min-height: 50px;">
+    <div class="container-fluid">
+      <a class="navbar-brand" routerLink="/home">
+        <img src="/assets/logo.png" alt="Logo" width="80" />
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="'/home'" [class.active]="isActive('home')">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="'/produtos'" [class.active]="isActive('produtos')">Produtos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="'/artistas'" [class.active]="isActive('artistas')">Artistas e Bandas</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="'/companhias'" [class.active]="isActive('companhias')">Empresas</a>
+          </li>
+        </ul>
+  
+        <ng-container *ngIf="user?.isAuthenticated">
+          <div class="navbar-text me-3 fw-bold fs-5">
+            <ng-container [ngSwitch]="user.userType">
+              <span *ngSwitchCase="'individual'">Bem-Vind@, Utilizador {{ user.username }}</span>
+              <span *ngSwitchCase="'admin'">Bem-Vind@, Administrador {{ user.username }}</span>
+              <span *ngSwitchCase="'company'">Bem-Vind@, Empresa {{ user.username }}</span>
+            </ng-container>
+          </div>
+        </ng-container>
+  
+        <form class="d-flex me-3" (ngSubmit)="search(searchInput.value)">
+          <input
+            #searchInput
+            class="form-control me-2 search-input"
+            type="search"
+            placeholder="Pesquisar"
+          />
+          <button class="btn btn-outline-dark" type="submit">
+            <i class="fa fa-search"></i>
+          </button>
+        </form>
+  
+        <div class="d-flex">
+          <ng-container *ngIf="user?.isAuthenticated; else loginTemplate">
+            <ng-container [ngSwitch]="user.userType">
+              <ng-container *ngSwitchCase="'individual'">
+                <a routerLink="/profile" class="btn btn-outline-dark me-2"><i class="fa fa-user"></i></a>
+                <a routerLink="/cart" class="btn btn-outline-dark me-2"><i class="fa fa-shopping-cart"></i></a>
+                <a routerLink="/favorites" class="btn btn-outline-dark me-2"><i class="fa fa-heart text-danger"></i></a>
+                <a (click)="logout()" class="btn btn-outline-dark"><i class="fas fa-sign-out-alt"></i></a>
+              </ng-container>
+              <ng-container *ngSwitchCase="'admin'">
+                <a routerLink="/profile" class="btn btn-outline-dark me-2"><i class="fa fa-user"></i></a>
+                <a routerLink="/add-company" class="btn btn-outline-dark me-2"><i class="fa fa-plus"></i> Adicionar Empresa</a>
+                <a (click)="logout()" class="btn btn-outline-dark"><i class="fas fa-sign-out-alt"></i></a>
+              </ng-container>
+              <ng-container *ngSwitchCase="'company'">
+                <a routerLink="/profile" class="btn btn-outline-dark me-2"><i class="fa fa-user"></i></a>
+                <a [routerLink]="['/company-products', user.company?.id]" class="btn btn-outline-dark me-2">
+                  <i class="bi bi-archive-fill"></i> Ver os meus produtos
+                </a>
+                <a (click)="logout()" class="btn btn-outline-dark"><i class="fas fa-sign-out-alt"></i></a>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+          <ng-template #loginTemplate>
+            <a routerLink="/login" class="btn btn-outline-dark"><img src="/assets/user.png" width="20" /> Login</a>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </nav>
+  

@@ -1,0 +1,258 @@
+{% extends "layout.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container rounded bg-white mt-5 mb-5">
+    <div class="alert-messages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="row">
+        <div class="col-md-4 border-right" style="max-height: 500px; overflow-y: auto;">
+            <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                {% if user.image %}
+                    <img class="profile-picture rounded-circle mt-5" width="200px" height="200px" src="{{ user.image.url }}" style="object-fit: cover;">
+                {% else %}
+                    <img class="rounded-circle mt-5" width="200px" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
+                {% endif %}
+                <div class="mt-2" id="editImageLink" style="display: none;">
+                    <button class="btn btn-link" name="editimage" id="editimage" type="button">Alterar foto de perfil</button>
+                </div>
+                <span class="font-weight-bold">{{ user.username }}</span>
+                <span class="text-black-50">{{ user.email }}</span>
+                {% if user.user_type == 'individual' %}
+                <span>Número de Compras: {{ number_of_purchases }}</span>
+                {% endif %}
+            </div>            
+        </div>
+        
+        <div class="col-md-8">
+            <div class="p-3 py-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="text-right">Configurações do Perfil</h4>
+                </div>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <label class="labels">Primeiro Nome</label>
+                            <input type="text" class="form-control" name="name" placeholder="Primeiro Nome" value="{{ user.first_name }}" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="labels">Último Nome</label>
+                            <input type="text" class="form-control" name="surname" value="{{ user.last_name }}" placeholder="Último Nome" readonly>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="labels">Email</label>
+                            <input type="text" class="form-control" name="email" placeholder="Email" value="{{ user.email }}" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="labels">Username</label>
+                            <input type="text" class="form-control" name="username" value="{{ user.username }}" placeholder="Username" readonly>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="labels">Endereço</label>
+                            <input type="text" class="form-control" name="address" placeholder="Endereço" value="{{ user.address }}" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="labels">Telefone</label>
+                            <input type="text" class="form-control" name="phone" value="{{ user.phone }}" placeholder="Telefone" readonly>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="labels">País</label>
+                            <input type="text" class="form-control" name="country" placeholder="País" value="{{ user.country }}" readonly>
+                        </div>
+                    </div>
+                    <div class="row mt-3" id="passwordFields" style="display: none;">
+                        <div class="col-md-12">
+                            <label class="labels">Senha Antiga</label>
+                            <input type="password" class="form-control" name="old_password" placeholder="Senha Antiga">
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <label class="labels">Nova Senha</label>
+                            <input type="password" class="form-control" name="new_password" placeholder="Nova Senha">
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <label class="labels">Repetir Nova Senha</label>
+                            <input type="password" class="form-control" name="confirm_new_password" placeholder="Repetir Nova Senha">
+                        </div>
+                    </div>
+                    <hr class="my-4" />
+                    <input type="file" id="id_image" name="image" style="display: none;">
+                    <div class="mt-5 text-end">
+                        <button class="btn btn-primary profile-button" name="edit" id="editButton" type="button">Editar</button>
+                        <button class="btn btn-danger profile-button" name="delete_account" type="submit">Eliminar Conta</button>
+                        <button class="btn btn-success profile-button" name="save" id="saveButton" type="submit" style="display: none;">Salvar</button>
+                        <button class="btn btn-secondary profile-button" name="Change_password" id="change_password" type="button">Alterar Senha</button>
+                        <button class="btn btn-success profile-button" name="submit_password" id="submit_password" type="submit" style="display: none;">Mudar Palavra Passe</button>
+                    </div>
+                </form>
+            </div>
+
+            {% if user.user_type == 'individual'%}
+            <div class="p-3 bg-secondary text-white rounded mt-4">
+                <h4 class="mb-4">Encomendas</h4>
+                {% if purchases %}
+                    <div class="row">
+                        {% for purchase in purchases %}
+                            <div class="col-12 col-md-6 col-lg-4 mb-4">
+                                <div class="card bg-light text-dark shadow-sm h-100">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Encomenda #{{ forloop.counter }}</h5>
+                                    </div>
+                                    <div class="card-body" style="text-align:left">
+                                        <div class="info-grid">
+                                            <div class="info-item">
+                                                <span class="text-muted"><strong>Data:</strong></span>
+                                                <span>{{ purchase.date }}</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="text-muted"><strong>Portes de Envio:</strong></span>
+                                                <span>{{ purchase.shipping_fee|floatformat:2 }}€</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="text-muted"><strong>Total:</strong></span>
+                                                <span>{{ purchase.total_amount|floatformat:2 }}€</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="text-muted"><strong>Método de Pagamento:</strong></span>
+                                                <span>{{ purchase.paymentMethod }}</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="text-muted"><strong>Endereço de Envio:</strong></span>
+                                                <span>{{ purchase.shippingAddress }}</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="text-muted"><strong>Estado:</strong></span>
+                                                <span>{{ purchase.status }}</span>
+                                            </div>
+                                            <h6 class="mb-3 text-muted"><strong>Produtos:</strong></h6>
+                                            <ul class="list-unstyled">
+                                                {% for item in purchase.purchase_products.all %}
+                                                    <li>- {{ item.product.name }} (Quantidade: {{ item.quantity }})</li>
+                                                {% endfor %}
+                                            </ul>
+                                            <div class="text-center mt-3"> 
+                                                <button class="btn btn-primary" onclick="showOrderDetails({{ purchase.id }})">Ver Detalhes</button>
+                                            </div>                                        
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-light">Você ainda não fez nenhuma encomenda.</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="orderDetailsModalLabel">Detalhes da Encomenda</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="orderDetailsContent">
+                                <p>Carregando detalhes da encomenda...</p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('editimage').addEventListener('click', function() {
+        document.getElementById('id_image').click();
+    });
+
+    document.getElementById('editButton').addEventListener('click', function() {
+        const inputs = document.querySelectorAll('input[readonly]');
+        inputs.forEach(input => {
+            input.removeAttribute('readonly');
+        });
+
+        document.getElementById('editButton').style.display = 'none';
+        document.querySelector('button[name="delete_account"]').style.display = 'none';
+        document.querySelector('button[name="Change_password"]').style.display = 'none';
+
+        document.getElementById('saveButton').style.display = 'inline-block';
+        document.getElementById('editImageLink').style.display = 'block';
+    });
+
+    document.getElementById('change_password').addEventListener('click', function() {
+        document.getElementById('passwordFields').style.display = 'block';
+
+        document.getElementById('editButton').style.display = 'none';
+        document.querySelector('button[name="delete_account"]').style.display = 'none';
+        document.getElementById('change_password').style.display = 'none';
+
+        document.getElementById('submit_password').style.display = 'inline-block';
+    });
+
+    setTimeout(function() {
+        const alertMessages = document.querySelectorAll('.alert-messages .alert');
+        alertMessages.forEach(alert => {
+            alert.classList.remove('show'); 
+            alert.classList.add('fade'); 
+        });
+    }, 5000);
+
+    function showOrderDetails(orderId) {
+        fetch(`/account/order_details/${orderId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const orderDetailsContent = document.getElementById('orderDetailsContent');
+                orderDetailsContent.innerHTML = `
+                    <p><strong>Data:</strong> ${data.date}</p>
+                    <p><strong>Total:</strong> ${data.total_amount}€</p>
+                    <p><strong>Método de Pagamento:</strong> ${data.paymentMethod}</p>
+                    <p><strong>Endereço de Envio:</strong> ${data.shippingAddress}</p>
+                    <p><strong>Status:</strong> ${data.status}</p>
+                    <h6 class="mt-4"><strong>Produtos:</strong></h6>
+                    <ul class="list-unstyled">
+                        ${data.products.map(product => `
+                            <li class="d-flex align-items-center mb-3">
+                                <img src="${product.image_url}" alt="${product.name}" class="me-3" width="60" height="60" style="object-fit: cover; border-radius: 8px;">
+                                <div>
+                                    <p class="mb-0"><strong>${product.name}</strong></p>
+                                    <p class="mb-0">Quantidade: ${product.quantity} | Preço Unitário: ${product.unit_price}€ | Preço Total: ${product.total_price}€</p>
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                const orderDetailsModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                orderDetailsModal.show();
+            })
+            .catch(error => {
+                console.error("Erro ao buscar detalhes da encomenda:", error);
+                document.getElementById('orderDetailsContent').innerHTML = '<p>Erro ao carregar os detalhes da encomenda.</p>';
+            });
+    }
+
+</script>
+
+
+{% endblock %}
