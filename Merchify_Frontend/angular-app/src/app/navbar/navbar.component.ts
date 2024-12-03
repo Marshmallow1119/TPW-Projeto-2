@@ -1,35 +1,23 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Required for *ngIf, *ngSwitch
-import { RouterModule } from '@angular/router'; // Required for [routerLink]
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
-  standalone: true,
-  imports: [CommonModule, RouterModule], // Add required modules here
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css'],
+  standalone: true, 
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive, RouterModule],  templateUrl: './navbar.component.html', 
+  styleUrls: ['./navbar.component.css'], 
 })
 export class NavbarComponent {
-  user: { isAuthenticated: boolean; username: string; userType: string; company?: { id: string } } | null = {
-    isAuthenticated: true,
-    username: 'JohnDoe',
-    userType: 'individual',
-  };
+  searchQuery: string = ''; // Propriedade para armazenar a pesquisa
 
-  constructor() {}
-
-  logout(): void {
-    this.user = null;
-    console.log('User logged out'); // Replace with real logout logic
-  }
-
-  search(query: string): void {
-    if (query.trim()) {
-      console.log('Search for:', query); // Replace with real search logic
+  onSearch(): void {
+    if (this.searchQuery.trim() === '') {
+      alert('Por favor, insira o que pretende pesquisar.');
+      return;
     }
-  }
-
-  isActive(route: string): boolean {
-    return false; // Replace with real logic if needed
+    console.log('Pesquisa realizada para:', this.searchQuery);
+    // Substituir esta lógica por navegação ou busca real
   }
 }

@@ -1,37 +1,79 @@
-<nav class="navbar">
-  <a class="navbar-brand" href="/">
-    <img src="../../assets/logo.png" alt="Logo" />
-  </a>
-
-  <ul class="navbar-nav">
-    <li class="nav-item">
-      <a href="/home" class="nav-link active">Home</a>
-    </li>
-    <li class="nav-item">
-      <a href="/produtos" class="nav-link">Produtos</a>
-    </li>
-    <li class="nav-item">
-      <a href="/artistas" class="nav-link">Artistas e Bandas</a>
-    </li>
-    <li class="nav-item">
-      <a href="/companhias" class="nav-link">Empresas</a>
-    </li>
-  </ul>
-
-  <form class="search-form" action="/search" method="GET">
-    <input
-      type="text"
-      name="q"
-      class="search-input"
-      placeholder="Pesquisar"
-    />
-    <button type="submit" class="search-button">
-      <i class="fa fa-search"></i>
-    </button>
-  </form>
-
-  <button class="login-button">
-    <img src="../../assets/user-icon.png" alt="User Icon" />
-    Login
-  </button>
-</nav>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" routerLink="/">
+        <img src="assets/logo.png" alt="Logo" width="80" />
+      </a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [routerLink]="'/'"
+              [routerLinkActive]="'active'"
+              >Home</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [routerLink]="'/produtos'"
+              [routerLinkActive]="'active'"
+              >Produtos</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [routerLink]="'/artistas'"
+              [routerLinkActive]="'active'"
+              >Artistas e Bandas</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [routerLink]="'/companhias'"
+              [routerLinkActive]="'active'"
+              >Empresas</a
+            >
+          </li>
+        </ul>
+  
+        <!-- Contêiner para a barra de pesquisa e o botão de login -->
+        <div class="search-login-container ms-auto d-flex">
+          <!-- Barra de pesquisa -->
+          <form class="d-flex align-items-center mb-2" (submit)="onSearch()">
+            <input
+              class="form-control search-input"
+              type="text"
+              placeholder="Pesquisar"
+              [(ngModel)]="searchQuery"
+              name="search"
+            />
+            <button class="btn btn-outline-dark search-button" type="submit">
+              <i class="fa fa-search"></i>
+            </button>
+          </form>
+  
+          <!-- Botão de login -->
+          <div class="login-button-container">
+            <a routerLink="/login" class="btn btn-outline-dark">
+              <i class="fas fa-user"></i> Login
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  
