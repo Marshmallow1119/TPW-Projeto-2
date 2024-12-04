@@ -10,7 +10,7 @@ import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
   styleUrls: ['./navbar.component.css'], 
 })
 export class NavbarComponent {
-  searchQuery: string = ''; // Propriedade para armazenar a pesquisa
+  searchQuery: string = '';
 
   onSearch(): void {
     if (this.searchQuery.trim() === '') {
@@ -18,6 +18,5 @@ export class NavbarComponent {
       return;
     }
     console.log('Pesquisa realizada para:', this.searchQuery);
-    // Substituir esta lógica por navegação ou busca real
   }
 }

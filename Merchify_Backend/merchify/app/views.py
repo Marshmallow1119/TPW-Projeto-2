@@ -122,13 +122,24 @@ def home(request):
 @api_view(['GET'])
 def companhias(request):
     companies = Company.objects.all()
+
     if request.user.is_authenticated:
-       favorited_company_ids = FavoriteCompany.objects.filter(user=request.user).values_list('company_id', flat=True)
+        favorited_company_ids = FavoriteCompany.objects.filter(user=request.user).values_list('company_id', flat=True)
     else:
-       favorited_company_ids = []
-    for company in companies:
-           company.is_favorited = company.id in favorited_company_ids
-    return render(request, 'companhias.html', {'companhias': companies})
+        favorited_company_ids = []
+
+    companies_data = [
+        {
+            'id': company.id,
+            'name': company.name,
+            'description': company.description,
+            'image': company.image.url if company.image else None,
+            'is_favorited': company.id in favorited_company_ids,
+        }
+        for company in companies
+    ]
+
+    return Response(companies_data)
 
 @api_view(['GET'])
 def produtos(request):
@@ -218,12 +229,18 @@ def artistas(request):
     else:
         favorited_artist_ids = []
 
-    for artist in artists:
-        artist.is_favorited = artist.id in favorited_artist_ids
+    artists_data = [
+        {
+            'id': artist.id,
+            'name': artist.name,
+            'description': artist.description,
+            'image': artist.image.url if artist.image else None,
+            'is_favorited': artist.id in favorited_artist_ids,
+        }
+        for artist in artists
+    ]
 
-
-    return render(request, 'artistas.html', {'artists': artists})
-
+    return Response(artists_data)
 
 @api_view(['GET'])
 def artistsProducts(request, name):

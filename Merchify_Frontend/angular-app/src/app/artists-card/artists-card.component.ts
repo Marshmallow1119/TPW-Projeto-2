@@ -1,11 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { Artist } from '../models/artista';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-artists-card',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './artists-card.component.html',
   styleUrl: './artists-card.component.css'
 })
 export class ArtistsCardComponent {
+  @Input() artist!: Artist;
+  @Input() isAuthenticated: boolean = false;
+  @Input() userType: string = ''
+
+  toggleFavorite(): void {
+    console.log(`Toggled favorite for artist ID: ${this.artist.id}`);
+  }
 
 }

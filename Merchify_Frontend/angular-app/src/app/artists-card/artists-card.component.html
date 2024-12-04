@@ -1,1 +1,16 @@
-<p>artists-card works!</p>
+<div class="card card-hover position-relative" style="height: 400px;">
+  <a [routerLink]="['/products', artist.name]" class="card-link" style="display: block; height: 100%;">
+    <div class="card-img-wrapper" style="height: 85%;">
+      <img [src]="artist.image" class="card-img-top" [alt]="artist.name" style="height: 100%; object-fit: cover;">
+    </div>
+    <div class="card-body text-center" style="height: 15%;">
+      <p class="card-text">{{ artist.name }}</p>
+    </div>
+  </a>
+  <i
+    *ngIf="!isAuthenticated || userType === 'individual'"
+    class="fa fa-heart favorite-icon"
+    [ngClass]="{ filled: artist.is_favorited }"
+    (click)="toggleFavorite()"
+  ></i>
+</div>

@@ -36,7 +36,7 @@
           <li class="nav-item">
             <a
               class="nav-link"
-              [routerLink]="'/artistas'"
+              [routerLink]="'/artists-page'"
               [routerLinkActive]="'active'"
               >Artistas e Bandas</a
             >
@@ -44,16 +44,14 @@
           <li class="nav-item">
             <a
               class="nav-link"
-              [routerLink]="'/companhias'"
+              [routerLink]="'/companhias-page'"
               [routerLinkActive]="'active'"
               >Empresas</a
             >
           </li>
         </ul>
   
-        <!-- Contêiner para a barra de pesquisa e o botão de login -->
         <div class="search-login-container ms-auto d-flex">
-          <!-- Barra de pesquisa -->
           <form class="d-flex align-items-center mb-2" (submit)="onSearch()">
             <input
               class="form-control search-input"
