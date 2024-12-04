@@ -1,35 +1,24 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ProductsService } from '../products.service';
+import { Component, Input } from '@angular/core';
 import { Product } from '../models/produto';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  standalone: true, // Enable standalone component
-  imports: [CommonModule, RouterModule],
   selector: 'app-product-card',
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.css'],
-  
+  imports: [CommonModule,RouterModule],
 })
-export class ProductCardComponent implements OnInit {
-  @Input() product!: Product; // Product passed to this component
-  products: Product[] = []; // Array to hold fetched products
-  @Input() user: any; // Add user input
+export class ProductCardComponent {
+  @Input() product!: Product; 
+  @Input() user: any; 
 
-  // Add the missing addToCart method
+  // Add to cart method
   addToCart(product: Product): void {
     console.log('Add to cart:', product);
   }
 
-
-  constructor(private productsService: ProductsService) {}
-
-  async ngOnInit(): Promise<void> {
-    try {
-      this.products = await this.productsService.getProducts();
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    }
+  toggleFavorite(productId: number): void {
+    console.log('Toggle favorite for product ID:', productId);
   }
 }

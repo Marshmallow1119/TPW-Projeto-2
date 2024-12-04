@@ -16,6 +16,7 @@ export interface Product {
     category: string;
     addedProduct: Date;
     count: number;
+    is_favorited?: boolean; // Add this property
   }
   
   export interface Vinil extends Product {

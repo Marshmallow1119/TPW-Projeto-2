@@ -1,44 +1,47 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Product } from './models/produto';
+import { base64toBlob } from './utils';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class ProductsService {
-  private baseUrl = 'http://localhost:8000/ws/';
+  private baseUrl: string = 'http://localhost:8000/ws/';  
+  
+  constructor(private router:Router) { }
 
-  constructor() {}
-
-  // Fetch a single product
-  async getProduct(id: number): Promise<Product> {
-    const response = await fetch(`${this.baseUrl}produtos/${id}`);
-    const product: Product = await response.json();
-    return this.processProduct(product);
-  }
-
-  // Fetch all products
-  async getProducts(): Promise<Product[]> {
-    const response = await fetch(`${this.baseUrl}produtos/`);
-    const products: Product[] = await response.json();
-    return products.map(this.processProduct);
-  }
-
-  // Process product data (e.g., convert base64 image to blob)
-  private processProduct(product: Product): Product {
-    if (product.image) {
-      const blob = this.base64toBlob(product.image, 'image/png');
-      product.image = URL.createObjectURL(blob);
-    }
+  //getProduct
+  async getProduct(id:number):Promise<Product>{
+    //path('ws/product/<int:identifier>/',  views.productDetails, name='productDetails'),
+    const url = this.baseUrl + 'produtos/' + id;
+    const data: Response =  await fetch(url);
+    const product: Product = await data.json() ?? [];
+    const blob = base64toBlob(product.image, 'image/png');
+    product.image = URL.createObjectURL(blob);
     return product;
+
   }
 
-  // Utility function to convert base64 string to Blob
-  private base64toBlob(base64: string, type: string): Blob {
-    const binary = atob(base64.split(',')[1]);
-    const array = [];
-    for (let i = 0; i < binary.length; i++) {
-      array.push(binary.charCodeAt(i));
+  //getProducts
+  async getProducts(): Promise<Product[]> {
+    try {
+      const response = await fetch(`${this.baseUrl}produtos/`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const products: Product[] = await response.json();
+      console.log('Fetched Products:', products); // Debug log
+      return products.map((product) => ({
+        ...product,
+        image: `http://localhost:8000${product.image}`, // Adjust image URL if needed
+      }));
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      return [];
     }
-    return new Blob([new Uint8Array(array)], { type });
   }
+  
+
+
 }

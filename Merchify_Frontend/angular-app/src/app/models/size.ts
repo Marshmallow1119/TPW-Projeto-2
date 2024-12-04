@@ -1,4 +1,4 @@
-import { Clothing } from './clothing';
+import { Clothing } from './produto';
 
 export interface Size {
   id?: number;           

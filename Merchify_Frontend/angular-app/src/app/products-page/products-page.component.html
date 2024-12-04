@@ -1,21 +1,19 @@
 <div class="container my-8" style="max-width: 75%;">
-    <h1 class="my-4 text-center">Produtos</h1>
-  
-    <div class="row">
-      <!-- Filters -->
-      <div class="col-md-3">
-        <app-filtro (filtersChanged)="applyFilters($event)"></app-filtro>
-      </div>
-  
-      <!-- Products -->
-      <div class="col-md-9">
-        <div class="row">
-          <app-product-card
-            *ngFor="let product of products"
-            [product]="product"
-          ></app-product-card>
+  <h1 class="my-4 text-center">Produtos</h1>
+
+  <!-- Filter Component -->
+  <div class="row">
+    <div class="col-md-3">
+      <app-filtro (filtersChanged)="applyFilters($event)"></app-filtro>
+    </div>
+
+    <!-- Products List -->
+    <div class="col-md-9">
+      <div class="row">
+        <div class="col-12 col-md-6 col-lg-4 mb-4" *ngFor="let product of filteredProducts">
+          <app-product-card [product]="product" [user]="user"></app-product-card>
         </div>
       </div>
     </div>
   </div>
-  
+</div>
