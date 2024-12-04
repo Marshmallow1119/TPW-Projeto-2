@@ -1,11 +1,64 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterLink, RouterModule } from '@angular/router';
+import { ProductsListComponent } from '../products-list/products-list.component';
+import { ProductsService } from '../products.service';
+import { Product } from '../models/produto';
+import { HomeService } from '../home.service';
 
 @Component({
   selector: 'app-home',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink, RouterModule,ProductsListComponent],  
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent {
+  showPromotion: boolean = true;
+  homeService: HomeService = inject(HomeService);
+  recentProducts: Product[] = [];
+  artists: any[] = [];
+
+
+  // Simulated user object
+  user = {
+    isAuthenticated: false, // Set to true if the user is logged in
+  };
+
+  slides = [
+    {
+      name: 'Olivia Rodrigo',
+      image: 'assets/carrousel_images/gutsTour.jpeg',
+      alt: 'Imagem 1'
+    },
+    {
+      name: 'The Beatles',
+      image: 'assets/carrousel_images/beatles.png',
+      alt: 'Imagem 2'
+    },
+    {
+      name: 'Taylor Swift',
+      image: 'assets/carrousel_images/taylor2.jpg',
+      alt: 'Imagem 3'
+    }
+  ];
+
+  constructor() {
+    this.loadHomeData();
+  }
+
+  async loadHomeData() {
+    try {
+      const data = await this.homeService.getHomeData();
+      this.artists = data.artists;
+      this.recentProducts = data.recent_products;
+      console.log('Artistas carregados:', this.artists);
+      console.log('Produtos recentes carregados:', this.recentProducts);
+    } catch (error) {
+      console.error('Erro ao carregar dados da home:', error);
+    }
+  }
 
 }
+

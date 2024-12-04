@@ -2,7 +2,6 @@ footer {
   position: fixed;
   bottom: 0;
   width: 100%;
-  z-index: 1000;
   background-color: #343a40; 
   color: #f8f9fa; 
   padding: 1rem 0; 
@@ -23,3 +22,5 @@ footer a {
 footer a:hover {
   color: #ffc107;
 }
+
+

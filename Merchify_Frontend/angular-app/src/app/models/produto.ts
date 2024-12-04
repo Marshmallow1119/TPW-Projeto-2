@@ -6,15 +6,15 @@ import { Size } from "./size";
 
 
 export interface Product {
-    id?: number;
+    id: number;
     name: string;
     description: string;
     price: number;
-    image?: string; // URL to the product image
+    image: string; // URL to the product image
     artist?: Artist;
-    company?: Company;
+    company: Company;
     category: string;
-    addedProduct?: Date;
+    addedProduct: Date;
     count: number;
   }
   

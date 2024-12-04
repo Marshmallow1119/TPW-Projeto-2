@@ -68,26 +68,26 @@
   
   @media (max-width: 992px) {
     .search-login-container {
-        flex-direction: column; /* Coloca os itens em coluna */
-        align-items: flex-start; /* Alinha os itens ao lado esquerdo */
-        gap: 0rem; /* Espaçamento entre os itens */
+        flex-direction: column; 
+        align-items: flex-start;
+        gap: 0rem; 
       }
 
     .login-button-container {
-        text-align: right; /* Garante que o botão fique alinhado à direita */
-        width: auto; /* Impede que o botão ocupe 100% da largura */
+        text-align: right; 
+        width: auto; 
       }
   
       .search-input {
-        width: 250px; /* Define uma largura fixa */
-        max-width: 100%; /* Garante que não exceda o espaço disponível */
-      }
+        width: 250px; 
+        max-width: 100%; 
   
     .search-button {
-      width: 45px; /* Define uma largura fixa para o botão */
+      width: 45px; 
     }
     .login-button-container {
-        width: auto; /* Evita que o botão ocupe 100% */
-        text-align: right; /* Alinha o botão de login à direita */
+        width: auto; 
+        text-align: right; 
       }
+    }
     }
