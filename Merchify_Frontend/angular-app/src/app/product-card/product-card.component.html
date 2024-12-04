@@ -1,0 +1,44 @@
+<div class="col-md-9">
+    <div class="row">
+      <div *ngFor="let product of products" class="col-12 col-md-6 col-lg-4 mb-4">
+        <div class="position-relative">
+          <!-- Artist Identifier -->
+          <div class="artist-identifier">
+            <a [routerLink]="['/artistsProducts', product.artist?.name]">
+              <img [src]="product.artist?.image" [alt]="product.artist?.name" />
+            </a>
+          </div>
+  
+          <!-- Favorite Icon -->
+          <!-- <i
+          <!--   *ngIf="!user?.is_authenticated || user?.user_type === 'individual'"-->
+          <!--   class="fa fa-heart favorite-icon"-->
+          <!--   [class.filled]="product.is_favorited"-->
+          <!--   (click)="handleFavoriteClick(product.id)"-->
+          <!-- ></i>-->
+  
+          <!-- Product Card -->
+
+          <a [routerLink]="['/product', product.id]" class="product-card d-block">
+            <img [src]="product.image" [alt]="product.name" />
+            <div class="p-3 text-center">
+              <div class="d-flex align-items-center justify-content-center mb-2">
+                <p class="product-name mb-0">{{ product.name }}</p>
+              </div>
+              <p class="product-price">{{ product.price }}€</p>
+  
+              <!-- Add to Cart Button -->
+              <button
+                *ngIf="!user?.is_authenticated || user?.user_type === 'individual'"
+                class="btn btn-add-to-cart w-100"
+                (click)="addToCart(product)"
+              >
+                Adicionar ao carrinho
+              </button>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  

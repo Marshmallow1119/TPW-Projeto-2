@@ -37,6 +37,14 @@
     </button>
   </div>
 
+  <!-- Artists List -->
+  <app-artists-list
+    title="Artistas"
+    [artists]="artists"
+    [showButton]="true"
+    buttonLabel="Ver todos os artistas"
+    buttonLink="/artists"
+  ></app-artists-list>
   <!-- Products List -->
   <app-products-list
     title="Produtos recentemente adicionados"
@@ -45,4 +53,5 @@
     buttonLabel="Ver todos os produtos"
     buttonLink="/products"
   ></app-products-list>
+
 </div>

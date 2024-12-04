@@ -6,11 +6,12 @@ import { ProductsListComponent } from '../products-list/products-list.component'
 import { ProductsService } from '../products.service';
 import { Product } from '../models/produto';
 import { HomeService } from '../home.service';
+import { ArtistsListComponent } from '../artists-list/artists-list.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, RouterModule,ProductsListComponent],  
+  imports: [CommonModule, FormsModule, RouterLink, RouterModule,ProductsListComponent,ArtistsListComponent],  
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })

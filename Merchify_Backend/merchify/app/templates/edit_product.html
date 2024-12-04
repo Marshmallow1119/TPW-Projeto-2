@@ -1,0 +1,167 @@
+{% extends "layout.html" %}
+{% load filters %}
+{% block content %}
+<div class="container mt-5" style="margin-bottom: 60px">
+    <h2 class="text-center mb-4">Editar Produto: {{ product.name }}</h2>
+    <div class="card shadow-sm p-4">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="product_type" class="form-label">Tipo de Produto</label>
+                    <select name="product_type" class="form-select" id="product_type">
+                        <option value="vinil" {% if initial_product_type == "vinil" %}selected{% endif %}>Vinil</option>
+                        <option value="cd" {% if initial_product_type == "cd" %}selected{% endif %}>CD</option>
+                        <option value="clothing" {% if initial_product_type == "clothing" %}selected{% endif %}>Roupa</option>
+                        <option value="accessory" {% if initial_product_type == "accessory" %}selected{% endif %}>Outros</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="artist" class="form-label">Artista</label>
+                    {{ product_form.artist|add_class:"form-select" }}
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="name" class="form-label">Nome do Produto</label>
+                {{ product_form.name|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Descrição</label>
+                {{ product_form.description|add_class:"form-control" }}
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="price" class="form-label">Preço (€)</label>
+                    {{ product_form.price|add_class:"form-control" }}
+                </div>
+                <div class="col-md-6">
+                    <label for="image" class="form-label">Imagem do Produto</label>
+                    {{ product_form.image|add_class:"form-control" }}
+                </div>
+            </div>
+
+            <div id="vinil-fields" class="card p-4 mb-4 shadow-sm" style="display: none;">
+                <h5>Detalhes do Vinil</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="genre" class="form-label">Gênero</label>
+                        {{ vinil_form.genre|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="lpSize" class="form-label">Tamanho do LP</label>
+                        {{ vinil_form.lpSize|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="releaseDate" class="form-label">Data de Lançamento</label>
+                        {{ vinil_form.releaseDate|add_class:"form-control" }}
+                    </div>
+                    <input type="hidden" name="stock" value="0">
+                </div>
+            </div>
+
+            <div id="cd-fields" class="card p-4 mb-4 shadow-sm" style="display: none;">
+                <h5>Detalhes do CD</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="genre" class="form-label">Gênero</label>
+                        {{ cd_form.genre|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="releaseDate" class="form-label">Data de Lançamento</label>
+                        {{ cd_form.releaseDate|add_class:"form-control" }}
+                    </div>
+                    <input type="hidden" name="stock" value="0">
+                </div>
+            </div>
+
+            <div id="clothing-fields" class="card p-4 mb-4 shadow-sm" style="display: none;">
+                <h5>Detalhes da Roupa</h5>
+                <div class="mb-3">
+                    <label for="color" class="form-label">Cor</label>
+                    {{ clothing_form.color|add_class:"form-control" }}
+                </div>
+            </div>
+
+            <div id="accessory-fields" class="card p-4 mb-4 shadow-sm" style="display: none;">
+                <h5>Detalhes de 'Outros'</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="material" class="form-label">Material</label>
+                        {{ accessory_form.material|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="color" class="form-label">Cor</label>
+                        {{ accessory_form.color|add_class:"form-control" }}
+                    </div>
+                    <input type="hidden" name="stock" value="0"> 
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center mt-4">
+                <button type="submit" class="btn btn-success me-2">Salvar Alterações</button>
+                {%  if user.user_type == 'company' %}
+                    <a href="{% url 'company_products' company_id=product.company.id %}" class="btn btn-secondary">Cancelar</a>
+                {% else %}
+                    <a href="{% url 'admin_home' %}" class="btn btn-secondary">Cancelar</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const productTypeField = document.querySelector('[name="product_type"]');
+        const initialProductType = "{{ initial_product_type|escapejs }}";  
+    
+        const vinilFields = document.getElementById('vinil-fields');
+        const cdFields = document.getElementById('cd-fields');
+        const clothingFields = document.getElementById('clothing-fields');
+        const accessoryFields = document.getElementById('accessory-fields');
+    
+        function hideAllDetailSections() {
+            [vinilFields, cdFields, clothingFields, accessoryFields].forEach(section => {
+                if (section) {
+                    section.style.display = 'none';
+                    section.querySelectorAll('input, select, textarea').forEach(field => {
+                        field.disabled = true;  
+                    });
+                }
+            });
+        }
+    
+        function showDetailSection(section) {
+            if (section) {
+                section.style.display = 'block';
+                section.querySelectorAll('input, select, textarea').forEach(field => {
+                    field.disabled = false;
+                });
+            }
+        }
+    
+        function updateFieldVisibility(productType) {
+            hideAllDetailSections();
+    
+            if (productType === 'vinil') {
+                showDetailSection(vinilFields);
+            } else if (productType === 'cd') {
+                showDetailSection(cdFields);
+            } else if (productType === 'clothing') {
+                showDetailSection(clothingFields);
+            } else if (productType === 'accessory') {
+                showDetailSection(accessoryFields);
+            }
+        }
+    
+        updateFieldVisibility(initialProductType);
+    
+        productTypeField.addEventListener('change', function() {
+            const selectedProductType = productTypeField.value;
+            updateFieldVisibility(selectedProductType);
+        });
+    });
+    </script>
+    
+    
+{% endblock %}
