@@ -132,8 +132,9 @@ def companhias(request):
         {
             'id': company.id,
             'name': company.name,
-            'description': company.description,
-            'image': company.image.url if company.image else None,
+            'productCount': company.getNumberOfProducts(),
+            'averageRating': company.get_average_rating(),
+            'image': company.logo.url if company.logo else None,
             'is_favorited': company.id in favorited_company_ids,
         }
         for company in companies
