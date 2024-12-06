@@ -15,8 +15,8 @@ import { RouterModule } from '@angular/router';
 })
 export class ArtistsPageComponent implements OnInit {
   artists: Artist[] = [];
-  isAuthenticated: boolean = false; // Mock; replace with actual auth logic
-  userType: string = 'individual'; // Mock; replace with actual user type logic
+  isAuthenticated: boolean = false;
+  userType: string = 'individual'; 
 
   constructor(private artistsService: ArtistsService) {}
 

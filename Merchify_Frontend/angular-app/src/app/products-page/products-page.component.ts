@@ -15,15 +15,14 @@ import { CommonModule } from '@angular/common';
 export class ProductsPageComponent implements OnInit {
   products: Product[] = [];
   filteredProducts: Product[] = [];
-  filters: any = {}; // Filters object captured from FilterComponent
+  filters: any = {}; 
   private productService: ProductsService = inject(ProductsService);
-  user: any = { is_authenticated: true, user_type: 'individual' }; // Example user object
+  user: any = { is_authenticated: true, user_type: 'individual' }; 
   
   async ngOnInit(): Promise<void> {
     await this.loadProductsData();
   }
 
-  // Load all products
   private async loadProductsData(): Promise<void> {
     try {
       this.products = await this.productService.getProducts();
@@ -34,11 +33,9 @@ export class ProductsPageComponent implements OnInit {
     }
   }
 
-  // Apply filters to products
   applyFilters(filters: any): void {
     this.filters = filters;
 
-    // Example filter logic (adapt as needed)
     this.filteredProducts = this.products.filter((product) => {
       const matchesType = !filters.type || product.category === filters.type;
       const matchesPrice =

@@ -5,18 +5,18 @@ import { Size } from './size';
 export interface Product {
   id: number;
   name: string;
-  description?: string; // Optional, as per the model
+  description?: string;
   price: number;
-  image?: string; // URL to the product image, optional
+  image?: string; 
   artist?: Artist;
   company: Company;
   category: string;
   addedProduct: Date;
   count: number;
-  is_favorited?: boolean; // Optional
-  average_rating?: string | number; // Add to match `get_average_rating()`
-  product_type?: string; // Add to match `get_product_type()`
-  stock?: number; // Add to match `get_stock()`
+  is_favorited?: boolean; 
+  average_rating?: string | number; 
+  product_type?: string; 
+  stock?: number; 
 }
 
 export interface Vinil extends Product {

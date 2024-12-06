@@ -22,9 +22,8 @@ export class HomeComponent {
   artists: any[] = [];
 
 
-  // Simulated user object
   user = {
-    isAuthenticated: false, // Set to true if the user is logged in
+    isAuthenticated: false,
   };
 
   slides = [

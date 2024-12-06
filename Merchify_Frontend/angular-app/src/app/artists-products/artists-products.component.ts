@@ -13,14 +13,14 @@ import { ProdutosArtistaService } from '../produtos-artista.service';
   styleUrls: ['./artists-products.component.css'],
 })
 export class ArtistsProductsComponent implements OnInit {
-  artist: any = null; // Armazena os dados do artista
-  products: any[] = []; // Todos os produtos do artista
-  filteredProducts: any[] = []; // Produtos após aplicação de filtros
-  isAuthenticated: boolean = false; // Estado de autenticação do usuário
-  user: any = { user_type: '' }; // Dados do usuário autenticado
+  artist: any = null; 
+  products: any[] = []; 
+  filteredProducts: any[] = []; 
+  isAuthenticated: boolean = false; 
+  user: any = { user_type: '' };
 
-  genres: string[] = []; // Gêneros disponíveis
-  colors: string[] = []; // Cores disponíveis
+  genres: string[] = [];
+  colors: string[] = []; 
 
   constructor(
     private route: ActivatedRoute,
@@ -39,7 +39,7 @@ export class ArtistsProductsComponent implements OnInit {
       if (data) {
         this.artist = data.artist;
         this.products = data.products;
-        this.filteredProducts = [...this.products]; // Inicialmente, sem filtros
+        this.filteredProducts = [...this.products]; 
         this.genres = data.genres || [];
         this.colors = data.colors || [];
       } else {
@@ -56,7 +56,7 @@ export class ArtistsProductsComponent implements OnInit {
     } else if (order === 'priceDesc') {
       this.filteredProducts.sort((a, b) => b.price - a.price);
     } else if (order === 'featured') {
-      this.filteredProducts.sort((a, b) => b.featured - a.featured); // Exemplo para ordenação por destaque
+      this.filteredProducts.sort((a, b) => b.featured - a.featured); 
     }
   }
 
@@ -69,7 +69,7 @@ export class ArtistsProductsComponent implements OnInit {
   }
 
   onFiltersApplied(filters: any): void {
-    console.log('Filtros aplicados:', filters); // Debugging
+    console.log('Filtros aplicados:', filters); 
     this.filteredProducts = this.products.filter((product) => {
       if (filters.genreVinyl && product.genre !== filters.genreVinyl) return false;
       if (filters.colorClothing && product.color !== filters.colorClothing) return false;

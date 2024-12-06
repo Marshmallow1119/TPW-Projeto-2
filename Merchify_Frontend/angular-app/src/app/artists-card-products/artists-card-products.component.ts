@@ -10,10 +10,10 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./artists-card-products.component.css'],
 })
 export class ArtistsCardProductsComponent {
-  @Input() products: any[] = []; // Lista de produtos
-  @Input() isAuthenticated: boolean = false; // Indica se o usuário está autenticado
-  @Input() user: any = null; // Dados do usuário
-  @Output() favoriteToggled = new EventEmitter<number>(); // Evento para favoritar produtos
+  @Input() products: any[] = []; 
+  @Input() isAuthenticated: boolean = false;
+  @Input() user: any = null; 
+  @Output() favoriteToggled = new EventEmitter<number>(); 
 
   toggleFavorite(productId: number): void {
     this.favoriteToggled.emit(productId);

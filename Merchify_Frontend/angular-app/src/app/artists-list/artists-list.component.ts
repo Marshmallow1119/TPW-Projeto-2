@@ -11,9 +11,9 @@ import { Artist } from '../models/artista';
   styleUrl: './artists-list.component.css'
 })
 export class ArtistsListComponent {
-  @Input() title: string = ''; // Title for the list
-  @Input() artists: Artist[] = []; // List of artists
-  @Input() showButton: boolean = false; // Flag to show the button
-  @Input() buttonLabel: string = 'View All Artists'; // Button text
-  @Input() buttonLink: string = '/artists'; // Link for the button
+  @Input() title: string = ''; 
+  @Input() artists: Artist[] = [];
+  @Input() showButton: boolean = false; 
+  @Input() buttonLabel: string = 'View All Artists';
+  @Input() buttonLink: string = '/artists'; 
 }

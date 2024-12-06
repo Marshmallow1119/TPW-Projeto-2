@@ -11,10 +11,9 @@ import { FormsModule } from '@angular/forms';
 })
 export class FiltroComponent {
   @Output() filtersChanged = new EventEmitter<any>();
-  @Input() genres: string[] = []; // Adicionado como Input
-  @Input() colors: string[] = []; // Adicionado como Input
+  @Input() genres: string[] = [];
+  @Input() colors: string[] = [];
 
-  // Propriedade adicionada para corrigir o erro
   sizes: string[] = ['S', 'M', 'L'];
 
   productTypes = [
@@ -35,17 +34,14 @@ export class FiltroComponent {
     max_price: null,
   };
 
-  // Método para exibir filtros com base no tipo de produto selecionado
   showFilters(type: string): void {
     this.selectedType = type;
   }
 
-  // Método para aplicar filtros
   applyFilters(): void {
     this.filtersChanged.emit(this.filters);
   }
 
-  // Método para redefinir filtros
   resetFilters(): void {
     this.filters = {
       genreVinyl: '',

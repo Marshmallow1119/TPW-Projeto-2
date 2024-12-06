@@ -14,8 +14,8 @@ import { CompanhiasCardComponent } from '../companhias-card/companhias-card.comp
 })
 export class CompaniesPageComponent implements OnInit {
   companies: Company[] = [];
-  isAuthenticated: boolean = false; // Replace with actual authentication logic
-  userType: string = 'individual'; // Replace with actual user type logic
+  isAuthenticated: boolean = false; 
+  userType: string = 'individual'; 
 
   constructor(private companiesService: CompaniesService) {}
 

@@ -4,9 +4,8 @@ export interface Company {
     address?: string;
     email: string;
     phone: string;
-    image?: string; // URL to the image
-    productCount: number; // Total products associated with the company
-    averageRating: number; // Average rating of the company
-    isFavorited: boolean; // Ensure this is included
+    image?: string;
+    productCount: number;  
+    averageRating: number;
+    isFavorited: boolean; 
   }
-  
