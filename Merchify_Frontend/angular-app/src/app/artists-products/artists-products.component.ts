@@ -51,12 +51,13 @@ export class ArtistsProductsComponent implements OnInit {
   }
 
   sortProducts(order: string): void {
+    console.log('Sorting by:', order); // Debug log
     if (order === 'priceAsc') {
       this.filteredProducts.sort((a, b) => a.price - b.price);
     } else if (order === 'priceDesc') {
       this.filteredProducts.sort((a, b) => b.price - a.price);
     } else if (order === 'featured') {
-      this.filteredProducts.sort((a, b) => b.featured - a.featured); 
+      this.filteredProducts = [...this.products];
     }
   }
 
