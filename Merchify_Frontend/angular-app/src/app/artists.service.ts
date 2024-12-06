@@ -11,23 +11,6 @@ export class ArtistsService {
   private baseUrl: string = 'http://localhost:8000/ws/';  
   
   constructor(private router:Router) { }
-  //    path('ws/products/<str:name>/', views.artistsProducts, name='artistsProducts'),
-  async getArtistaProdutos(name: string): Promise<any[]> {
-    const url = `${this.baseUrl}products/${name}`;
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const products: any[] = await response.json();
-      return products;
-    } catch (error) {
-      console.error('Erro ao buscar produtos:', error);
-      return [];
-    }
-  }
-  
-
   //    path('ws/artists/', views.artistas, name='artistas'),
   async getArtistas(): Promise<Artist[]> {
     try {

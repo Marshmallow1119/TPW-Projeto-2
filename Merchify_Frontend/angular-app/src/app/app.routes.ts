@@ -12,6 +12,6 @@ export const routes: Routes = [
   { path: 'artists-page', component: ArtistsPageComponent },
   { path: 'companhias-page', component: CompaniesPageComponent },
   { path: 'product/:identifier', component: ProductDetailsComponent },
-  { path: 'products/:name', component:  ArtistsProductsComponent},
+  { path: 'products/:artistName', component:  ArtistsProductsComponent},
 
 ];

@@ -243,89 +243,144 @@ def artistas(request):
 
     return Response(artists_data)
 
+#@api_view(['GET'])
+#def artistsProducts(request, name):
+#    artist = get_object_or_404(Artist, name=name)
+#
+#    products = Product.objects.filter(artist=artist)
+#    print(products)
+#    
+#    sort = request.GET.get('sort', 'featured')
+#    if sort == 'priceAsc':
+#        products = products.order_by('price')
+#    elif sort == 'priceDesc':
+#        products = products.order_by('-price')
+#
+#    if request.user.is_authenticated:
+#        favorited_product_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
+#    else:
+#        favorited_product_ids = []
+#
+#    for product in products:
+#        product.is_favorited = product.id in favorited_product_ids
+#
+#
+#    background_url = artist.background_image.url
+#
+#    product_type = request.GET.get('type')
+#    if product_type:
+#        if product_type == 'Vinil':
+#            products = products.filter(vinil__isnull=False)
+#            genre = request.GET.get('genreVinyl')
+#            if genre:
+#                products = products.filter(vinil__genre=genre)
+#            logger.debug(f"Filtered by 'Vinil' type and genre {genre}, products count: {products.count()}")
+#
+#        elif product_type == 'CD':
+#            products = products.filter(cd__isnull=False)
+#            genre = request.GET.get('genreCD')
+#            if genre:
+#                products = products.filter(cd__genre=genre)
+#            logger.debug(f"Filtered by 'CD' type and genre {genre}, products count: {products.count()}")
+#
+#        elif product_type == 'Clothing':
+#            products = products.filter(clothing__isnull=False)
+#            color = request.GET.get('colorClothing')
+#            if color:
+#                products = products.filter(clothing__color=color)
+#            logger.debug(f"Filtered by 'Clothing' type and color {color}, products count: {products.count()}")
+#
+#        elif product_type == 'Accessory':
+#            products = products.filter(accessory__isnull=False)
+#            color = request.GET.get('colorAccessory')
+#            if color:
+#                products = products.filter(accessory__color=color)
+#            size = request.GET.get('size')
+#            if size:
+#                products = products.filter(accessory__size=size)
+#            logger.debug(f"Filtered by 'Accessory' type, color {color}, and size {size}, products count: {products.count()}")
+#
+#    min_price = request.GET.get('min_price')
+#    max_price = request.GET.get('max_price')
+#    if min_price:
+#        try:
+#            products = products.filter(price__gte=float(min_price))
+#            logger.debug(f"Applied min price filter {min_price}, products count: {products.count()}")
+#        except ValueError:
+#            logger.debug("Invalid minimum price provided.")
+#    if max_price:
+#        try:
+#            products = products.filter(price__lte=float(max_price))
+#            logger.debug(f"Applied max price filter {max_price}, products count: {products.count()}")
+#        except ValueError:
+#            logger.debug("Invalid maximum price provided.")
+#
+#    genres = Vinil.objects.values_list('genre', flat=True).distinct()
+#    colors = Clothing.objects.values_list('color', flat=True).distinct()
+#
+#    context = {
+#        'artist': artist,
+#        'products': products,
+#        'background_url': background_url,
+#        'genres': genres,
+#        'colors': colors
+#    }
+#    return render(request, 'artists_products.html', context)
+
 @api_view(['GET'])
 def artistsProducts(request, name):
-    artist = get_object_or_404(Artist, name=name)
+    print(f"Recebido nome do artista: {name}")
+    try:
+        artist = get_object_or_404(Artist, name=name)
+        print(f"Artista encontrado: {artist.name}")
+    except Exception as e:
+        print(f"Erro ao encontrar artista: {e}")
+        return JsonResponse({'error': 'Artista não encontrado'}, status=404)
 
-    products = Product.objects.filter(artist=artist)
-    print(products)
-    
-    sort = request.GET.get('sort', 'featured')
-    if sort == 'priceAsc':
-        products = products.order_by('price')
-    elif sort == 'priceDesc':
-        products = products.order_by('-price')
+    try:
+        products = Product.objects.filter(artist=artist)
+        print(f"Produtos encontrados: {products.count()}")
 
-    if request.user.is_authenticated:
-        favorited_product_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
-    else:
-        favorited_product_ids = []
+        # Determinar os produtos favoritos com base no usuário
+        if request.user.is_authenticated:
+            favorited_product_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
+        else:
+            favorited_product_ids = []  # Nenhum favorito para usuários não autenticados
 
-    for product in products:
-        product.is_favorited = product.id in favorited_product_ids
+        # Processar os produtos
+        products_data = []
+        for product in products:
+            print(f"Processando produto: {product.name}, ID: {product.id}")
+            products_data.append({
+                'id': product.id,
+                'name': product.name,
+                'price': product.price,
+                'description': product.description,
+                'is_favorited': product.id in favorited_product_ids,
+                'image_url': product.image.url if product.image else None,
+                'type': product.get_product_type(),
+            })
 
+        # Dados adicionais
+        genres = list(Vinil.objects.values_list('genre', flat=True).distinct())
+        colors = list(Clothing.objects.values_list('color', flat=True).distinct())
 
-    background_url = artist.background_image.url
+        response_data = {
+            'artist': {
+                'id': artist.id,
+                'name': artist.name,
+                'image_url': artist.image.url if artist.image else None,
+                'background_url': artist.background_image.url if artist.background_image else None,
+            },
+            'products': products_data,
+            'genres': genres,
+            'colors': colors,
+        }
+        return JsonResponse(response_data)
+    except Exception as e:
+        print(f"Erro ao processar a resposta: {e}")
+        return JsonResponse({'error': 'Erro interno do servidor'}, status=500)
 
-    product_type = request.GET.get('type')
-    if product_type:
-        if product_type == 'Vinil':
-            products = products.filter(vinil__isnull=False)
-            genre = request.GET.get('genreVinyl')
-            if genre:
-                products = products.filter(vinil__genre=genre)
-            logger.debug(f"Filtered by 'Vinil' type and genre {genre}, products count: {products.count()}")
-
-        elif product_type == 'CD':
-            products = products.filter(cd__isnull=False)
-            genre = request.GET.get('genreCD')
-            if genre:
-                products = products.filter(cd__genre=genre)
-            logger.debug(f"Filtered by 'CD' type and genre {genre}, products count: {products.count()}")
-
-        elif product_type == 'Clothing':
-            products = products.filter(clothing__isnull=False)
-            color = request.GET.get('colorClothing')
-            if color:
-                products = products.filter(clothing__color=color)
-            logger.debug(f"Filtered by 'Clothing' type and color {color}, products count: {products.count()}")
-
-        elif product_type == 'Accessory':
-            products = products.filter(accessory__isnull=False)
-            color = request.GET.get('colorAccessory')
-            if color:
-                products = products.filter(accessory__color=color)
-            size = request.GET.get('size')
-            if size:
-                products = products.filter(accessory__size=size)
-            logger.debug(f"Filtered by 'Accessory' type, color {color}, and size {size}, products count: {products.count()}")
-
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
-    if min_price:
-        try:
-            products = products.filter(price__gte=float(min_price))
-            logger.debug(f"Applied min price filter {min_price}, products count: {products.count()}")
-        except ValueError:
-            logger.debug("Invalid minimum price provided.")
-    if max_price:
-        try:
-            products = products.filter(price__lte=float(max_price))
-            logger.debug(f"Applied max price filter {max_price}, products count: {products.count()}")
-        except ValueError:
-            logger.debug("Invalid maximum price provided.")
-
-    genres = Vinil.objects.values_list('genre', flat=True).distinct()
-    colors = Clothing.objects.values_list('color', flat=True).distinct()
-
-    context = {
-        'artist': artist,
-        'products': products,
-        'background_url': background_url,
-        'genres': genres,
-        'colors': colors
-    }
-    return render(request, 'artists_products.html', context)
 
 #@api_view(['GET'])
 #def productDetails(request, identifier):
