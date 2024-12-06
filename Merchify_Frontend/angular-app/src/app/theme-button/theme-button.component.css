@@ -1,0 +1,27 @@
+.theme-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .theme-toggle-btn:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  .sun-icon,
+  .moon-icon {
+    transition: transform 0.3s ease;
+  }
+  
+  .theme-toggle-btn:hover .sun-icon,
+  .theme-toggle-btn:hover .moon-icon {
+    transform: rotate(15deg);
+  }
+  .sun-icon {
+    color: #e6bf23;
+  }
+  

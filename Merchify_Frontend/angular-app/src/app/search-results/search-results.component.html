@@ -1,0 +1,48 @@
+<div class="search-results-container">
+    <h2 *ngIf="searchQuery">Results for "{{ searchQuery }}"</h2>
+  
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading">Loading...</div>
+
+    <div *ngIf="!isLoading && artists.length === 0 && products.length === 0">
+      <p>No results found for "{{ searchQuery }}".</p>
+    </div>
+    
+    <div *ngIf="!isLoading">
+      <div *ngIf="artists.length > 0">
+        <div class="container my-5">
+        <h1 class="text-center">Artistas e Bandas</h1>
+        <div class="row">
+        <div class="col-12 col-md-6 col-lg-4 mb-4" *ngFor="let artist of artists">
+        <app-artists-card
+          [artist]="artist"
+          [isAuthenticated]="true" 
+          [userType]="'viewer'"
+          class="artist-card">
+        </app-artists-card>
+        </div>
+        </div>
+      </div>
+      <div *ngIf="artists.length === 0">
+        <p>No artists found.</p>
+      </div>
+    
+      <div *ngIf="products.length > 0">
+        <div class="container my-5">
+          <h1 class="text-center">Produtos</h1>
+          <div class="row">
+          <div class="col-12 col-md-6 col-lg-4 mb-4" *ngFor="let product of products">
+          <app-product-card
+            [product]="product">
+          </app-product-card>
+          </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="products.length === 0">
+        <p>No products found.</p>
+      </div>
+    </div>
+    
+  </div>
+  

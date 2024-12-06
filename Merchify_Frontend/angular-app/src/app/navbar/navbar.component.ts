@@ -1,22 +1,35 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { ThemeService } from '../theme.service';
+import { ThemeButtonComponent } from '../theme-button/theme-button.component';
 
 @Component({
   selector: 'app-navbar',
   standalone: true, 
-  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive, RouterModule],  templateUrl: './navbar.component.html', 
-  styleUrls: ['./navbar.component.css'], 
+  templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.css'],
+  imports: [FormsModule, RouterModule, ThemeButtonComponent],
 })
 export class NavbarComponent {
   searchQuery: string = '';
 
-  onSearch(): void {
-    if (this.searchQuery.trim() === '') {
-      alert('Por favor, insira o que pretende pesquisar.');
-      return;
+  constructor(private router: Router, public themeService: ThemeService) {} 
+
+  onKeyUp(): void {
+    if (this.searchQuery.trim().length > 0) {
+      this.router.navigate(['/search-results'], {
+        queryParams: { query: this.searchQuery },
+      });
     }
-    console.log('Pesquisa realizada para:', this.searchQuery);
   }
+
+  onSearch(): void {
+    if (this.searchQuery.trim().length > 0) {
+      this.router.navigate(['/search-results'], {
+        queryParams: { query: this.searchQuery },
+      });
+    }
+  }
+
 }

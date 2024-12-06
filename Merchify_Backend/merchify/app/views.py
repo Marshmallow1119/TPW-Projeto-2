@@ -361,7 +361,7 @@ def search(request):
 
     if query:
         products = Product.objects.filter(Q(name__icontains=query) | Q(artist__name__icontains=query)).exclude(name__isnull=True).exclude(name='')
-        artists = Artist.objects.filter(name__icontains=query.strip()).exclude(name__isnull=True).exclude(name='')
+        artists = Artist.objects.filter(name__icontains=query).exclude(name__isnull=True).exclude(name='')
     else:
         products = Product.objects.none()
         artists = Artist.objects.none()
@@ -369,25 +369,35 @@ def search(request):
     if request.user.is_authenticated:
         favorited_artist_ids = FavoriteArtist.objects.filter(user=request.user).values_list('artist_id', flat=True)
         favorited_product_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
-
     else:
         favorited_artist_ids = []
         favorited_product_ids = []
 
+    artist_results = [
+        {
+            'id': artist.id,
+            'name': artist.name,
+            'is_favorited': artist.id in favorited_artist_ids,
+            'image': artist.image.url if artist.image else None
+        }
+        for artist in artists
+    ]
 
-    for artist in artists:
-        artist.is_favorited = artist.id in favorited_artist_ids
-
-    for product in products:
-        product.is_favorited = product.id in favorited_product_ids
-
-
-    return render(request, 'search_results.html', {
-        'products': products,  
-        'artists': artists,
+    product_results = [
+        {
+            'id': product.id,
+            'name': product.name,
+            'artist_name': product.artist.name if product.artist else None,
+            'is_favorited': product.id in favorited_product_ids,
+            'image': product.image.url if product.image else None
+        }
+        for product in products
+    ]
+    return Response({
+        'products': product_results,
+        'artists': artist_results,
         'query': query,
     })
-
 
 @api_view(['POST'])
 def register_view(request):

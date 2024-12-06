@@ -1,1 +1,73 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+    --background-color: #ffffff;
+    --text-color: #000000;
+  }
+  
+  .dark-theme {
+    --background-color: #121212;
+    --text-color: #ffffff;
+  }
+  
+  body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .dark-theme .navbar {
+    background-color: #343a40 !important; /* Dark background */
+  }
+
+  .dark-theme .nav-link {
+    color: #ffffff !important;
+  }
+.sidebar-filter {
+    background-color: #f8f9fa; /* Light background */
+    color: #212529; /* Dark text */
+  }
+  
+  /* Dark mode styles */
+  .dark-theme .sidebar-filter {
+    background-color: #343a40 !important; /* Dark background */
+    color: #f8f9fa; /* Light text */
+  }
+  
+  .dark-theme .form-control {
+    background-color: #495057; /* Dark input background */
+    color: #f8f9fa !important; /* Light text */
+    border: 1px solid #343a40; /* Darker border */
+  }
+  
+  .dark-theme .form-control::placeholder {
+    color: #adb5bd; /* Light gray placeholder */
+  }
+  
+  .dark-theme .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: #f8f9fa;
+  }
+  
+  .dark-theme .btn-success {
+    background-color: #198754;
+    border-color: #198754;
+    color: #f8f9fa;
+  }
+  
+  .dark-theme p {
+    color: #f8f9fa !important;
+  }
+
+  .dark-theme .logo{
+    filter: brightness(0) invert(1);
+  }
+
+  .dark-theme .card{
+    background-color: #343a40;
+    color: #f8f9fa;
+  }
+  .btn .dark-theme{
+    background-color: #343a40;
+    color: #f8f9fa !important;
+  }
