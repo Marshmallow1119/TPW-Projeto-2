@@ -22,19 +22,10 @@ export class HomeService {
 
       const data = await response.json();
 
-      const baseUrl = 'http://localhost:8000';
-      data.artists.forEach((artist: any) => {
-        if (artist.image) {
-          artist.image = baseUrl + artist.image;
-        }
-      });
-
-      data.recent_products.forEach((product: any) => {
-        if (product.image) {
-          product.image = baseUrl + product.image;
-        }
-      });
-
+      data.artists = data.artists.map((artist: any) => ({
+        ...artist,
+        image: artist.image_url, // Set `image` equal to `image_url`
+      }));
       return data;
 
     } catch (error) {

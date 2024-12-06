@@ -52,37 +52,22 @@ from rest_framework.authtoken.models import Token
 
 @api_view(['GET'])
 def home(request):
-    artists = Artist.objects.all()
-    recent_products = Product.objects.order_by('-addedProduct')[:20]
-    
-    
-    logger.info(f"Number of artists: {len(artists)}")
-    logger.info(f"Number of recent products: {len(recent_products)}")
+    try:
+        artists = Artist.objects.all()
+        recent_products = Product.objects.order_by('-addedProduct')[:20]
 
-    # Dados a retornar
-    artists_data = [
-        {
-            'id': artist.id,
-            'name': artist.name,
-            'image': artist.image.url if artist.image else None
-        }
-        for artist in artists
-    ]
+        # Pass `request` in the serializer context
+        artists_data = ArtistSerializer(artists, many=True, context={'request': request}).data
+        recent_products_data = ProductSerializer(recent_products, many=True, context={'request': request}).data
 
-    recent_products_data = [
-        {
-            'id': product.id,
-            'name': product.name,
-            'price': product.price,
-            'image': product.image.url if product.image else None
-        }
-        for product in recent_products
-    ]
+        return Response({
+            'artists': artists_data,
+            'recent_products': recent_products_data,
+        })
+    except Exception as e:
+        logger.error(f"Error in home view: {e}")
+        return Response({'error': str(e)}, status=500)
 
-    return Response({
-        'artists': artists_data,
-        'recent_products': recent_products_data,
-    })
 #def home(request):
 #    artists = Artist.objects.all()
 #    recent_products = Product.objects.order_by('-addedProduct')[:20]

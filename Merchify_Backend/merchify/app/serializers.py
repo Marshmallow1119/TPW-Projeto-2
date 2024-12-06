@@ -3,6 +3,7 @@ import base64
 from app.models import *
 from rest_framework import serializers
 from django.contrib.auth.models import User as AuthUser
+from django.conf import settings
 
 
 # Helper para codificar imagens em Base64
@@ -33,20 +34,25 @@ class UserSerializer(serializers.ModelSerializer):
     def get_image_base64(self, obj):
         return encode_image_to_base64(obj.image)
 
-# Serializer para o modelo Artist
 class ArtistSerializer(serializers.ModelSerializer):
-    image_base64 = serializers.SerializerMethodField()
-    background_image_base64 = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
+    background_image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Artist
-        fields = ['id', 'name', 'description', 'image_base64', 'background_image_base64']
+        fields = ['id', 'name', 'description', 'image_url', 'background_image_url']
 
-    def get_image_base64(self, obj):
-        return encode_image_to_base64(obj.image)
+    def get_image_url(self, obj):
+        if obj.image:
+            # Directly use obj.image.url to avoid duplication
+            return self.context['request'].build_absolute_uri(obj.image.url)
+        return None
 
-    def get_background_image_base64(self, obj):
-        return encode_image_to_base64(obj.background_image)
+    def get_background_image_url(self, obj):
+        if obj.background_image:
+            # Directly use obj.background_image.url to avoid duplication
+            return self.context['request'].build_absolute_uri(obj.background_image.url)
+        return None
 
 class ProductSerializer(serializers.ModelSerializer):
     average_rating = serializers.SerializerMethodField()
