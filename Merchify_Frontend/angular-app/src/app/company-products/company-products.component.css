@@ -1,0 +1,116 @@
+.product-card {
+    position: relative;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .product-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+  }
+  
+  .favorite-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    -webkit-text-stroke: 3px #434343;
+    text-shadow: 2px 2px 1px rgba(0, 0, 0, 0.3);
+  }
+  
+  .favorite-icon:hover {
+    color: #a6a6a6;
+    transition: ease-in-out 0.3s;
+    transform: scale(1.2);
+  }
+  
+  .favorite-icon.filled {
+    color: #e85454;
+  }
+  
+  .product-name {
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .product-price {
+    color: #888;
+  }
+  
+  .btn-add-to-cart {
+    background-color: #100f0f;
+    color: #fff;
+    font-weight: bold;
+  }
+  
+  .company-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .company-header img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+    border: 3px solid white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .company-background {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 40px 20px;
+    border-radius: 10px;
+    min-height: 300px;
+  }
+  
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+  }
+  
+  .company-header h2 {
+    color: white;
+    font-size: 50px;
+    font-weight: bold;
+  }
+  
+  .produtos-container {
+    padding: 0 15px;
+    width: 100%;
+  }
+  
+  .col-md-3 {
+    max-width: 20%;
+  }
+  
+  .col-md-9 {
+    max-width: 75%;
+  }
+  
+  .produtos-container .col-6 {
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
+  }
+  

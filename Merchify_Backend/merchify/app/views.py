@@ -1192,15 +1192,48 @@ def company_home(request):
     print("Company ID:", company_id)
     return render(request, 'company_home.html', {'company_id': company_id})
 
+#@api_view(['GET'])
+#def company_products(request, company_id):
+#    company = get_object_or_404(Company, id=company_id)
+#    products = Product.objects.filter(company=company)
+#
+#    for product in products:
+#        if hasattr(product, 'clothing'): 
+#            sizes = product.clothing.sizes.all()
+#            product.size_stock = {
+#                'XS': sizes.filter(size='XS').first().stock if sizes.filter(size='XS').exists() else 0,
+#                'S': sizes.filter(size='S').first().stock if sizes.filter(size='S').exists() else 0,
+#                'M': sizes.filter(size='M').first().stock if sizes.filter(size='M').exists() else 0,
+#                'L': sizes.filter(size='L').first().stock if sizes.filter(size='L').exists() else 0,
+#                'XL': sizes.filter(size='XL').first().stock if sizes.filter(size='XL').exists() else 0,
+#            }
+#        else:
+#            product.size_stock = product.get_stock()
+#    for product in products:
+#        product.favorites_count = product.favorites.count()
+#        product.reviews_count = product.reviews.count()
+#
+#    context = {
+#        'company': company,
+#        'products': products,
+#    }
+#
+#    return render(request, 'company_products.html', {'company': company, 'products': products})
+
 @api_view(['GET'])
 def company_products(request, company_id):
+    print(f"Received company_id: {company_id}")  # Debugging: Log the company_id
     company = get_object_or_404(Company, id=company_id)
-    products = Product.objects.filter(company=company)
+    print(f"Found company: {company.name}")  # Debugging: Log the company name
 
+    products = Product.objects.filter(company=company)
+    print(f"Number of products found: {products.count()}")  # Debugging: Log the product count
+
+    products_data = []
     for product in products:
-        if hasattr(product, 'clothing'): 
+        if hasattr(product, 'clothing'):
             sizes = product.clothing.sizes.all()
-            product.size_stock = {
+            size_stock = {
                 'XS': sizes.filter(size='XS').first().stock if sizes.filter(size='XS').exists() else 0,
                 'S': sizes.filter(size='S').first().stock if sizes.filter(size='S').exists() else 0,
                 'M': sizes.filter(size='M').first().stock if sizes.filter(size='M').exists() else 0,
@@ -1208,17 +1241,31 @@ def company_products(request, company_id):
                 'XL': sizes.filter(size='XL').first().stock if sizes.filter(size='XL').exists() else 0,
             }
         else:
-            product.size_stock = product.get_stock()
-    for product in products:
-        product.favorites_count = product.favorites.count()
-        product.reviews_count = product.reviews.count()
+            size_stock = product.get_stock()
 
-    context = {
-        'company': company,
-        'products': products,
+        products_data.append({
+            'id': product.id,
+            'name': product.name,
+            'description': product.description,
+            'price': product.price,
+            'image': product.image.url if product.image else None,
+            'favorites_count': product.favorites.count(),
+            'reviews_count': product.reviews.count(),
+            'size_stock': size_stock,
+        })
+
+    response = {
+        'company': {
+            'id': company.id,
+            'name': company.name,
+            'logo': company.logo.url if company.logo else None,
+        },
+        'products': products_data,
     }
 
-    return render(request, 'company_products.html', {'company': company, 'products': products})
+    print(f"Returning response: {response}")  # Debugging: Log the response
+    return Response(response)
+
 
 @api_view(['GET'])
 def company_product_detail(request, company_id, product_id):
