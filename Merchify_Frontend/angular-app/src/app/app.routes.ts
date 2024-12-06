@@ -14,7 +14,6 @@ export const routes: Routes = [
   { path: 'artists-page', component: ArtistsPageComponent },
   { path: 'companhias-page', component: CompaniesPageComponent },
   { path: 'search-results', component: SearchResultsComponent },
-,
   { path: 'product/:identifier', component: ProductDetailsComponent },
   { path: 'products/:artistName', component:  ArtistsProductsComponent},
   { path: 'company/:company_id/products', component: CompanyProductsComponent },
