@@ -52,37 +52,22 @@ from rest_framework.authtoken.models import Token
 
 @api_view(['GET'])
 def home(request):
-    artists = Artist.objects.all()
-    recent_products = Product.objects.order_by('-addedProduct')[:20]
-    
-    
-    logger.info(f"Number of artists: {len(artists)}")
-    logger.info(f"Number of recent products: {len(recent_products)}")
+    try:
+        artists = Artist.objects.all()
+        recent_products = Product.objects.order_by('-addedProduct')[:20]
 
-    # Dados a retornar
-    artists_data = [
-        {
-            'id': artist.id,
-            'name': artist.name,
-            'image': artist.image.url if artist.image else None
-        }
-        for artist in artists
-    ]
+        # Pass `request` in the serializer context
+        artists_data = ArtistSerializer(artists, many=True, context={'request': request}).data
+        recent_products_data = ProductSerializer(recent_products, many=True, context={'request': request}).data
 
-    recent_products_data = [
-        {
-            'id': product.id,
-            'name': product.name,
-            'price': product.price,
-            'image': product.image.url if product.image else None
-        }
-        for product in recent_products
-    ]
+        return Response({
+            'artists': artists_data,
+            'recent_products': recent_products_data,
+        })
+    except Exception as e:
+        logger.error(f"Error in home view: {e}")
+        return Response({'error': str(e)}, status=500)
 
-    return Response({
-        'artists': artists_data,
-        'recent_products': recent_products_data,
-    })
 #def home(request):
 #    artists = Artist.objects.all()
 #    recent_products = Product.objects.order_by('-addedProduct')[:20]
@@ -243,89 +228,172 @@ def artistas(request):
 
     return Response(artists_data)
 
+#@api_view(['GET'])
+#def artistsProducts(request, name):
+#    artist = get_object_or_404(Artist, name=name)
+#
+#    products = Product.objects.filter(artist=artist)
+#    print(products)
+#    
+#    sort = request.GET.get('sort', 'featured')
+#    if sort == 'priceAsc':
+#        products = products.order_by('price')
+#    elif sort == 'priceDesc':
+#        products = products.order_by('-price')
+#
+#    if request.user.is_authenticated:
+#        favorited_product_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
+#    else:
+#        favorited_product_ids = []
+#
+#    for product in products:
+#        product.is_favorited = product.id in favorited_product_ids
+#
+#
+#    background_url = artist.background_image.url
+#
+#    product_type = request.GET.get('type')
+#    if product_type:
+#        if product_type == 'Vinil':
+#            products = products.filter(vinil__isnull=False)
+#            genre = request.GET.get('genreVinyl')
+#            if genre:
+#                products = products.filter(vinil__genre=genre)
+#            logger.debug(f"Filtered by 'Vinil' type and genre {genre}, products count: {products.count()}")
+#
+#        elif product_type == 'CD':
+#            products = products.filter(cd__isnull=False)
+#            genre = request.GET.get('genreCD')
+#            if genre:
+#                products = products.filter(cd__genre=genre)
+#            logger.debug(f"Filtered by 'CD' type and genre {genre}, products count: {products.count()}")
+#
+#        elif product_type == 'Clothing':
+#            products = products.filter(clothing__isnull=False)
+#            color = request.GET.get('colorClothing')
+#            if color:
+#                products = products.filter(clothing__color=color)
+#            logger.debug(f"Filtered by 'Clothing' type and color {color}, products count: {products.count()}")
+#
+#        elif product_type == 'Accessory':
+#            products = products.filter(accessory__isnull=False)
+#            color = request.GET.get('colorAccessory')
+#            if color:
+#                products = products.filter(accessory__color=color)
+#            size = request.GET.get('size')
+#            if size:
+#                products = products.filter(accessory__size=size)
+#            logger.debug(f"Filtered by 'Accessory' type, color {color}, and size {size}, products count: {products.count()}")
+#
+#    min_price = request.GET.get('min_price')
+#    max_price = request.GET.get('max_price')
+#    if min_price:
+#        try:
+#            products = products.filter(price__gte=float(min_price))
+#            logger.debug(f"Applied min price filter {min_price}, products count: {products.count()}")
+#        except ValueError:
+#            logger.debug("Invalid minimum price provided.")
+#    if max_price:
+#        try:
+#            products = products.filter(price__lte=float(max_price))
+#            logger.debug(f"Applied max price filter {max_price}, products count: {products.count()}")
+#        except ValueError:
+#            logger.debug("Invalid maximum price provided.")
+#
+#    genres = Vinil.objects.values_list('genre', flat=True).distinct()
+#    colors = Clothing.objects.values_list('color', flat=True).distinct()
+#
+#    context = {
+#        'artist': artist,
+#        'products': products,
+#        'background_url': background_url,
+#        'genres': genres,
+#        'colors': colors
+#    }
+#    return render(request, 'artists_products.html', context)
+
 @api_view(['GET'])
 def artistsProducts(request, name):
-    artist = get_object_or_404(Artist, name=name)
+    print(f"Recebido nome do artista: {name}")
+    try:
+        artist = get_object_or_404(Artist, name=name)
+        print(f"Artista encontrado: {artist.name}")
+    except Exception as e:
+        print(f"Erro ao encontrar artista: {e}")
+        return JsonResponse({'error': 'Artista não encontrado'}, status=404)
 
-    products = Product.objects.filter(artist=artist)
-    print(products)
-    
-    sort = request.GET.get('sort', 'featured')
-    if sort == 'priceAsc':
-        products = products.order_by('price')
-    elif sort == 'priceDesc':
-        products = products.order_by('-price')
+    try:
+        products = Product.objects.filter(artist=artist)
+        print(f"Produtos encontrados: {products.count()}")
 
-    if request.user.is_authenticated:
-        favorited_product_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
-    else:
-        favorited_product_ids = []
+        # Determinar os produtos favoritos com base no usuário
+        if request.user.is_authenticated:
+            favorited_product_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
+        else:
+            favorited_product_ids = []  # Nenhum favorito para usuários não autenticados
 
-    for product in products:
-        product.is_favorited = product.id in favorited_product_ids
+        # Processar os produtos
+        products_data = []
+        for product in products:
+            print(f"Processando produto: {product.name}, ID: {product.id}")
+            products_data.append({
+                'id': product.id,
+                'name': product.name,
+                'price': product.price,
+                'description': product.description,
+                'is_favorited': product.id in favorited_product_ids,
+                'image_url': product.image.url if product.image else None,
+                'type': product.get_product_type(),
+            })
+
+        # Dados adicionais
+        genres = list(Vinil.objects.values_list('genre', flat=True).distinct())
+        colors = list(Clothing.objects.values_list('color', flat=True).distinct())
+
+        response_data = {
+            'artist': {
+                'id': artist.id,
+                'name': artist.name,
+                'image_url': artist.image.url if artist.image else None,
+                'background_url': artist.background_image.url if artist.background_image else None,
+            },
+            'products': products_data,
+            'genres': genres,
+            'colors': colors,
+        }
+        return JsonResponse(response_data)
+    except Exception as e:
+        print(f"Erro ao processar a resposta: {e}")
+        return JsonResponse({'error': 'Erro interno do servidor'}, status=500)
 
 
-    background_url = artist.background_image.url
+#@api_view(['GET'])
+#def productDetails(request, identifier):
+#    product = get_object_or_404(Product, id=identifier)
+#    product.count += 1
+#    product.save()
+#
+#    recently_viewed = request.session.get('recently_viewed', [])
+#    if product.id in recently_viewed:
+#        recently_viewed.remove(product.id)
+#    recently_viewed.insert(0, product.id)
+#    recently_viewed = recently_viewed[:4]
+#    request.session['recently_viewed'] = recently_viewed
+#
+#    context = {
+#        'product': product,
+#    }
+#
+#    if isinstance(product, Clothing):
+#        sizes = product.sizes.all()
+#        context['sizes'] = sizes
+#
+#    average_rating = product.reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+#    context['average_rating'] = average_rating
+#
+#    user = request.user
+#    return render(request, 'productDetails.html', context)
 
-    product_type = request.GET.get('type')
-    if product_type:
-        if product_type == 'Vinil':
-            products = products.filter(vinil__isnull=False)
-            genre = request.GET.get('genreVinyl')
-            if genre:
-                products = products.filter(vinil__genre=genre)
-            logger.debug(f"Filtered by 'Vinil' type and genre {genre}, products count: {products.count()}")
-
-        elif product_type == 'CD':
-            products = products.filter(cd__isnull=False)
-            genre = request.GET.get('genreCD')
-            if genre:
-                products = products.filter(cd__genre=genre)
-            logger.debug(f"Filtered by 'CD' type and genre {genre}, products count: {products.count()}")
-
-        elif product_type == 'Clothing':
-            products = products.filter(clothing__isnull=False)
-            color = request.GET.get('colorClothing')
-            if color:
-                products = products.filter(clothing__color=color)
-            logger.debug(f"Filtered by 'Clothing' type and color {color}, products count: {products.count()}")
-
-        elif product_type == 'Accessory':
-            products = products.filter(accessory__isnull=False)
-            color = request.GET.get('colorAccessory')
-            if color:
-                products = products.filter(accessory__color=color)
-            size = request.GET.get('size')
-            if size:
-                products = products.filter(accessory__size=size)
-            logger.debug(f"Filtered by 'Accessory' type, color {color}, and size {size}, products count: {products.count()}")
-
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
-    if min_price:
-        try:
-            products = products.filter(price__gte=float(min_price))
-            logger.debug(f"Applied min price filter {min_price}, products count: {products.count()}")
-        except ValueError:
-            logger.debug("Invalid minimum price provided.")
-    if max_price:
-        try:
-            products = products.filter(price__lte=float(max_price))
-            logger.debug(f"Applied max price filter {max_price}, products count: {products.count()}")
-        except ValueError:
-            logger.debug("Invalid maximum price provided.")
-
-    genres = Vinil.objects.values_list('genre', flat=True).distinct()
-    colors = Clothing.objects.values_list('color', flat=True).distinct()
-
-    context = {
-        'artist': artist,
-        'products': products,
-        'background_url': background_url,
-        'genres': genres,
-        'colors': colors
-    }
-    return render(request, 'artists_products.html', context)
 
 @api_view(['GET'])
 def productDetails(request, identifier):
@@ -333,26 +401,69 @@ def productDetails(request, identifier):
     product.count += 1
     product.save()
 
-    recently_viewed = request.session.get('recently_viewed', [])
-    if product.id in recently_viewed:
-        recently_viewed.remove(product.id)
-    recently_viewed.insert(0, product.id)
-    recently_viewed = recently_viewed[:4]
-    request.session['recently_viewed'] = recently_viewed
-
-    context = {
-        'product': product,
+    # Base product data
+    product_data = {
+        'id': product.id,
+        'name': product.name,
+        'description': product.description,
+        'price': product.price,
+        'image': product.image.url if product.image else None,
+        'artist': {'name': product.artist.name} if product.artist else None,
+        'company': {'name': product.company.name} if product.company else None,
+        'category': product.category,
+        'addedProduct': product.addedProduct.strftime('%Y-%m-%d') if product.addedProduct else None,
+        'count': product.count,
+        'average_rating': product.get_average_rating(),
+        'product_type': product.get_product_type(),
+        'stock': product.get_stock(),
     }
 
-    if isinstance(product, Clothing):
-        sizes = product.sizes.all()
-        context['sizes'] = sizes
+    # Add clothing-specific data if applicable
+    if hasattr(product, 'clothing'):
+        product_data['sizes'] = [
+            {'id': size.id, 'size': size.size, 'stock': size.stock}
+            for size in product.clothing.sizes.all()
+        ]
 
-    average_rating = product.reviews.aggregate(Avg('rating'))['rating__avg'] or 0
-    context['average_rating'] = average_rating
+    # Add vinil-specific data if applicable
+    if hasattr(product, 'vinil'):
+        product_data['vinil'] = {
+            'genre': product.vinil.genre,
+            'lpSize': product.vinil.lpSize,
+            'releaseDate': product.vinil.releaseDate.strftime('%Y-%m-%d') if product.vinil.releaseDate else None,
+            'stock': product.vinil.stock,
+        }
 
-    user = request.user
-    return render(request, 'productDetails.html', context)
+    # Add CD-specific data if applicable
+    if hasattr(product, 'cd'):
+        product_data['cd'] = {
+            'genre': product.cd.genre,
+            'releaseDate': product.cd.releaseDate.strftime('%Y-%m-%d') if product.cd.releaseDate else None,
+            'stock': product.cd.stock,
+        }
+
+    # Add accessory-specific data if applicable
+    if hasattr(product, 'accessory'):
+        product_data['accessory'] = {
+            'material': product.accessory.material,
+            'color': product.accessory.color,
+            'size': product.accessory.size,
+            'stock': product.accessory.stock,
+        }
+
+    # Add reviews
+    product_data['reviews'] = [
+        {
+            'user': {'username': review.user.username},
+            'rating': review.rating,
+            'text': review.text,
+            'date': review.date.strftime('%Y-%m-%d') if review.date else None,
+        }
+        for review in product.reviews.all()
+    ]
+
+    return JsonResponse(product_data, safe=False)
+
 
 
 @api_view(['GET'])
@@ -1076,15 +1187,48 @@ def company_home(request):
     print("Company ID:", company_id)
     return render(request, 'company_home.html', {'company_id': company_id})
 
+#@api_view(['GET'])
+#def company_products(request, company_id):
+#    company = get_object_or_404(Company, id=company_id)
+#    products = Product.objects.filter(company=company)
+#
+#    for product in products:
+#        if hasattr(product, 'clothing'): 
+#            sizes = product.clothing.sizes.all()
+#            product.size_stock = {
+#                'XS': sizes.filter(size='XS').first().stock if sizes.filter(size='XS').exists() else 0,
+#                'S': sizes.filter(size='S').first().stock if sizes.filter(size='S').exists() else 0,
+#                'M': sizes.filter(size='M').first().stock if sizes.filter(size='M').exists() else 0,
+#                'L': sizes.filter(size='L').first().stock if sizes.filter(size='L').exists() else 0,
+#                'XL': sizes.filter(size='XL').first().stock if sizes.filter(size='XL').exists() else 0,
+#            }
+#        else:
+#            product.size_stock = product.get_stock()
+#    for product in products:
+#        product.favorites_count = product.favorites.count()
+#        product.reviews_count = product.reviews.count()
+#
+#    context = {
+#        'company': company,
+#        'products': products,
+#    }
+#
+#    return render(request, 'company_products.html', {'company': company, 'products': products})
+
 @api_view(['GET'])
 def company_products(request, company_id):
+    print(f"Received company_id: {company_id}")  # Debugging: Log the company_id
     company = get_object_or_404(Company, id=company_id)
-    products = Product.objects.filter(company=company)
+    print(f"Found company: {company.name}")  # Debugging: Log the company name
 
+    products = Product.objects.filter(company=company)
+    print(f"Number of products found: {products.count()}")  # Debugging: Log the product count
+
+    products_data = []
     for product in products:
-        if hasattr(product, 'clothing'): 
+        if hasattr(product, 'clothing'):
             sizes = product.clothing.sizes.all()
-            product.size_stock = {
+            size_stock = {
                 'XS': sizes.filter(size='XS').first().stock if sizes.filter(size='XS').exists() else 0,
                 'S': sizes.filter(size='S').first().stock if sizes.filter(size='S').exists() else 0,
                 'M': sizes.filter(size='M').first().stock if sizes.filter(size='M').exists() else 0,
@@ -1092,17 +1236,31 @@ def company_products(request, company_id):
                 'XL': sizes.filter(size='XL').first().stock if sizes.filter(size='XL').exists() else 0,
             }
         else:
-            product.size_stock = product.get_stock()
-    for product in products:
-        product.favorites_count = product.favorites.count()
-        product.reviews_count = product.reviews.count()
+            size_stock = product.get_stock()
 
-    context = {
-        'company': company,
-        'products': products,
+        products_data.append({
+            'id': product.id,
+            'name': product.name,
+            'description': product.description,
+            'price': product.price,
+            'image': product.image.url if product.image else None,
+            'favorites_count': product.favorites.count(),
+            'reviews_count': product.reviews.count(),
+            'size_stock': size_stock,
+        })
+
+    response = {
+        'company': {
+            'id': company.id,
+            'name': company.name,
+            'logo': company.logo.url if company.logo else None,
+        },
+        'products': products_data,
     }
 
-    return render(request, 'company_products.html', {'company': company, 'products': products})
+    print(f"Returning response: {response}")  # Debugging: Log the response
+    return Response(response)
+
 
 @api_view(['GET'])
 def company_product_detail(request, company_id, product_id):

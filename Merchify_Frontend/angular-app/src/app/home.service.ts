@@ -4,40 +4,28 @@ import { Product } from './models/produto';
 import { base64toBlob } from './utils';
 
 @Injectable({
-  providedIn: 'root' // Isso torna o serviço disponível globalmente
+  providedIn: 'root' 
 })
 export class HomeService {
   private baseUrl: string = 'http://localhost:8000/ws/';
 
   constructor() {}
 
-  // Pega os dados da home (artistas e produtos recentes)
   async getHomeData(): Promise<{ artists: any[], recent_products: any[] }> {
     const url = this.baseUrl + 'home/';
     try {
       const response: Response = await fetch(url);
 
-      // Verifica se a resposta é válida
       if (!response.ok) {
         throw new Error(`Erro na requisição: ${response.statusText}`);
       }
 
       const data = await response.json();
 
-      // Adiciona a base da URL para imagens relativas
-      const baseUrl = 'http://localhost:8000';
-      data.artists.forEach((artist: any) => {
-        if (artist.image) {
-          artist.image = baseUrl + artist.image;
-        }
-      });
-
-      data.recent_products.forEach((product: any) => {
-        if (product.image) {
-          product.image = baseUrl + product.image;
-        }
-      });
-
+      data.artists = data.artists.map((artist: any) => ({
+        ...artist,
+        image: artist.image_url, // Set `image` equal to `image_url`
+      }));
       return data;
 
     } catch (error) {

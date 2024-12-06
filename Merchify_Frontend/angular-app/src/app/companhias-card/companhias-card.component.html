@@ -2,7 +2,7 @@
     <a [routerLink]="['/company', company.id]" class="card-link">
       <div class="card-img-wrapper">
         <img *ngIf="company.image" [src]="company.image" class="card-img-top" [alt]="company.name" />
-        <img *ngIf="!company.image" src="/assets/default_logo.png" class="card-img-top" alt="Default Logo" />
+        <img *ngIf="!company.image" src="/assets/logo.png" class="card-img-top" alt="Default Logo" />
       </div>
       <div class="card-body text-center d-flex flex-column">
         <h5 class="card-text">{{ company.name }}</h5>

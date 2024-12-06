@@ -11,16 +11,6 @@ export class ArtistsService {
   private baseUrl: string = 'http://localhost:8000/ws/';  
   
   constructor(private router:Router) { }
-  //    path('ws/products/<str:name>/', views.artistsProducts, name='artistsProducts'),
-  async getArtistaProdutos(name:string):Promise<Artist>{
-    const url = this.baseUrl + 'products/' + name;
-    const data: Response =  await fetch(url);
-    const artist: Artist = await data.json() ?? [];
-    const blob = base64toBlob(artist.image, 'image/png');
-    artist.image = URL.createObjectURL(blob);
-    return artist;
-  }
-
   //    path('ws/artists/', views.artistas, name='artistas'),
   async getArtistas(): Promise<Artist[]> {
     try {

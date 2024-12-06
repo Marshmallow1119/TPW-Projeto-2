@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -7,12 +7,15 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './filtro.component.html',
   styleUrls: ['./filtro.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule], // Removed RouterLink
+  imports: [CommonModule, FormsModule],
 })
 export class FiltroComponent {
   @Output() filtersChanged = new EventEmitter<any>();
+  @Input() genres: string[] = [];
+  @Input() colors: string[] = [];
 
-  // Declare required properties
+  sizes: string[] = ['S', 'M', 'L'];
+
   productTypes = [
     { value: 'Vinil', label: 'Vinil' },
     { value: 'CD', label: 'CD' },
@@ -31,21 +34,14 @@ export class FiltroComponent {
     max_price: null,
   };
 
-  genres = ['Rock', 'Jazz', 'Pop', 'Classical'];
-  colors = ['Red', 'Blue', 'Green', 'Black', 'White'];
-  sizes = ['S', 'M', 'L'];
-
-  // Method to show filters based on the selected type
   showFilters(type: string): void {
     this.selectedType = type;
   }
 
-  // Method to apply filters
   applyFilters(): void {
     this.filtersChanged.emit(this.filters);
   }
 
-  // Method to reset filters
   resetFilters(): void {
     this.filters = {
       genreVinyl: '',

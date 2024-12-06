@@ -3,7 +3,7 @@ export interface User {
     username: string;
     firstname?: string;
     lastname?: string; 
-    user_type: 'individual' | 'company' | 'admin'; // Restricted to defined user types
+    user_type: 'individual' | 'company' | 'admin'; 
     number_of_purchases: number;
     address?: string; 
     email?: string; 

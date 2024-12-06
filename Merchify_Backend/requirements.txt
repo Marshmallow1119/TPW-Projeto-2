@@ -2,3 +2,5 @@ djangorestframework
 django-cors-headers
 pillow
 jsonschema
+django-filter
+markdown

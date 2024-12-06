@@ -1,12 +1,12 @@
 .navbar {
-    background-color: #f8f9fa; /* Cor de fundo clara */
-    border-bottom: 1px solid #e0e0e0; /* Linha inferior para separação */
-    font-family: 'Nunito Sans', sans-serif; /* Fonte limpa e profissional */
-    padding: 0.25rem 1rem; /* Reduz o espaçamento vertical */
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0; 
+    font-family: 'Nunito Sans', sans-serif; 
+    padding: 0.25rem 1rem; 
 }
   
   .navbar-brand img {
-    max-width: 70px; /* Ajusta o tamanho do logo */
+    max-width: 70px; 
   }
   
   .navbar-nav .nav-link {
@@ -28,28 +28,27 @@
   }
   
   .search-login-container {
-    margin-left: auto; /* Empurra o contêiner para o lado direito */
+    margin-left: auto; 
     display: flex;
-    gap: 1rem; /* Espaçamento entre os itens */
+    gap: 1rem;
   }
-  /* Input e botão com alturas iguais */
   .search-input {
-    height: 40px; /* Define altura */
+    height: 40px; 
     border: 1px solid #ccc;
-    border-radius: 0.25rem 0 0 0.25rem; /* Borda arredondada na esquerda */
-    flex-grow: 1; /* Faz o input se expandir dentro do formulário */
+    border-radius: 0.25rem 0 0 0.25rem; 
+    flex-grow: 1; 
   }
   
   .search-button {
-    height: 40px; /* Define altura igual ao input */
-    border-radius: 0 0.25rem 0.25rem 0; /* Borda arredondada na direita */
+    height: 40px; 
+    border-radius: 0 0.25rem 0.25rem 0; 
     display: flex;
     align-items: center;
     justify-content: center;
   }
   
   .search-button i {
-    margin: 0; /* Remove margens do ícone */
+    margin: 0; 
   }
   .login-button-container {
     text-align: right;

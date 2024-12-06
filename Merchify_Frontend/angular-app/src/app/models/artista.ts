@@ -2,8 +2,8 @@ export interface Artist {
     id: number;
     name: string;
     description: string;
-    image: string; // URL to the image
-    background_image: string; // URL to the background image
-    is_favorited?: boolean; // Add this field
+    image: string; 
+    background_image: string; 
+    is_favorited?: boolean; 
   }
   

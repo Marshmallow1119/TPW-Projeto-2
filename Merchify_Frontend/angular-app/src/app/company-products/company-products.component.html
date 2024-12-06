@@ -1,0 +1,57 @@
+<div class="container my-5" style="max-width: 75%;">
+    <div class="company-header company-background">
+        <div class="overlay">
+          <img *ngIf="company.image" [src]="company.image" [alt]="company.id">
+          <h2>{{ company.name }}</h2>
+        </div>
+      </div>
+      
+    <!-- Container Principal -->
+    <div class="produtos-container mt-5">
+      <div class="row">
+        <!-- Filtros -->
+        <div class="col-md-3">
+          <h4>Filtros</h4>
+          <app-filtro
+            [genres]="genres"
+            [colors]="colors"
+            (filtersChanged)="onFiltersApplied($event)">
+          </app-filtro>
+        </div>
+  
+        <!-- Lista de Produtos -->
+        <div class="col-md-9">
+          <div class="d-flex justify-content-between align-items-center mb-3 ordenar-por-container">
+            <p>{{ filteredProducts.length }} produtos</p>
+            <div class="dropdown ordenar-dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
+                Ordenar por:
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li>
+                  <a class="dropdown-item" href="#" (click)="sortProducts('featured')">Em destaque</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#" (click)="sortProducts('priceAsc')">Preço (ascendente)</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#" (click)="sortProducts('priceDesc')">Preço (descendente)</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+  
+          <div class="row">
+            <!-- Cartões de Produtos -->
+            <app-artists-card-products
+              [products]="filteredProducts"
+              [isAuthenticated]="isAuthenticated"
+              [user]="user"
+              (favoriteToggled)="onFavoriteToggled($event)">
+            </app-artists-card-products>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

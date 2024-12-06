@@ -3,6 +3,7 @@ import base64
 from app.models import *
 from rest_framework import serializers
 from django.contrib.auth.models import User as AuthUser
+from django.conf import settings
 
 
 # Helper para codificar imagens em Base64
@@ -33,35 +34,46 @@ class UserSerializer(serializers.ModelSerializer):
     def get_image_base64(self, obj):
         return encode_image_to_base64(obj.image)
 
-# Serializer para o modelo Artist
 class ArtistSerializer(serializers.ModelSerializer):
-    image_base64 = serializers.SerializerMethodField()
-    background_image_base64 = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
+    background_image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Artist
-        fields = ['id', 'name', 'description', 'image_base64', 'background_image_base64']
+        fields = ['id', 'name', 'description', 'image_url', 'background_image_url']
 
-    def get_image_base64(self, obj):
-        return encode_image_to_base64(obj.image)
+    def get_image_url(self, obj):
+        if obj.image:
+            # Directly use obj.image.url to avoid duplication
+            return self.context['request'].build_absolute_uri(obj.image.url)
+        return None
 
-    def get_background_image_base64(self, obj):
-        return encode_image_to_base64(obj.background_image)
+    def get_background_image_url(self, obj):
+        if obj.background_image:
+            # Directly use obj.background_image.url to avoid duplication
+            return self.context['request'].build_absolute_uri(obj.background_image.url)
+        return None
 
-# Serializer para o modelo Product
 class ProductSerializer(serializers.ModelSerializer):
-    image_base64 = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
+    product_type = serializers.SerializerMethodField()
+    stock = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'image_base64', 'category', 'addedProduct', 'count', 'average_rating']
-
-    def get_image_base64(self, obj):
-        return encode_image_to_base64(obj.image)
+        fields = [
+            'id', 'name', 'description', 'price', 'image', 'artist', 'company',
+            'category', 'addedProduct', 'count', 'average_rating', 'product_type', 'stock'
+        ]
 
     def get_average_rating(self, obj):
         return obj.get_average_rating()
+
+    def get_product_type(self, obj):
+        return obj.get_product_type()
+
+    def get_stock(self, obj):
+        return obj.get_stock()
 
 # Serializer para o modelo Size
 class SizeSerializer(serializers.ModelSerializer):
