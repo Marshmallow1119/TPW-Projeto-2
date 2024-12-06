@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -7,12 +7,16 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './filtro.component.html',
   styleUrls: ['./filtro.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule], // Removed RouterLink
+  imports: [CommonModule, FormsModule],
 })
 export class FiltroComponent {
   @Output() filtersChanged = new EventEmitter<any>();
+  @Input() genres: string[] = []; // Adicionado como Input
+  @Input() colors: string[] = []; // Adicionado como Input
 
-  // Declare required properties
+  // Propriedade adicionada para corrigir o erro
+  sizes: string[] = ['S', 'M', 'L'];
+
   productTypes = [
     { value: 'Vinil', label: 'Vinil' },
     { value: 'CD', label: 'CD' },
@@ -31,21 +35,17 @@ export class FiltroComponent {
     max_price: null,
   };
 
-  genres = ['Rock', 'Jazz', 'Pop', 'Classical'];
-  colors = ['Red', 'Blue', 'Green', 'Black', 'White'];
-  sizes = ['S', 'M', 'L'];
-
-  // Method to show filters based on the selected type
+  // Método para exibir filtros com base no tipo de produto selecionado
   showFilters(type: string): void {
     this.selectedType = type;
   }
 
-  // Method to apply filters
+  // Método para aplicar filtros
   applyFilters(): void {
     this.filtersChanged.emit(this.filters);
   }
 
-  // Method to reset filters
+  // Método para redefinir filtros
   resetFilters(): void {
     this.filters = {
       genreVinyl: '',

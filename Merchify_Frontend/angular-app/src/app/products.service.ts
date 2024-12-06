@@ -17,8 +17,10 @@ export class ProductsService {
     const url = this.baseUrl + 'produtos/' + id;
     const data: Response =  await fetch(url);
     const product: Product = await data.json() ?? [];
-    const blob = base64toBlob(product.image, 'image/png');
-    product.image = URL.createObjectURL(blob);
+    if (product.image) {
+      const blob = base64toBlob(product.image, 'image/png');
+      product.image = URL.createObjectURL(blob);
+    }
     return product;
 
   }

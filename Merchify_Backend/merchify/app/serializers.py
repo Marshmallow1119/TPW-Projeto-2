@@ -48,20 +48,26 @@ class ArtistSerializer(serializers.ModelSerializer):
     def get_background_image_base64(self, obj):
         return encode_image_to_base64(obj.background_image)
 
-# Serializer para o modelo Product
 class ProductSerializer(serializers.ModelSerializer):
-    image_base64 = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
+    product_type = serializers.SerializerMethodField()
+    stock = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'image_base64', 'category', 'addedProduct', 'count', 'average_rating']
-
-    def get_image_base64(self, obj):
-        return encode_image_to_base64(obj.image)
+        fields = [
+            'id', 'name', 'description', 'price', 'image', 'artist', 'company',
+            'category', 'addedProduct', 'count', 'average_rating', 'product_type', 'stock'
+        ]
 
     def get_average_rating(self, obj):
         return obj.get_average_rating()
+
+    def get_product_type(self, obj):
+        return obj.get_product_type()
+
+    def get_stock(self, obj):
+        return obj.get_stock()
 
 # Serializer para o modelo Size
 class SizeSerializer(serializers.ModelSerializer):

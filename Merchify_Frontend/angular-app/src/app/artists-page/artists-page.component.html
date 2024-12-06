@@ -2,11 +2,14 @@
   <h1 class="text-center">Artistas e Bandas</h1>
   <div class="row">
     <div class="col-12 col-md-6 col-lg-4 mb-4" *ngFor="let artist of artists">
-      <app-artists-card
-        [artist]="artist"
-        [isAuthenticated]="isAuthenticated"
-        [userType]="userType"
-      ></app-artists-card>
+      <!-- Adicionando o routerLink -->
+      <a [routerLink]="['/products', artist.name]" class="text-decoration-none">
+        <app-artists-card
+          [artist]="artist"
+          [isAuthenticated]="isAuthenticated"
+          [userType]="userType"
+        ></app-artists-card>
+      </a>
     </div>
   </div>
 </div>

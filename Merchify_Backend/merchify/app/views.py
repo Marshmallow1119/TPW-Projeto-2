@@ -327,32 +327,103 @@ def artistsProducts(request, name):
     }
     return render(request, 'artists_products.html', context)
 
+#@api_view(['GET'])
+#def productDetails(request, identifier):
+#    product = get_object_or_404(Product, id=identifier)
+#    product.count += 1
+#    product.save()
+#
+#    recently_viewed = request.session.get('recently_viewed', [])
+#    if product.id in recently_viewed:
+#        recently_viewed.remove(product.id)
+#    recently_viewed.insert(0, product.id)
+#    recently_viewed = recently_viewed[:4]
+#    request.session['recently_viewed'] = recently_viewed
+#
+#    context = {
+#        'product': product,
+#    }
+#
+#    if isinstance(product, Clothing):
+#        sizes = product.sizes.all()
+#        context['sizes'] = sizes
+#
+#    average_rating = product.reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+#    context['average_rating'] = average_rating
+#
+#    user = request.user
+#    return render(request, 'productDetails.html', context)
+
+
 @api_view(['GET'])
 def productDetails(request, identifier):
     product = get_object_or_404(Product, id=identifier)
     product.count += 1
     product.save()
 
-    recently_viewed = request.session.get('recently_viewed', [])
-    if product.id in recently_viewed:
-        recently_viewed.remove(product.id)
-    recently_viewed.insert(0, product.id)
-    recently_viewed = recently_viewed[:4]
-    request.session['recently_viewed'] = recently_viewed
-
-    context = {
-        'product': product,
+    # Base product data
+    product_data = {
+        'id': product.id,
+        'name': product.name,
+        'description': product.description,
+        'price': product.price,
+        'image': product.image.url if product.image else None,
+        'artist': {'name': product.artist.name} if product.artist else None,
+        'company': {'name': product.company.name} if product.company else None,
+        'category': product.category,
+        'addedProduct': product.addedProduct.strftime('%Y-%m-%d') if product.addedProduct else None,
+        'count': product.count,
+        'average_rating': product.get_average_rating(),
+        'product_type': product.get_product_type(),
+        'stock': product.get_stock(),
     }
 
-    if isinstance(product, Clothing):
-        sizes = product.sizes.all()
-        context['sizes'] = sizes
+    # Add clothing-specific data if applicable
+    if hasattr(product, 'clothing'):
+        product_data['sizes'] = [
+            {'id': size.id, 'size': size.size, 'stock': size.stock}
+            for size in product.clothing.sizes.all()
+        ]
 
-    average_rating = product.reviews.aggregate(Avg('rating'))['rating__avg'] or 0
-    context['average_rating'] = average_rating
+    # Add vinil-specific data if applicable
+    if hasattr(product, 'vinil'):
+        product_data['vinil'] = {
+            'genre': product.vinil.genre,
+            'lpSize': product.vinil.lpSize,
+            'releaseDate': product.vinil.releaseDate.strftime('%Y-%m-%d') if product.vinil.releaseDate else None,
+            'stock': product.vinil.stock,
+        }
 
-    user = request.user
-    return render(request, 'productDetails.html', context)
+    # Add CD-specific data if applicable
+    if hasattr(product, 'cd'):
+        product_data['cd'] = {
+            'genre': product.cd.genre,
+            'releaseDate': product.cd.releaseDate.strftime('%Y-%m-%d') if product.cd.releaseDate else None,
+            'stock': product.cd.stock,
+        }
+
+    # Add accessory-specific data if applicable
+    if hasattr(product, 'accessory'):
+        product_data['accessory'] = {
+            'material': product.accessory.material,
+            'color': product.accessory.color,
+            'size': product.accessory.size,
+            'stock': product.accessory.stock,
+        }
+
+    # Add reviews
+    product_data['reviews'] = [
+        {
+            'user': {'username': review.user.username},
+            'rating': review.rating,
+            'text': review.text,
+            'date': review.date.strftime('%Y-%m-%d') if review.date else None,
+        }
+        for review in product.reviews.all()
+    ]
+
+    return JsonResponse(product_data, safe=False)
+
 
 
 @api_view(['GET'])
