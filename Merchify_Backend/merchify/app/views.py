@@ -46,7 +46,7 @@ from rest_framework import status
 from rest_framework.decorators import (
     api_view, authentication_classes, permission_classes
 )
-from app.serializers import UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
+from app.serializers import LoginSerializer, RegisterSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
 
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -515,55 +515,37 @@ def search(request):
 
 @api_view(['POST'])
 def register_view(request):
-    if request.method == 'POST':
-        form = RegisterForm(request.POST, request.FILES)
-        if form.is_valid():
-            user = User.objects.create_user(
-                first_name=form.cleaned_data['first_name'],
-                last_name=form.cleaned_data['last_name'],
-                username=form.cleaned_data['username'],
-                email=form.cleaned_data['email'],
-                phone=form.cleaned_data['phone'],
-                address=form.cleaned_data['address'],
-                country=form.cleaned_data['country'],
-                password=form.cleaned_data['password1'],
-                image=form.cleaned_data['image']
-            )
-            user.save()
-
-            refresh = RefreshToken.for_user(user)
-
-            return Response({
-                'message': 'Utilizador registado com sucesso!',
-                'access': str(refresh.access_token),
-                'refresh': str(refresh),
-                'username': user.username,
-                'id': user.id,
-                'user_type': 'individual',  
-            }, status=status.HTTP_201_CREATED)
-        else:
-            print('Form validation failed:', form.errors)  # Log errors
-            return Response({'errors': form.errors}, status=status.HTTP_400_BAD_REQUEST)
+   serializer = RegisterSerializer(data=request.data)
+   if serializer.is_valid():
+       user = serializer.save()
+       refresh = RefreshToken.for_user(user)
+       return Response({
+           'message': 'User registered successfully!',
+           'access': str(refresh.access_token),
+           'refresh': str(refresh),
+           'username': user.username,
+           'id': user.id,
+       }, status=status.HTTP_201_CREATED)
+   return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
 def login(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-
-    if not username or not password:
-        return Response({"error": "Username and password are required"}, status=status.HTTP_400_BAD_REQUEST)
-
-    user = authenticate(request, username=username, password=password)
-    if user is not None:
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            "access": str(refresh.access_token),
-            "refresh": str(refresh),
-            "user_type": user.user_type if hasattr(user, 'user_type') else "unknown",
-        })
-    else:
-        return Response({"error": "Invalid username or password"}, status=status.HTTP_401_UNAUTHORIZED)
+    serializer = LoginSerializer(data=request.data)
+    if serializer.is_valid():
+        username = serializer.validated_data['username']
+        password = serializer.validated_data['password']
+        user = authenticate(username=username, password=password)
+        if user:
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'username': user.username,
+                'id': user.id,
+            }, status=status.HTTP_200_OK)
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def validate_token(request):
