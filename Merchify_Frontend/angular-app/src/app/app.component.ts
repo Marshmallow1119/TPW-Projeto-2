@@ -5,13 +5,12 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { FooterComponent } from './footer/footer.component';
 import { FormsModule } from '@angular/forms';
 
-
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet,RouterModule,NavbarComponent, FooterComponent,RouterModule,FormsModule],
+  imports: [CommonModule, RouterOutlet, RouterModule, NavbarComponent, FooterComponent, FormsModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
   title = 'Merchify';

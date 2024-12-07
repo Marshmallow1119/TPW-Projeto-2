@@ -60,7 +60,7 @@
   }
 
   .dark-theme .logo{
-    filter: brightness(0) invert(1);
+    filter: brightness(0) invert(1) !important;
   }
 
   .dark-theme .card{
@@ -69,5 +69,22 @@
   }
   .btn .dark-theme{
     background-color: #343a40;
+    color: #f8f9fa !important;
+  }
+
+  .dark-theme .form-label{
+    color: #f8f9fa !important;
+  }
+
+  .dark-theme .form-signin{
+    background-color: #343a40 !important;
+    color: #f8f9fa;
+  }
+
+  .dark-theme h1, h2, h3, h4, h5{
+    color: #f8f9fa !important;
+  }
+
+  .dark-theme .navbar-text {
     color: #f8f9fa !important;
   }

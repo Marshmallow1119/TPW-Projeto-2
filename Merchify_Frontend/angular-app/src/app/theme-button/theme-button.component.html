@@ -1,39 +1,45 @@
 <button class="theme-toggle-btn" (click)="toggleTheme()">
-    <div *ngIf="!themeService.getTheme()" class="icon-container sun-container">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="#f9d71c"
-        width="24px"
-        height="24px"
-        class="sun-icon"
-      >
-        <circle cx="12" cy="12" r="5"></circle>
-        <g>
-          <line x1="12" y1="2" x2="12" y2="5" stroke="#f9d71c" stroke-width="2"></line>
-          <line x1="12" y1="19" x2="12" y2="22" stroke="#f9d71c" stroke-width="2"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="#f9d71c" stroke-width="2"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="#f9d71c" stroke-width="2"></line>
-          <line x1="2" y1="12" x2="5" y2="12" stroke="#f9d71c" stroke-width="2"></line>
-          <line x1="19" y1="12" x2="22" y2="12" stroke="#f9d71c" stroke-width="2"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="#f9d71c" stroke-width="2"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="#f9d71c" stroke-width="2"></line>
-        </g>
-      </svg>
-    </div>
-    <div *ngIf="themeService.getTheme()" class="icon-container moon-container">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="#4a4e69"
-        width="24px"
-        height="24px"
-        class="moon-icon"
-      >
-        <path
-          d="M21.75,12.81A9,9,0,1,1,11.19,2.25,7.5,7.5,0,1,0,21.75,12.81Z"
-        ></path>
-      </svg>
-    </div>
-  </button>
-  
+  <div *ngIf="!themeService.getTheme()" class="icon-container sun-container">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="#f9d71c"
+      width="24px"
+      height="24px"
+      class="sun-icon"
+    >
+      <!-- Define shadow filter -->
+      <defs>
+        <filter id="black-shadow">
+          <feDropShadow dx="1" dy="1" stdDeviation="0.8" flood-color="#333" />
+        </filter>
+      </defs>
+
+      <circle cx="12" cy="12" r="5" filter="url(#black-shadow)"></circle>
+      <g filter="url(#black-shadow)">
+        <line x1="12" y1="2" x2="12" y2="5" stroke="#f9d71c" stroke-width="2"></line>
+        <line x1="12" y1="19" x2="12" y2="22" stroke="#f9d71c" stroke-width="2"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="#f9d71c" stroke-width="2"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="#f9d71c" stroke-width="2"></line>
+        <line x1="2" y1="12" x2="5" y2="12" stroke="#f9d71c" stroke-width="2"></line>
+        <line x1="19" y1="12" x2="22" y2="12" stroke="#f9d71c" stroke-width="2"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="#f9d71c" stroke-width="2"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="#f9d71c" stroke-width="2"></line>
+      </g>
+    </svg>
+  </div>
+  <div *ngIf="themeService.getTheme()" class="icon-container moon-container">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="#eee"
+      width="24px"
+      height="24px"
+      class="moon-icon"
+    >
+      <path
+        d="M21.75,12.81A9,9,0,1,1,11.19,2.25,7.5,7.5,0,1,0,21.75,12.81Z"
+      ></path>
+    </svg>
+  </div>
+</button>

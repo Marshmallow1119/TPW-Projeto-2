@@ -1,0 +1,51 @@
+<div class="container mt-5">
+  <div class="mb-3">
+    <a routerLink="/login" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Voltar para o Login
+    </a>
+  </div>
+  <div class="title text-center mb-4">Registo de Utilizador</div>
+  <div class="content bg-light p-5 rounded shadow">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+      <div class="user-details">
+        <div class="input-box" *ngFor="let field of formFields">
+          <span class="details">{{ field.label }}</span>
+          <!-- Input Fields -->
+          <input
+            *ngIf="field.type !== 'file'"
+            [type]="field.type"
+            class="form-control"
+            [formControlName]="field.name"
+          />
+          <!-- File Input -->
+          <input
+            *ngIf="field.type === 'file'"
+            type="file"
+            class="form-control"
+            (change)="onFileChange($event)"
+          />
+
+          <!-- Display validation errors -->
+          <div *ngIf="registerForm.get(field.name)?.touched" class="invalid-feedback d-block">
+            <!-- Required Field Error -->
+            <span *ngIf="registerForm.get(field.name)?.hasError('required')">
+              {{ field.error }}
+            </span>
+            <!-- Server-Side Error -->
+            <span *ngIf="registerForm.get(field.name)?.hasError('serverError')">
+              {{ registerForm.get(field.name)?.getError('serverError') }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- General Error Message -->
+      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn btn-primary w-100" [disabled]="registerForm.invalid">
+        Register
+      </button>
+    </form>
+  </div>
+</div>

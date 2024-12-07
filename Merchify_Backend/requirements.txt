@@ -4,3 +4,4 @@ pillow
 jsonschema
 django-filter
 markdown
+djangorestframework-simplejwt

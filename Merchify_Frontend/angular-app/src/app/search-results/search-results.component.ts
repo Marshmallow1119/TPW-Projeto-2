@@ -11,7 +11,7 @@ import { ProductCardComponent } from '../product-card/product-card.component';
   selector: 'app-search-results',
   templateUrl: './search-results.component.html',
   styleUrls: ['./search-results.component.css'],
-  imports:[CommonModule, ArtistsCardComponent, RouterLink, RouterModule, ProductCardComponent]
+  imports:[CommonModule, ArtistsCardComponent, RouterModule, ProductCardComponent]
 })
 export class SearchResultsComponent implements OnInit {
   searchQuery: string = '';

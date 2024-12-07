@@ -5,6 +5,7 @@ from datetime import date
 from urllib.parse import urlencode
 
 # Django Core Imports
+from django.conf import settings
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
@@ -19,6 +20,8 @@ from django.urls import reverse, resolve, Resolver404
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+import jwt
+from rest_framework_simplejwt.tokens import RefreshToken
 
 # Django Forms and Validation
 from .forms import (
@@ -31,7 +34,7 @@ from django.contrib.auth import password_validation
 
 # Application Models
 from app.models import (
-    Product, Company, Cart, CartItem, Purchase, Vinil, CD, Clothing, Accessory,
+    Product, Company, Cart, CartItem, Purchase, User, Vinil, CD, Clothing, Accessory,
     Size, Favorite, FavoriteArtist, FavoriteCompany, Artist, Review, PurchaseProduct
 )
 
@@ -512,11 +515,8 @@ def search(request):
 
 @api_view(['POST'])
 def register_view(request):
-    next_url = request.GET.get('next', request.POST.get('next', ''))
-
     if request.method == 'POST':
         form = RegisterForm(request.POST, request.FILES)
-
         if form.is_valid():
             user = User.objects.create_user(
                 first_name=form.cleaned_data['first_name'],
@@ -529,65 +529,62 @@ def register_view(request):
                 password=form.cleaned_data['password1'],
                 image=form.cleaned_data['image']
             )
-
-            group = Group.objects.get(name='client')
-            user.groups.add(group)
             user.save()
 
-            auth_login(request, user)
-            print(next_url)
-            if next_url:
-                return redirect(next_url)
-            else:
-                return redirect('home')
+            refresh = RefreshToken.for_user(user)
+
+            return Response({
+                'message': 'Utilizador registado com sucesso!',
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'username': user.username,
+                'id': user.id,
+                'user_type': 'individual',  
+            }, status=status.HTTP_201_CREATED)
         else:
-            messages.error(request, "Formulário inválido. Verifique os campos.")
-            return render(request, 'register_user.html', {'form': form, 'next': next_url})
-    else:
-        form = RegisterForm()
+            print('Form validation failed:', form.errors)  # Log errors
+            return Response({'errors': form.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    return render(request, 'register_user.html', {'form': form, 'next': next_url})
-
-
-def is_valid_url(url_name):
-    try:
-        resolve(url_name)
-        return True
-    except Resolver404:
-        return False
 
 @api_view(['POST'])
 def login(request):
-    if request.method == 'POST':
-        next_url = request.GET.get('next', None)
-        print(next_url)
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+    username = request.data.get('username')
+    password = request.data.get('password')
 
-        if not User.objects.filter(username=username).exists():
-            error_message = "Username does not exist"
-            return render(request, 'login.html', {'error_message': error_message})
+    if not username or not password:
+        return Response({"error": "Username and password are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            auth_login(request, user)
-            if hasattr(user, 'user_type'):
-                if user.user_type == 'individual':
-                    return redirect(next_url or 'home')
-                elif user.user_type == 'company':
-                    company_id = user.company.id
-                    return redirect('company_products', company_id=company_id)
-                elif user.user_type == 'admin':
-                    return redirect('admin_home')
-                else:
-                    return redirect('home')
-            else:
-                return redirect('home')
-        else:
-            error_message = "Invalid username or password"
-            return render(request, 'login.html', {'error_message': error_message})
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "user_type": user.user_type if hasattr(user, 'user_type') else "unknown",
+        })
     else:
-        return render(request, 'login.html')
+        return Response({"error": "Invalid username or password"}, status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['POST'])
+def validate_token(request):
+    token = request.data.get('token')
+    if not token:
+        return Response({"error": "Token is required"}, status=400)
+
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        user = User.objects.get(id=payload['user_id'])
+        return Response({
+            "id": user.id,
+            "username": user.username,
+            "user_type": user.user_type,
+            "number_of_purchases": user.number_of_purchases 
+        })
+    except jwt.ExpiredSignatureError:
+        return Response({"error": "Token has expired"}, status=401)
+    except jwt.InvalidTokenError:
+        return Response({"error": "Invalid token"}, status=401)
+
 
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])

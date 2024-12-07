@@ -22,6 +22,7 @@
     transform: rotate(15deg);
   }
   .sun-icon {
-    color: #e6bf23;
+    color: #c7a82e;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
   }
   

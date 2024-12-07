@@ -1,20 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../auth.service';
+import { User } from '../models/user';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { ThemeService } from '../theme.service';
 import { ThemeButtonComponent } from '../theme-button/theme-button.component';
 
 @Component({
   selector: 'app-navbar',
-  standalone: true, 
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
-  imports: [FormsModule, RouterModule, ThemeButtonComponent],
+  imports: [CommonModule, FormsModule, RouterModule, ThemeButtonComponent],
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   searchQuery: string = '';
+  user: User | null = null;
 
-  constructor(private router: Router, public themeService: ThemeService) {} 
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.authService.user$.subscribe((user) => {
+      this.user = user;
+    });
+  }
 
   onKeyUp(): void {
     if (this.searchQuery.trim().length > 0) {
@@ -32,4 +43,8 @@ export class NavbarComponent {
     }
   }
 
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

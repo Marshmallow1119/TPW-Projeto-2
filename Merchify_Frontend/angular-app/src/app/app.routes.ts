@@ -7,6 +7,8 @@ import { ProductDetailsComponent } from './product-details/product-details.compo
 import { ArtistsProductsComponent } from './artists-products/artists-products.component';
 import { CompanyProductsComponent } from './company-products/company-products.component';
 import { SearchResultsComponent } from './search-results/search-results.component';
+import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component'; // Correct name
 
 export const routes: Routes = [
   { path: '', component: HomeComponent }, // Home Route
@@ -17,4 +19,6 @@ export const routes: Routes = [
   { path: 'product/:identifier', component: ProductDetailsComponent },
   { path: 'products/:artistName', component:  ArtistsProductsComponent},
   { path: 'company/:company_id/products', component: CompanyProductsComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent }, 
 ];

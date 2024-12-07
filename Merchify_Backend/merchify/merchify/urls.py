@@ -20,7 +20,7 @@ from app import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
-
+from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView,)
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -71,6 +71,9 @@ urlpatterns = [
     path('ws/carrinho/', views.viewCart, name='viewCart'),
     path('ws/product/<int:product_id>/add_clothing_stock/', views.add_clothing_stock, name='add_clothing_stock'),
     path('ws/product/<int:product_id>/add_stock/', views.add_stock, name='add_stock'),
+    path('ws/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('ws/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('ws/token/validate/', views.validate_token, name='validate_token'),
 
 ]   
 
