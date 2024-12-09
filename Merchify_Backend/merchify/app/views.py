@@ -1664,10 +1664,8 @@ def delete_product(request, product_id):
 @api_view(['GET'])
 def get_users(request):
     users = User.objects.all()
-    
     serialized_users = UserSerializer(users, many=True)
-
-    
+    print(serialized_users.data)
     return Response(serialized_users.data)
 
 @api_view(['DELETE'])

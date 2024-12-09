@@ -9,7 +9,7 @@ export interface User {
     email: string; 
     phone: string;
     country: string; 
-    image_base64?: string; 
+    image?: string; 
     company?: {
       id: number;
       name: string;

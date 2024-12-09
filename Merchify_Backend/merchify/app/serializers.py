@@ -47,13 +47,13 @@ class CompanySerializer(serializers.ModelSerializer):
     
 # Serializer para o modelo User
 class UserSerializer(serializers.ModelSerializer):
-    image_base64 = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'firstname', 'lastname', 'user_type', 'email', 'phone', 'country', 'image_base64']
+        fields = ['id', 'username', 'firstname', 'lastname', 'user_type', 'email', 'phone', 'country', 'image']
 
-    def get_image_base64(self, obj):
+    def get_image(self, obj):
         return encode_image_to_base64(obj.image)
 
 class ArtistSerializer(serializers.ModelSerializer):
