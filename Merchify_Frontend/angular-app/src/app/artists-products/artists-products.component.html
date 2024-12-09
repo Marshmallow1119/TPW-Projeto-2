@@ -1,7 +1,7 @@
 <div class="container my-5" style="max-width: 75%;">
   <!-- Cabeçalho do Artista -->
-  <div class="artist-header artist-background" [style.background-image]="'url(' + artist?.background_image_url + ')'">    
-  <div class="overlay">
+  <div *ngIf="artist" class="artist-header artist-background" [style.background-image]="'url(' + artist?.background_image_url + ')'">
+    <div class="overlay">
       <img *ngIf="artist.image_url" [src]="artist.image_url" [alt]="artist.name" class="artist-photo" />
       <h2>{{ artist?.name }}</h2>
     </div>
