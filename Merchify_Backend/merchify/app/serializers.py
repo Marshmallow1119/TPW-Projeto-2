@@ -168,27 +168,26 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)  # Usa o ProductSerializer
+    product = ProductSerializer(read_only=True)  
 
     class Meta:
         model = Favorite
         fields = ['id', 'user', 'product']
 
 class FavoriteArtistSerializer(serializers.ModelSerializer):
-    artist = ArtistSerializer(read_only=True)  # Usa o ArtistSerializer
+    artist = ArtistSerializer(read_only=True) 
 
     class Meta:
         model = FavoriteArtist
         fields = ['id', 'user', 'artist']
 
 class FavoriteCompanySerializer(serializers.ModelSerializer):
-    company = CompanySerializer(read_only=True)  # Usa o CompanySerializer
+    company = CompanySerializer(read_only=True) 
 
     class Meta:
         model = FavoriteCompany
         fields = ['id', 'user', 'company']
 
-# Serializer para o modelo Purchase
 class PurchaseSerializer(serializers.ModelSerializer):
     total = serializers.ReadOnlyField()
 
