@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FavoritesService } from '../favorites.service';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,RouterModule],
   selector: 'app-favorites',
   templateUrl: './favorites.component.html',
   styleUrls: ['./favorites.component.css']
@@ -18,8 +19,9 @@ export class FavoritesComponent implements OnInit {
   constructor(private favoritesService: FavoritesService) { }
 
   ngOnInit(): void {
-    this.loadProducts(); // Carrega os favoritos de produtos inicialmente
+    this.loadProducts();
   }
+  
 
   // Alterna entre categorias
   switchCategory(category: string): void {

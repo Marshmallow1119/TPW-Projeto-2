@@ -10,6 +10,7 @@ import { SearchResultsComponent } from './search-results/search-results.componen
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { AdminHomeComponent } from './admin-home/admin-home.component';
+import { FavoritesComponent } from './favorites/favorites.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent }, // Home Route
@@ -23,5 +24,8 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent }, 
   { path: 'admin', component: AdminHomeComponent }, 
+  { path: 'favorites', component: FavoritesComponent }, 
+ 
+
   
 ];
