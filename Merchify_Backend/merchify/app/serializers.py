@@ -14,15 +14,37 @@ def encode_image_to_base64(image_field):
 
 # Serializer para o modelo Company
 class CompanySerializer(serializers.ModelSerializer):
-    logo_base64 = serializers.SerializerMethodField()
+    logo_base64 = serializers.SerializerMethodField()  
+    product_count = serializers.SerializerMethodField()  
+    average_rating = serializers.SerializerMethodField() 
 
     class Meta:
         model = Company
-        fields = ['id', 'name', 'address', 'email', 'phone', 'logo_base64']
+        fields = [
+            'id',
+            'name',
+            'address',
+            'email',
+            'phone',
+            'logo_base64',
+            'product_count',
+            'average_rating',
+        ]
 
     def get_logo_base64(self, obj):
-        return encode_image_to_base64(obj.logo)
+        """Converte a imagem do logo para Base64"""
+        if obj.logo:
+            return encode_image_to_base64(obj.logo)
+        return None
 
+    def get_product_count(self, obj):
+        """Retorna o número de produtos associados à empresa"""
+        return obj.getNumberOfProducts()
+
+    def get_average_rating(self, obj):
+        """Calcula a média das avaliações dos produtos da empresa"""
+        return obj.get_average_rating()
+    
 # Serializer para o modelo User
 class UserSerializer(serializers.ModelSerializer):
     image_base64 = serializers.SerializerMethodField()
@@ -44,13 +66,11 @@ class ArtistSerializer(serializers.ModelSerializer):
 
     def get_image_url(self, obj):
         if obj.image:
-            # Directly use obj.image.url to avoid duplication
             return self.context['request'].build_absolute_uri(obj.image.url)
         return None
 
     def get_background_image_url(self, obj):
         if obj.background_image:
-            # Directly use obj.background_image.url to avoid duplication
             return self.context['request'].build_absolute_uri(obj.background_image.url)
         return None
 
@@ -67,13 +87,17 @@ class ProductSerializer(serializers.ModelSerializer):
         ]
 
     def get_average_rating(self, obj):
+        """Calcula a média de avaliações do produto."""
         return obj.get_average_rating()
 
     def get_product_type(self, obj):
+        """Determina o tipo do produto (Vinil, CD, etc.)."""
         return obj.get_product_type()
 
     def get_stock(self, obj):
+        """Obtém o estoque do produto."""
         return obj.get_stock()
+
 
 # Serializer para o modelo Size
 class SizeSerializer(serializers.ModelSerializer):

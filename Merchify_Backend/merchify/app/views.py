@@ -106,42 +106,37 @@ def home(request):
 
     #return render(request, 'home.html', {'artists': artists, 'products': recent_products, 'show_promotion': show_promotion, 'recently_viewed_products': recently_viewed_products, 'most_viewed_products': most_viewed_products})
 
-
 @api_view(['GET'])
 def companhias(request):
     companies = Company.objects.all()
 
+    # Fetch favorited companies for the authenticated user
     if request.user.is_authenticated:
         favorited_company_ids = FavoriteCompany.objects.filter(user=request.user).values_list('company_id', flat=True)
     else:
         favorited_company_ids = []
 
-    companies_data = [
-        {
-            'id': company.id,
-            'name': company.name,
-            'productCount': company.getNumberOfProducts(),
-            'averageRating': company.get_average_rating(),
-            'image': company.logo.url if company.logo else None,
-            'is_favorited': company.id in favorited_company_ids,
-        }
-        for company in companies
-    ]
+    # Serialize company data
+    serializer = CompanySerializer(companies, many=True)
+    companies_data = serializer.data
+
+    # Add `is_favorited` and other custom fields
+    for company in companies_data:
+        company_id = company['id']
+        company['is_favorited'] = company_id in favorited_company_ids
 
     return Response(companies_data)
 
 @api_view(['GET'])
 def produtos(request):
-    produtos= Product.objects.all()
-    sort= request.GET.get('sort', 'featured')
+    produtos = Product.objects.all()
+
+    # Sorting logic
+    sort = request.GET.get('sort', 'featured')
     if sort == 'priceAsc':
         produtos = produtos.order_by('price')
     elif sort == 'priceDesc':
         produtos = produtos.order_by('-price')
-    #if request.user.is_authenticated:
-    #   favorited_product_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
-    #else:
-    #   favorited_product_ids = []
 
     product_type = request.GET.get('type')
     if product_type:
@@ -150,21 +145,18 @@ def produtos(request):
             genre = request.GET.get('genreVinyl')
             if genre:
                 produtos = produtos.filter(vinil__genre=genre)
-            logger.debug(f"Filtered by 'Vinil' type and genre {genre}, products count: {produtos.count()}")
 
         elif product_type == 'CD':
             produtos = produtos.filter(cd__isnull=False)
             genre = request.GET.get('genreCD')
             if genre:
                 produtos = produtos.filter(cd__genre=genre)
-            logger.debug(f"Filtered by 'CD' type and genre {genre}, products count: {produtos.count()}")
 
         elif product_type == 'Clothing':
             produtos = produtos.filter(clothing__isnull=False)
             color = request.GET.get('colorClothing')
             if color:
                 produtos = produtos.filter(clothing__color=color)
-            logger.debug(f"Filtered by 'Clothing' type and color {color}, products count: {produtos.count()}")
 
         elif product_type == 'Accessory':
             produtos = produtos.filter(accessory__isnull=False)
@@ -174,8 +166,8 @@ def produtos(request):
             size = request.GET.get('size')
             if size:
                 produtos = produtos.filter(accessory__size=size)
-            logger.debug(f"Filtered by 'Accessory' type, color {color}, and size {size}, products count: {produtos.count()}")
 
+    # Filtering by price range
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     if min_price:
@@ -189,18 +181,10 @@ def produtos(request):
         except ValueError:
             logger.debug("Invalid maximum price provided.")
 
-    produtos_data = [
-        {
-            'id': product.id,
-            'name': product.name,
-            'price': product.price,
-            'description': product.description,
-            'image': product.image.url if product.image else None,
-        }
-        for product in produtos
-    ]
+    # Serialize the filtered products
+    serializer = ProductSerializer(produtos, many=True)
+    return Response(serializer.data)
 
-    return Response(produtos_data)
     #for product in produtos:
     #   product.is_favorited = product.id in favorited_product_ids
 
@@ -218,16 +202,12 @@ def artistas(request):
     else:
         favorited_artist_ids = []
 
-    artists_data = [
-        {
-            'id': artist.id,
-            'name': artist.name,
-            'description': artist.description,
-            'image': artist.image.url if artist.image else None,
-            'is_favorited': artist.id in favorited_artist_ids,
-        }
-        for artist in artists
-    ]
+    serializer = ArtistSerializer(artists, many=True, context={'request': request})
+    artists_data = serializer.data
+
+    # Add "is_favorited" field to each artist
+    for artist_data in artists_data:
+        artist_data['is_favorited'] = int(artist_data['id']) in favorited_artist_ids
 
     return Response(artists_data)
 
@@ -317,56 +297,45 @@ def artistas(request):
 
 @api_view(['GET'])
 def artistsProducts(request, name):
-    print(f"Recebido nome do artista: {name}")
     try:
         artist = get_object_or_404(Artist, name=name)
-        print(f"Artista encontrado: {artist.name}")
     except Exception as e:
-        print(f"Erro ao encontrar artista: {e}")
         return JsonResponse({'error': 'Artista não encontrado'}, status=404)
 
     try:
         products = Product.objects.filter(artist=artist)
-        print(f"Produtos encontrados: {products.count()}")
 
-        # Determinar os produtos favoritos com base no usuário
+        # Determine favorite products for authenticated users
         if request.user.is_authenticated:
             favorited_product_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
         else:
-            favorited_product_ids = []  # Nenhum favorito para usuários não autenticados
+            favorited_product_ids = []
 
-        # Processar os produtos
-        products_data = []
-        for product in products:
-            print(f"Processando produto: {product.name}, ID: {product.id}")
-            products_data.append({
-                'id': product.id,
-                'name': product.name,
-                'price': product.price,
-                'description': product.description,
-                'is_favorited': product.id in favorited_product_ids,
-                'image_url': product.image.url if product.image else None,
-                'type': product.get_product_type(),
-            })
+        # Serialize products
+        serializer_context = {'request': request}
+        product_serializer = ProductSerializer(products, many=True, context=serializer_context)
+        products_data = product_serializer.data
 
-        # Dados adicionais
+        # Add "is_favorited" field to serialized product data
+        for product_data in products_data:
+            product_data['is_favorited'] = product_data['id'] in favorited_product_ids
+
+        # Additional data
         genres = list(Vinil.objects.values_list('genre', flat=True).distinct())
         colors = list(Clothing.objects.values_list('color', flat=True).distinct())
 
+        # Serialize artist
+        artist_serializer = ArtistSerializer(artist, context=serializer_context)
+
         response_data = {
-            'artist': {
-                'id': artist.id,
-                'name': artist.name,
-                'image_url': artist.image.url if artist.image else None,
-                'background_url': artist.background_image.url if artist.background_image else None,
-            },
+            'artist': artist_serializer.data,
             'products': products_data,
             'genres': genres,
             'colors': colors,
         }
+
         return JsonResponse(response_data)
     except Exception as e:
-        print(f"Erro ao processar a resposta: {e}")
         return JsonResponse({'error': 'Erro interno do servidor'}, status=500)
 
 
