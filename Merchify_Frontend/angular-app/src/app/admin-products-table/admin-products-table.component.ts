@@ -1,14 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Product, Vinil, CD, Clothing, Accessory } from '../models/produto';
 import { ProductsService } from '../products.service';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-admin-products-table',
   templateUrl: './admin-products-table.component.html',
   styleUrls: ['./admin-products-table.component.css'],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
 })
 export class AdminProductsTableComponent implements OnInit {
-  products: Product[] = [];
+  @Input() products: Product[] = [];
   errorMessage: string | null = null;
 
   constructor(private productService: ProductsService) {}
@@ -41,8 +46,9 @@ export class AdminProductsTableComponent implements OnInit {
     return product.product_type === 'Accessory';
   }
 
-  deleteProduct(id): void {
+  deleteProduct(id: number): void {
     this.productService.deleteProduct(id);
     this.products = this.products.filter((product) => product.id !== id);
   }
+
 }

@@ -31,11 +31,11 @@
               <div *ngIf="isVinil(product)">
                 Genre: {{ product.genre }} <br />
                 LP Size: {{ product.lpSize }} <br />
-                Release Date: {{ product.releaseDate | date }}
+                Release Date: {{ product.releaseDate }}
               </div>
               <div *ngIf="isCD(product)">
                 Genre: {{ product.genre }} <br />
-                Release Date: {{ product.releaseDate | date }}
+                Release Date: {{ product.releaseDate }}
               </div>
               <div *ngIf="isClothing(product)">
                 Color: {{ product.color }} <br />
@@ -51,13 +51,11 @@
             <td>
               <button
                 class="btn btn-primary btn-sm"
-                (click)="editProduct(product.id)"
               >
                 Editar
               </button>
               <button
                 class="btn btn-danger btn-sm"
-                (click)="deleteProduct(product.id)"
               >
                 Apagar
               </button>
