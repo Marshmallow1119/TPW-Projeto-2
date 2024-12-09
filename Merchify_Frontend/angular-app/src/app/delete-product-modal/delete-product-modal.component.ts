@@ -1,11 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-delete-product-modal',
-  imports: [],
   templateUrl: './delete-product-modal.component.html',
-  styleUrl: './delete-product-modal.component.css'
+  styleUrls: ['./delete-product-modal.component.css']
 })
 export class DeleteProductModalComponent {
+  @Input() productName: string = ''; // Product name to display
+  @Input() productId: number | null = null; // Product ID
+  @Output() confirmDelete: EventEmitter<number> = new EventEmitter<number>(); // Emit when confirmed
 
+  onDelete(): void {
+    if (this.productId) {
+      this.confirmDelete.emit(this.productId);
+    }
+  }
 }
