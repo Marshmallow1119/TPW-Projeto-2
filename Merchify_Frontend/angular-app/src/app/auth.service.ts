@@ -40,11 +40,18 @@ export class AuthService {
         const user: User = {
           id: response.id || 0,
           username,
+          firstname: response.firstname,
+          lastname: response.lastname,
           user_type: response.user_type,
+          address: response.address,
+          email: response.email,
+          phone: response.phone,
+          country: response.country,
+
           number_of_purchases: response.number_of_purchases || 0,
         };
   
-        this.userSubject.next(user); // Emit the new user value
+        this.userSubject.next(user);
         localStorage.setItem('accessToken', response.access);
         localStorage.setItem('refreshToken', response.refresh);
       }),
@@ -73,9 +80,15 @@ export class AuthService {
           username: response.username,
           user_type: response.user_type,
           number_of_purchases: response.number_of_purchases || 0,
+          firstname: response.firstname,
+          lastname: response.lastname,
+          address: response.address,
+          email: response.email,
+          phone: response.phone,
+          country: response.country,
         };
   
-        this.userSubject.next(user); // Emit the validated user
+        this.userSubject.next(user); 
       },
       error: () => {
         this.logout();
@@ -117,7 +130,14 @@ export class AuthService {
             id: response.id,
             username: response.username,
             user_type: response.user_type,
-            number_of_purchases: 0
+            number_of_purchases: 0,
+            firstname: response.firstname,
+            lastname: response.lastname,
+            address: response.address,
+            email: response.email,
+            phone: response.phone,
+            country: response.country,
+
           };
   
           this.userSubject.next(user); 

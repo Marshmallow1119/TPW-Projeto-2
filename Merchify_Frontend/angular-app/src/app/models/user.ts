@@ -4,12 +4,12 @@ export interface User {
     firstname: string;
     lastname: string; 
     user_type: 'individual' | 'company' | 'admin'; 
-    number_of_purchases: number;
+    number_of_purchases: number | 0;
     address: string; 
     email: string; 
     phone: string;
     country: string; 
-    image_base64: string; 
+    image_base64?: string; 
     company?: {
       id: number;
       name: string;
