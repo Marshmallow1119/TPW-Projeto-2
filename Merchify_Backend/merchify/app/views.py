@@ -1552,7 +1552,7 @@ def add_product_to_company(request, company_id):
     return render(request, 'add_product_to_company.html', context)
 
 
-
+"""
 @api_view(['PUT'])
 def edit_product(request, company_id, product_id):
     if not (request.user.user_type == 'admin' or request.user.user_type == 'company'):
@@ -1646,6 +1646,71 @@ def edit_product(request, company_id, product_id):
     }
 
     return render(request, 'edit_product.html', context)
+"""
+
+@api_view(['PUT'])
+def edit_product(request, product_id):
+    if not (request.user.user_type == 'admin' or request.user.user_type == 'company'):
+        raise PermissionDenied
+    product = get_object_or_404(Product, id=product_id)
+
+    initial_product_type = product.get_product_type().lower()
+
+    if request.method == 'POST':
+        product_form = ProductForm(request.POST, request.FILES, instance=product)
+
+        if product_form.is_valid():
+            product = product_form.save(commit=False)
+
+            price = product_form.cleaned_data.get('price')
+            if price is None:
+                return render(request, 'edit_product.html', {
+                    'product_form': product_form,
+                    'error_message': "Price is required.",
+                    'initial_product_type': initial_product_type,
+                })
+            product.price = price
+
+            product_type = product_form.cleaned_data['product_type'].lower()
+
+            try:
+                product.save()
+            except IntegrityError:
+                return render(request, 'edit_product.html', {
+                    'product_form': product_form,
+                    'error_message': "There was an error saving the product. Please try again.",
+                    'initial_product_type': initial_product_type,
+                })
+
+            if product_type == 'vinil':
+                vinil = getattr(product, 'vinil', None)
+                if vinil:
+                    vinil.name = product.name
+                    vinil.price = product.price
+                    vinil.save()
+
+            elif product_type == 'cd':
+                cd = getattr(product, 'cd', None)
+                if cd:
+                    cd.name = product.name
+                    cd.price = product.price
+                    cd.save()
+
+            elif product_type == 'clothing':
+                clothing = getattr(product, 'clothing', None)
+                if clothing:
+                    clothing.name = product.name
+                    clothing.price = product.price
+                    clothing.save()
+
+            elif product_type == 'accessory':
+                accessory = getattr(product, 'accessory', None)
+                if accessory:
+                    accessory.name = product.name
+                    accessory.price = product.price
+                    accessory.save()
+
+            return Response({"success": True})
 
 
 @api_view(['DELETE'])
@@ -1658,6 +1723,7 @@ def delete_product(request, product_id):
     company_id = product.company.id 
     product.delete()
     return redirect('company_products', company_id=company_id)
+
 
 
 

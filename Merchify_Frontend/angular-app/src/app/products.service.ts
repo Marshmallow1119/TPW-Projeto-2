@@ -43,7 +43,30 @@ export class ProductsService {
       return [];
     }
   }
+
+  async deleteProduct(id: number): Promise<void> {
+    try {
+      await fetch(`${this.baseUrl}produtos/${id}`, {
+        method: 'DELETE',
+      });
+    }
+    catch (error) {
+      console.error('Error deleting product:', error);
+    }
+  }
+
+  async editProduct(product: Product): Promise<void> {
+    try {
+      await fetch(`${this.baseUrl}produtos/${product.id}/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(product),
+      });
+    } catch (error) {
+      console.error('Error editing product:', error);
+    }
+  }
   
-
-
 }
