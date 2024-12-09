@@ -24,7 +24,7 @@ export class HomeService {
 
       data.artists = data.artists.map((artist: any) => ({
         ...artist,
-        image: artist.image_url, // Set `image` equal to `image_url`
+        image: artist.image_url, 
       }));
       return data;
 

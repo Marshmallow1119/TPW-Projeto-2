@@ -89,6 +89,13 @@
     justify-content: center;
     border-radius: 10px;
   }
+
+  .col-md-3,
+.col-md-9 {
+  max-width: 100%; /* Permitir que ocupem a largura total */
+  flex: 0 0 100%; /* Adapta-se ao layout */
+}
+
   
   .company-header h2 {
     color: white;
@@ -99,14 +106,15 @@
   .produtos-container {
     padding: 0 15px;
     width: 100%;
+    margin: 0 auto; /* Centralizar os itens no espaço disponível */
   }
   
   .col-md-3 {
-    max-width: 20%;
+    max-width: 26%;
   }
   
   .col-md-9 {
-    max-width: 75%;
+    max-width: 74%;
   }
   
   .produtos-container .col-6 {

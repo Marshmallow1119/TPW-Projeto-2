@@ -21,6 +21,12 @@ export class ArtistsPageComponent implements OnInit {
   constructor(private artistsService: ArtistsService) {}
 
   async ngOnInit(): Promise<void> {
-    this.artists = await this.artistsService.getArtistas();
-  }
+    try {
+      this.artists = await this.artistsService.getArtistas();
+      console.log('Artistas carregados:', this.artists);
+    } catch (error) {
+      console.error('Error fetching Artistas:', error);
+    }
+    }
+  
 }
