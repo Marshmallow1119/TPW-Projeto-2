@@ -9,8 +9,9 @@ import { ReplaySubject } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
-  private userSubject = new ReplaySubject<User | null>(1);
+  private userSubject = new BehaviorSubject<User | null>(null); // Initialize with null
   user$ = this.userSubject.asObservable();
+  
   private registerUrl = 'http://localhost:8000/ws/register/';
   private validateTokenUrl = 'http://localhost:8000/ws/token/validate/';
   private loginUrl = 'http://localhost:8000/ws/login/';
@@ -39,11 +40,17 @@ export class AuthService {
         const user: User = {
           id: response.id || 0,
           username,
+          firstname: response.firstname,
+          lastname: response.lastname,
           user_type: response.user_type,
+          address: response.address,
+          email: response.email,
+          phone: response.phone,
+          country: response.country,
+
           number_of_purchases: response.number_of_purchases || 0,
         };
   
-        console.log('AuthService Login User:', user); 
         this.userSubject.next(user);
         localStorage.setItem('accessToken', response.access);
         localStorage.setItem('refreshToken', response.refresh);
@@ -55,19 +62,17 @@ export class AuthService {
     );
   }
   
+  
   loadUserFromToken(): void {
     if (!isPlatformBrowser(this.platformId)) {
-      console.log('Not running in browser; skipping token load.');
       return;
     }
   
     const token = localStorage.getItem('accessToken');
-    if (!token || !this.isLocalStorageAvailable()) {
-      console.log('No token found or localStorage unavailable');
+    if (!token) {
       return;
     }
   
-    console.log('Validating token:', token);
     this.http.post(this.validateTokenUrl, { token }).subscribe({
       next: (response: any) => {
         const user: User = {
@@ -75,17 +80,23 @@ export class AuthService {
           username: response.username,
           user_type: response.user_type,
           number_of_purchases: response.number_of_purchases || 0,
+          firstname: response.firstname,
+          lastname: response.lastname,
+          address: response.address,
+          email: response.email,
+          phone: response.phone,
+          country: response.country,
         };
   
-        console.log('AuthService Token Validation User:', user);
         this.userSubject.next(user); 
       },
-      error: (error) => {
-        console.error('Token validation failed:', error);
+      error: () => {
         this.logout();
       },
     });
   }
+  
+  
   
   logout(): void {
     this.userSubject.next(null);
@@ -119,7 +130,14 @@ export class AuthService {
             id: response.id,
             username: response.username,
             user_type: response.user_type,
-            number_of_purchases: 0
+            number_of_purchases: 0,
+            firstname: response.firstname,
+            lastname: response.lastname,
+            address: response.address,
+            email: response.email,
+            phone: response.phone,
+            country: response.country,
+
           };
   
           this.userSubject.next(user); 

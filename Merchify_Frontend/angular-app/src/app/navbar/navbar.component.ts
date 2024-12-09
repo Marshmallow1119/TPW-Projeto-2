@@ -1,16 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Inject, Injectable } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { User } from '../models/user';
+import { ThemeButtonComponent } from '../theme-button/theme-button.component';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { ThemeButtonComponent } from '../theme-button/theme-button.component';
 
+@Injectable({
+  providedIn: 'root',
+})
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
-  imports: [CommonModule, FormsModule, RouterModule, ThemeButtonComponent],
+  imports: [ThemeButtonComponent, RouterModule, CommonModule, FormsModule],
 })
 export class NavbarComponent implements OnInit {
   searchQuery: string = '';
@@ -18,13 +21,20 @@ export class NavbarComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private cdr: ChangeDetectorRef,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.authService.user$.subscribe((user) => {
+      console.log('NavbarComponent received user:', user);
       this.user = user;
+      this.cdr.detectChanges();
     });
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 
   onKeyUp(): void {
@@ -41,10 +51,5 @@ export class NavbarComponent implements OnInit {
         queryParams: { query: this.searchQuery },
       });
     }
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
   }
 }

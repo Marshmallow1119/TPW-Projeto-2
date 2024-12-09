@@ -2,13 +2,14 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { ProductsPageComponent } from './products-page/products-page.component';
 import { ArtistsPageComponent } from './artists-page/artists-page.component';
-import { CompaniesPageComponent } from './companhias-page/companhias-page.component'; // Correct name
+import { CompaniesPageComponent } from './companhias-page/companhias-page.component';
 import { ProductDetailsComponent } from './product-details/product-details.component';
 import { ArtistsProductsComponent } from './artists-products/artists-products.component';
 import { CompanyProductsComponent } from './company-products/company-products.component';
 import { SearchResultsComponent } from './search-results/search-results.component';
 import { LoginComponent } from './login/login.component';
-import { RegisterComponent } from './register/register.component'; // Correct name
+import { RegisterComponent } from './register/register.component';
+import { AdminHomeComponent } from './admin-home/admin-home.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent }, // Home Route
@@ -21,4 +22,5 @@ export const routes: Routes = [
   { path: 'company/:company_id/products', component: CompanyProductsComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent }, 
+  { path: 'admin', component: AdminHomeComponent }, 
 ];
