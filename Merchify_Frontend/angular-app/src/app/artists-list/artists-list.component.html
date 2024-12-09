@@ -5,7 +5,7 @@
         <a [routerLink]="['/products', artist.name]" class="text-decoration-none">
           <div class="card card-hover" style="height: 400px;">
             <div class="card-img-wrapper" style="height: 85%;">
-              <img [src]="artist.image" class="card-img-top" [alt]="artist.name" style="height: 100%; object-fit: cover;" />
+              <img [src]="artist.image_url" class="card-img-top" [alt]="artist.name" style="height: 100%; object-fit: cover;" />
             </div>
             <div class="card-body text-center" style="height: 15%;">
               <p class="card-text">{{ artist.name }}</p>

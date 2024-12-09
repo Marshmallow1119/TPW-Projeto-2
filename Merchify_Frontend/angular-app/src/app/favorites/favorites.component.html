@@ -1,1 +1,133 @@
-<p>favorites works!</p>
+<div class="container my-5">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+      <ul class="navbar-nav w-100 justify-content-center">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [class.active]="category === 'products'"
+            (click)="switchCategory('products')"
+          >
+            Produtos
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [class.active]="category === 'artists'"
+            (click)="switchCategory('artists')"
+          >
+            Artistas
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [class.active]="category === 'companies'"
+            (click)="switchCategory('companies')"
+          >
+            Empresas
+          </a>
+        </li>
+      </ul>
+    </nav>
+  
+    <!-- Lista de Produtos Favoritos -->
+    <div *ngIf="category === 'products'" class="favorites-section">
+      <h2 class="text-center">Meus Produtos Favoritos</h2>
+      <div *ngIf="favoriteProducts.length > 0; else noFavorites">
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Preço</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of favoriteProducts">
+              <td>
+                <div class="d-flex align-items-center">
+                  <img [src]="product.image" alt="{{ product.name }}" class="product-image mr-3" />
+                  <span>{{ product.name }}</span>
+                </div>
+              </td>
+              <td>{{ product.price }}€</td>
+              <td>
+                <button class="btn btn-danger" (click)="removeFromFavorites('products', product.id)">
+                  <i class="fas fa-trash-alt"></i> Remover
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #noFavorites>
+        <p class="text-muted text-center">Não há produtos favoritos.</p>
+      </ng-template>
+    </div>
+  
+    <!-- Lista de Artistas Favoritos -->
+    <div *ngIf="category === 'artists'" class="favorites-section">
+      <h2 class="text-center">Meus Artistas Favoritos</h2>
+      <div *ngIf="favoriteArtists.length > 0; else noFavorites">
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th>Imagem</th>
+              <th>Artista</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let artist of favoriteArtists">
+              <td>
+                <img [src]="artist.image" alt="{{ artist.name }}" class="product-image mr-3" />
+              </td>
+              <td>{{ artist.name }}</td>
+              <td>
+                <button class="btn btn-danger" (click)="removeFromFavorites('artists', artist.id)">
+                  <i class="fas fa-trash-alt"></i> Remover
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #noFavorites>
+        <p class="text-muted text-center">Não há artistas favoritos.</p>
+      </ng-template>
+    </div>
+  
+    <!-- Lista de Empresas Favoritas -->
+    <div *ngIf="category === 'companies'" class="favorites-section">
+      <h2 class="text-center">Minhas Empresas Favoritas</h2>
+      <div *ngIf="favoriteCompanies.length > 0; else noFavorites">
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th>Imagem</th>
+              <th>Empresa</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let company of favoriteCompanies">
+              <td>
+                <img [src]="company.image" alt="{{ company.name }}" class="product-image mr-3" />
+              </td>
+              <td>{{ company.name }}</td>
+              <td>
+                <button class="btn btn-danger" (click)="removeFromFavorites('companies', company.id)">
+                  <i class="fas fa-trash-alt"></i> Remover
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #noFavorites>
+        <p class="text-muted text-center">Não há empresas favoritas.</p>
+      </ng-template>
+    </div>
+  </div>
+  
