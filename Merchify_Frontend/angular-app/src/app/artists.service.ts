@@ -11,22 +11,20 @@ export class ArtistsService {
   private baseUrl: string = 'http://localhost:8000/ws/';  
   
   constructor(private router:Router) { }
+
   //    path('ws/artists/', views.artistas, name='artistas'),
   async getArtistas(): Promise<Artist[]> {
+    const url = `${this.baseUrl}artists/`;
     try {
-      const response = await fetch(`${this.baseUrl}artists/`);
+      const response: Response = await fetch(url);
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Failed to fetch Artists: ${response.statusText}`);
       }
-      const artists: Artist[] = await response.json();
-      console.log('Fetched Artists:', artists); // Debug log
-      return artists.map((artist) => ({
-        ...artist,
-        image: `http://localhost:8000${artist.image}`, // Adjust image URL if needed
-      }));
+      const artists: Artist[] = (await response.json()) ?? [];
+      return artists;
     } catch (error) {
-      console.error('Error fetching artists:', error);
-      return [];
+      console.error('Error fetching Artists:', error);
+      throw error;
     }
   }
 

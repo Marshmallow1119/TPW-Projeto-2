@@ -1,8 +1,8 @@
 <div class="product-card">
   <!-- Artist Identifier -->
   <div class="artist-identifier" *ngIf="product.artist">
-    <a [routerLink]="['/artistsProducts', product.artist.name]">
-      <img [src]="product.artist.image" [alt]="product.artist.name" />
+    <a [routerLink]="['/products', product.artist.name]">
+      <img [src]="product.artist.image_url" [alt]="product.artist.name" />
     </a>
   </div>
 

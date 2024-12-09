@@ -30,15 +30,6 @@ export class ProdutosArtistaService {
       }
       const response = await data.json(); 
       console.log('Fetched artist products:', response); 
-      if (response.products) {
-        response.products.forEach((product: any) => {
-          product.image = `http://localhost:8000${product.image_url}`;
-        });
-      }
-      if (response.artist) {
-        response.artist.image = `http://localhost:8000${response.artist.image_url}`;
-        response.artist.backgroundUrl = `http://localhost:8000${response.artist.background_url}`;
-      }
       return response; 
     } catch (error) {
       console.error('Erro ao buscar produtos:', error); 

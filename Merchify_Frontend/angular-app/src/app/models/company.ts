@@ -1,11 +1,12 @@
-export interface Company {
+
+  export interface Company {
     id: number;
     name: string;
     address?: string;
     email: string;
     phone: string;
-    image?: string;
-    productCount: number;  
-    averageRating: number;
-    isFavorited: boolean; 
+    logo_base64?: string; 
+    product_count: number; 
+    average_rating: number | string; 
+    is_favorited: boolean; 
   }

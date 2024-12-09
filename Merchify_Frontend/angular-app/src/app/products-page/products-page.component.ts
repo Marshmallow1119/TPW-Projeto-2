@@ -4,6 +4,8 @@ import { Product } from '../models/produto';
 import { ProductCardComponent } from '../product-card/product-card.component';
 import { FiltroComponent } from '../filtro/filtro.component';
 import { CommonModule } from '@angular/common';
+import { ArtistsService } from '../artists.service';
+import { Artist } from '../models/artista';
 
 @Component({
   selector: 'app-products-page',
@@ -14,22 +16,48 @@ import { CommonModule } from '@angular/common';
 })
 export class ProductsPageComponent implements OnInit {
   products: Product[] = [];
+  artists: Artist[] = [];
   filteredProducts: Product[] = [];
   filters: any = {}; 
   private productService: ProductsService = inject(ProductsService);
+  private artistsService: ArtistsService = inject(ArtistsService);
   user: any = { is_authenticated: true, user_type: 'individual' }; 
   
   async ngOnInit(): Promise<void> {
-    await this.loadProductsData();
+    await this.loadProductsAndArtistsData();
   }
 
-  private async loadProductsData(): Promise<void> {
+  private async loadProductsAndArtistsData(): Promise<void> {
     try {
-      this.products = await this.productService.getProducts();
+      // Fetch products and artists in parallel
+      const [products, artists] = await Promise.all([
+        this.productService.getProducts(),
+        this.artistsService.getArtistas(),
+      ]);
+      const artistMap = artists.reduce((map, artist) => {
+        map[artist.id] = artist;
+        return map;
+      }, {} as { [key: number]: Artist });
+  
+      this.products = products.map(product => {
+        const productArtist = product.artist; 
+        const associatedArtist = typeof productArtist === 'number' 
+          ? artistMap[productArtist] 
+          : productArtist; 
+  
+        console.log(`Produto: ${product.name}, Artista Associado:`, associatedArtist);
+  
+        return {
+          ...product,
+          artist: associatedArtist, 
+        };
+      });
+      this.artists = artists;
       this.filteredProducts = [...this.products];
-      console.log('Produtos carregados:', this.products);
+
+      console.log('Produtos e artistas carregados:', { products, artists });
     } catch (error) {
-      console.error('Erro ao carregar produtos:', error);
+      console.error('Erro ao carregar produtos e artistas:', error);
     }
   }
 

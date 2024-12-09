@@ -13,17 +13,17 @@ export class CompaniesService {
   // Fetch all companies
   async getCompanies(): Promise<Company[]> {
     const url = `${this.baseUrl}companhias/`;
-    const response: Response = await fetch(url);
-    const companies: Company[] = (await response.json()) ?? [];
-    
-    // Prepend the base URL to image paths if necessary
-    companies.forEach((company) => {
-      if (company.image && !company.image.startsWith('http')) {
-        company.image = `${this.baseUrl.replace('/ws/', '')}${company.image}`;
+    try {
+      const response: Response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch companies: ${response.statusText}`);
       }
-    });
-    
-    return companies;
+      const companies: Company[] = (await response.json()) ?? [];
+      return companies;
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+      throw error;
+    }
   }
 
   // Toggle favorite for a company
