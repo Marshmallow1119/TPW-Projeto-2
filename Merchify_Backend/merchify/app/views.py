@@ -526,6 +526,7 @@ def register_view(request):
            'username': user.username,
            'id': user.id,
        }, status=status.HTTP_201_CREATED)
+   print(serializer.errors)
    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -543,6 +544,7 @@ def login(request):
                 'refresh': str(refresh),
                 'username': user.username,
                 'id': user.id,
+                'user_type': user.user_type,
             }, status=status.HTTP_200_OK)
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -1535,35 +1537,16 @@ def delete_product(request, product_id):
     product.delete()
     return redirect('company_products', company_id=company_id)
 
-@login_required
-def admin_home(request):
-    if not request.user.is_superuser:  # Ensure user is an admin
-        raise PermissionDenied
+
+
+@api_view(['GET'])
+def get_users(request):
     users = User.objects.all()
-    products = Product.objects.all()
-    companies = Company.objects.all()
-    for product in products:
-        if hasattr(product, 'clothing'): 
-            sizes = product.clothing.sizes.all()
-            product.size_stock = {
-                'XS': sizes.filter(size='XS').first().stock if sizes.filter(size='XS').exists() else 0,
-                'S': sizes.filter(size='S').first().stock if sizes.filter(size='S').exists() else 0,
-                'M': sizes.filter(size='M').first().stock if sizes.filter(size='M').exists() else 0,
-                'L': sizes.filter(size='L').first().stock if sizes.filter(size='L').exists() else 0,
-                'XL': sizes.filter(size='XL').first().stock if sizes.filter(size='XL').exists() else 0,
-            }
-        else:
-            product.size_stock = product.get_stock()
-    for product in products:
-        product.favorites_count = product.favorites.count()
-        product.reviews_count = product.reviews.count()
+    
+    serialized_users = UserSerializer(users, many=True)
 
-    for product in products:
-        product.review_count = Review.objects.filter(product=product).count()
-
-    for user in users:
-        user.number_of_purchases = Purchase.objects.filter(user=user).count()
-    return render(request, 'admin_home.html', {'users': users, 'products': products, 'companies': companies})
+    
+    return Response(serialized_users.data)
 
 @api_view(['DELETE'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
@@ -1756,3 +1739,36 @@ def add_stock(request, product_id):
         return redirect('company_product_detail', company_id=product.company.id, product_id=product.id)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+"""
+@login_required
+def admin_home(request):
+    if not request.user.is_superuser:  # Ensure user is an admin
+        raise PermissionDenied
+    users = User.objects.all()
+    products = Product.objects.all()
+    companies = Company.objects.all()
+    for product in products:
+        if hasattr(product, 'clothing'): 
+            sizes = product.clothing.sizes.all()
+            product.size_stock = {
+                'XS': sizes.filter(size='XS').first().stock if sizes.filter(size='XS').exists() else 0,
+                'S': sizes.filter(size='S').first().stock if sizes.filter(size='S').exists() else 0,
+                'M': sizes.filter(size='M').first().stock if sizes.filter(size='M').exists() else 0,
+                'L': sizes.filter(size='L').first().stock if sizes.filter(size='L').exists() else 0,
+                'XL': sizes.filter(size='XL').first().stock if sizes.filter(size='XL').exists() else 0,
+            }
+        else:
+            product.size_stock = product.get_stock()
+    for product in products:
+        product.favorites_count = product.favorites.count()
+        product.reviews_count = product.reviews.count()
+
+    for product in products:
+        product.review_count = Review.objects.filter(product=product).count()
+
+    for user in users:
+        user.number_of_purchases = Purchase.objects.filter(user=user).count()
+    return render(request, 'admin_home.html', {'users': users, 'products': products, 'companies': companies})
+"""

@@ -1,0 +1,42 @@
+<h1>Lista de Utilizadores:</h1>
+<div *ngIf="users?.length; else noUsers">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Imagem</th>
+        <th scope="col">Username</th>
+        <th scope="col">Email</th>
+        <th scope="col">Número de Compras</th>
+        <th scope="col">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>
+          <img
+            [src]="user.image_base64"
+            [alt]="user.name"
+            class="user-image"
+          />
+        </td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.number_of_purchases }}</td>
+        <td>
+          <a
+            href="#"
+            class="btn btn-danger btn-sm"
+            data-toggle="modal"
+            data-target="#exampleModal2"
+            [attr.data-user-id]="user.id"
+          >
+            <i class="fas fa-trash-alt"></i> Banir Utilizador
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<ng-template #noUsers>
+  <p class="text-muted">No users found.</p>
+</ng-template>
