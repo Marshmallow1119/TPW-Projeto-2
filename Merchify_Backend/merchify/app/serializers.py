@@ -166,20 +166,24 @@ class CartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ['id', 'cart', 'product', 'quantity', 'size', 'total']
 
-# Serializer para o modelo Favorite
+
 class FavoriteSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)  # Usa o ProductSerializer
+
     class Meta:
         model = Favorite
         fields = ['id', 'user', 'product']
 
-# Serializer para o modelo FavoriteArtist
 class FavoriteArtistSerializer(serializers.ModelSerializer):
+    artist = ArtistSerializer(read_only=True)  # Usa o ArtistSerializer
+
     class Meta:
         model = FavoriteArtist
         fields = ['id', 'user', 'artist']
 
-# Serializer para o modelo FavoriteCompany
 class FavoriteCompanySerializer(serializers.ModelSerializer):
+    company = CompanySerializer(read_only=True)  # Usa o CompanySerializer
+
     class Meta:
         model = FavoriteCompany
         fields = ['id', 'user', 'company']
