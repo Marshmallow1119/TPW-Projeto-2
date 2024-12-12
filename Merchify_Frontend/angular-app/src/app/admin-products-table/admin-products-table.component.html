@@ -29,23 +29,23 @@
             <td>{{ product.category }}</td>
             <td>
               <div *ngIf="isVinil(product)">
-                Genre: {{ product.genre }} <br />
-                LP Size: {{ product.lpSize }} <br />
-                Release Date: {{ product.releaseDate }}
+                Genre: {{ product.specific_details.genre }} <br />
+                LP Size: {{ product.specific_details.lpSize }} <br />
+                Release Date: {{ product.specific_details.releaseDate }}
               </div>
               <div *ngIf="isCD(product)">
                 Genre: {{ product.genre }} <br />
                 Release Date: {{ product.releaseDate }}
               </div>
               <div *ngIf="isClothing(product)">
-                Color: {{ product.color }} <br />
+                Color: {{ product.specific_details.color }} <br />
                 Sizes:
                 <span *ngFor="let size of product.sizes">{{ size.size }}</span>
               </div>
               <div *ngIf="isAccessory(product)">
-                Material: {{ product.material }} <br />
-                Color: {{ product.color }} <br />
-                Size: {{ product.size }}
+                Material: {{ product.specific_details.material }} <br />
+                Color: {{ product.specific_details.color }} <br />
+                Size: {{ product.specific_details.size }}
               </div>
             </td>
             <td>
@@ -56,7 +56,7 @@
               </button>
               <button
                 class="btn btn-danger btn-sm"
-              >
+                (click) = "openDeleteModal(product)"
                 Apagar
               </button>
             </td>
@@ -69,3 +69,11 @@
     </ng-template>
   </div>
   
+
+  <app-delete-product-modal
+  *ngIf="selectedProduct"
+  [productName]="selectedProduct.name"
+  [productId]="selectedProduct.id"
+  (confirmDelete)="onConfirmDelete($event)"
+>
+</app-delete-product-modal>

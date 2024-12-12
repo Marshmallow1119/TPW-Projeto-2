@@ -4,29 +4,34 @@ import { ProductsService } from '../products.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { DeleteProductModalComponent } from '../delete-product-modal/delete-product-modal.component';
 
 @Component({
   selector: 'app-admin-products-table',
-  templateUrl: './admin-products-table.component.html',
-  styleUrls: ['./admin-products-table.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  templateUrl: './admin-products-table.component.html',
+  styleUrl: './admin-products-table.component.css',
+  imports: [CommonModule, RouterModule, DeleteProductModalComponent]
 })
 export class AdminProductsTableComponent implements OnInit {
-  @Input() products: Product[] = [];
+  products: Product[] = [];
   errorMessage: string | null = null;
-
+  selectedProduct: Product | null = null;
+  
   constructor(private productService: ProductsService) {}
 
-  ngOnInit(): void {
-    this.fetchProducts();
+  async ngOnInit(): Promise<void> {
+    await this.fetchProducts();
+    console.log('Products:', this.products);
   }
 
   async fetchProducts(): Promise<void> {
     try {
       this.products = await this.productService.getProducts();
+      console.log('Fetched products:', this.products);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching products:', error);
+      this.errorMessage = 'Error fetching products';
     }
   }
 
@@ -50,5 +55,29 @@ export class AdminProductsTableComponent implements OnInit {
     this.productService.deleteProduct(id);
     this.products = this.products.filter((product) => product.id !== id);
   }
+
+
+  openDeleteModal(product: Product): void {
+    this.selectedProduct = product;
+    const modal = document.getElementById('deleteProductModal');
+    if (modal) {
+      modal.classList.add('show');
+      modal.style.display = 'block';
+    }
+  }
+
+  closeDeleteModal(): void {
+    const modal = document.getElementById('deleteProductModal');
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+    }
+  }
+
+  onConfirmDelete(productId: number): void {
+    console.log('Deleting product with ID:', productId);
+    this.closeDeleteModal();
+  }
+  
 
 }

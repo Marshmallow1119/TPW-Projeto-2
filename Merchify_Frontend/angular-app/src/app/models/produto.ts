@@ -18,6 +18,7 @@ export interface Product {
   average_rating?: string | number; 
   product_type?: string; 
   stock?: number; 
+  specific_details?: any;
 }
 
 export interface Vinil extends Product {

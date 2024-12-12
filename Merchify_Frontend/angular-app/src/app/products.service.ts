@@ -25,6 +25,7 @@ export class ProductsService {
 
   }
 
+
   //getProducts
   async getProducts(): Promise<Product[]> {
     try {
@@ -33,7 +34,6 @@ export class ProductsService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const products: Product[] = await response.json();
-      console.log('Fetched Products:', products); 
       return products.map((product) => ({
         ...product,
         image: `http://localhost:8000${product.image}`, 

@@ -78,12 +78,13 @@ class ProductSerializer(serializers.ModelSerializer):
     average_rating = serializers.SerializerMethodField()
     product_type = serializers.SerializerMethodField()
     stock = serializers.SerializerMethodField()
+    specific_details = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'description', 'price', 'image', 'artist', 'company',
-            'category', 'addedProduct', 'count', 'average_rating', 'product_type', 'stock'
+            'category', 'addedProduct', 'count', 'average_rating', 'product_type', 'stock', 'specific_details'
         ]
 
     def get_average_rating(self, obj):
@@ -97,6 +98,34 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_stock(self, obj):
         """Obtém o estoque do produto."""
         return obj.get_stock()
+    
+    def get_specific_details(self, obj):
+        product_type = obj.get_product_type()
+        if product_type == 'Vinil':
+            try:
+                vinil_instance = obj.vinil  
+                return VinilSerializer(vinil_instance).data
+            except AttributeError:
+                return {}
+        elif product_type == 'CD':
+            try:
+                cd_instance = obj.cd
+                return CDSerializer(cd_instance).data
+            except AttributeError:
+                return {}
+        elif product_type == 'Clothing':
+            try:
+                clothing_instance = obj.clothing  
+                return ClothingSerializer(clothing_instance).data
+            except AttributeError:
+                return {}
+        elif product_type == 'Accessory':
+            try:
+                accessory_instance = obj.accessory  
+                return AccessorySerializer(accessory_instance).data
+            except AttributeError:
+                return {}
+        return {}
 
 
 # Serializer para o modelo Size
