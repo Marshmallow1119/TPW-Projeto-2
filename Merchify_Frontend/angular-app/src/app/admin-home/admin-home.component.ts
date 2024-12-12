@@ -13,31 +13,8 @@ import { Product } from '../models/produto';
   styleUrls: ['./admin-home.component.css'],
   imports: [AdminUsersTableComponent, AdminProductsTableComponent],
 })
-export class AdminHomeComponent implements OnInit {
-  users: User[] = [];
-  products: Product[] = [];
+export class AdminHomeComponent  {
 
+  constructor() {}
 
-  constructor(private usersService: UsersService, private productsService: ProductsService) {}
-
-  async ngOnInit(): Promise<void> {
-    await this.fetchUsers();
-    
-  }
-
-  async fetchUsers(): Promise<void> {
-    try {
-      this.users = await this.usersService.getUsers();
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
-  }
-
-  async fetchProducts(): Promise<void> {
-    try {
-      this.products = await this.productsService.getProducts();
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
-  }
 }

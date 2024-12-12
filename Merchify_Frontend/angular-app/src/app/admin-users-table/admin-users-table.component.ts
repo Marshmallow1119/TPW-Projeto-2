@@ -12,12 +12,13 @@ import { User } from '../models/user';
   styleUrl: './admin-users-table.component.css',
 })
 export class AdminUsersTableComponent {
-  @Input() users: User[] = [];
+  users: User[] = [];
 
   constructor(private usersService: UsersService) {}
 
   async ngOnInit(): Promise<void> {
     await this.fetchUsers();
+    console.log('Users:', this.users);
   }
 
   async fetchUsers(): Promise<void> {

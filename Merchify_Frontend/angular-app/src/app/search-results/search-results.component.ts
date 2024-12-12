@@ -38,7 +38,7 @@ export class SearchResultsComponent implements OnInit {
     try {
       const results = await this.searchService.search(query);
       this.artists = results.artists;
-      console.log('Artists:', this.artists); // Debug log
+      console.log('Artists:', this.artists); 
       this.products = results.products;
     } catch (error) {
       console.error('Error fetching search results:', error);
