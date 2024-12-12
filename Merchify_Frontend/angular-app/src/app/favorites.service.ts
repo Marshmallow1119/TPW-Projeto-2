@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class FavoritesService {
 
-  private baseUrl = 'http://localhost:8000/ws/';
+  private baseUrl = 'http://localhost:8000/ws/favorites/';
 
 
   constructor() { }

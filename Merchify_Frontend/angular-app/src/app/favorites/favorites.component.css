@@ -1,0 +1,36 @@
+.product-image {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+  }
+  
+  .product-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .product-info h5 {
+    margin-bottom: 0;
+  }
+  
+  .table td {
+    vertical-align: middle;
+  }
+  
+  .navzinha {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .navzinha .nav-item {
+    margin-right: 20px;
+  }
+  
+  .navzinha .nav-item:last-child {
+    margin-right: 0;
+  }
+  
+  .favorite-section {
+    padding: 20px;
+  }
+  
