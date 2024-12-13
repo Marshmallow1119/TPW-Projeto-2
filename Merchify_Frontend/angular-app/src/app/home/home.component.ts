@@ -53,8 +53,6 @@ export class HomeComponent {
       const data = await this.homeService.getHomeData();
       this.artists = data.artists;
       this.recentProducts = data.recent_products;
-      console.log('Artistas carregados:', this.artists);
-      console.log('Produtos recentes carregados:', this.recentProducts);
     } catch (error) {
       console.error('Erro ao carregar dados da home:', error);
     }

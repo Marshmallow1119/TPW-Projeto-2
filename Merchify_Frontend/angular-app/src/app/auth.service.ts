@@ -152,5 +152,41 @@ export class AuthService {
       })
     );
   }
+
+  isAuthenticated(): boolean {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      return false;
+    }
+  
+    return !this.isTokenExpired(token);
+  }
+
+  private isTokenExpired(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp * 1000 < Date.now();
+    } catch (e) {
+      console.error('Erro ao verificar expiração do token:', e);
+      return true;
+    }
+  }
+
+  getUserId(): number | null {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      return null;
+    }
+  
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1])); // Decodifica o payload do JWT
+      return payload.user_id || null; // Retorne o ID do usuário se existir no payload
+    } catch (e) {
+      console.error('Erro ao decodificar token:', e);
+      return null;
+    }
+  }
+  
+  
   
 }
