@@ -23,7 +23,7 @@ export class ProdutosCompanhiaService {
       console.error('ID da companhia está vazio ou inválido');
       return null;
     }
-    const url = `${this.baseUrl}company/${company_id}/products/`;
+    const url = `${this.baseUrl}/company/${company_id}/products/`;
     console.log(`Fetching products for company: ${company_id} from URL: ${url}`);
 
     try {

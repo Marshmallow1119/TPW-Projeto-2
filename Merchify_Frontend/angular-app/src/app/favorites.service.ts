@@ -13,7 +13,7 @@ export class FavoritesService {
 
   // Obtém favoritos por categoria
   async getFavorites(category: string): Promise<any> {
-    const response = await fetch(`${this.baseUrl}${category}/`, {
+    const response = await fetch(`${this.baseUrl}/${category}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -25,7 +25,7 @@ export class FavoritesService {
 
   // Adiciona um produto aos favoritos
   async addFavorite(productId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}add/${productId}/`, {
+    const response = await fetch(`${this.baseUrl}/add/${productId}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -37,7 +37,7 @@ export class FavoritesService {
 
   // Adiciona um artista aos favoritos
   async addFavoriteArtist(artistId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}add/artist/${artistId}/`, {
+    const response = await fetch(`${this.baseUrl}/add/artist/${artistId}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -49,7 +49,7 @@ export class FavoritesService {
 
   // Adiciona uma companhia aos favoritos
   async addFavoriteCompany(companyId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}add/company/${companyId}/`, {
+    const response = await fetch(`${this.baseUrl}/add/company/${companyId}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -61,7 +61,7 @@ export class FavoritesService {
 
   // Remove um produto dos favoritos
   async removeFavorite(productId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}remove/${productId}/`, {
+    const response = await fetch(`${this.baseUrl}/remove/${productId}/`, {
       method: 'DELETE'
     });
     return response.json();
@@ -69,7 +69,7 @@ export class FavoritesService {
 
   // Remove um artista dos favoritos
   async removeFavoriteArtist(artistId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}remove/artist/${artistId}/`, {
+    const response = await fetch(`${this.baseUrl}/remove/artist/${artistId}/`, {
       method: 'DELETE'
     });
     return response.json();
@@ -77,7 +77,7 @@ export class FavoritesService {
 
   // Remove uma companhia dos favoritos
   async removeFavoriteCompany(companyId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}remove/company/${companyId}/`, {
+    const response = await fetch(`${this.baseUrl}/remove/company/${companyId}/`, {
       method: 'DELETE'
     });
     return response.json();

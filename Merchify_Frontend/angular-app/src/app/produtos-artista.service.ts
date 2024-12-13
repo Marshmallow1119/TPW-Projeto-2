@@ -20,7 +20,7 @@ export class ProdutosArtistaService {
       console.error('Nome do artista está vazio ou inválido');
       return null;
     }
-    const url = `${this.baseUrl}products/${name}`;
+    const url = `${this.baseUrl}/products/${name}`;
     console.log(`Fetching products for artist: ${name} from URL: ${url}`);
   
     try {

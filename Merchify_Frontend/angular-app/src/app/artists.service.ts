@@ -14,7 +14,7 @@ export class ArtistsService {
 
   //    path('ws/artists/', views.artistas, name='artistas'),
   async getArtistas(): Promise<Artist[]> {
-    const url = `${this.baseUrl}artists/`;
+    const url = `${this.baseUrl}/artists/`;
     try {
       const response: Response = await fetch(url);
       if (!response.ok) {

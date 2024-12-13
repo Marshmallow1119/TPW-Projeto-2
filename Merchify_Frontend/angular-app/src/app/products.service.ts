@@ -62,7 +62,7 @@ export class ProductsService {
 
   async editProduct(product: Product): Promise<void> {
     try {
-      await fetch(`${this.baseUrl}products/${product.id}/`, {
+      await fetch(`${this.baseUrl}/products/${product.id}/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

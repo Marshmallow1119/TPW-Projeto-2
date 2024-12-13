@@ -13,7 +13,7 @@ export class CompaniesService {
 
   // Fetch all companies
   async getCompanies(): Promise<Company[]> {
-    const url = `${this.baseUrl}companhias/`;
+    const url = `${this.baseUrl}/companhias/`;
     try {
       const response: Response = await fetch(url);
       if (!response.ok) {
