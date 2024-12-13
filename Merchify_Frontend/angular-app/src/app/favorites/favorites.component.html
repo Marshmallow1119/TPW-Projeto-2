@@ -50,7 +50,7 @@
               </td>
               <td>{{ product.product.price }}€</td>
               <td class="text-right">
-                <button class="btn btn-danger mr-2" (click)="removeProductFromFavorites(product.id)">
+                <button class="btn btn-danger mr-2" (click)="removeProductFromFavorites(product.product.id)">
                   <i class="fas fa-trash-alt"></i> Remover
                 </button>
               </td>
@@ -82,7 +82,7 @@
               </td>
               <td>{{ artist.artist.name }}</td>
               <td class="text-right">
-                <button class="btn btn-danger mr-2" (click)="removeArtistFromFavorites(artist.id)">
+                <button class="btn btn-danger mr-2" (click)="removeArtistFromFavorites(artist.artist.id)">
                   <i class="fas fa-trash-alt"></i> Remover
                 </button>
               </td>
