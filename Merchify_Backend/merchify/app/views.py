@@ -632,9 +632,21 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
     - DELETE: Remover um item do carrinho
     """
 
+    """
+    quero verificar se o user nao tiver carrinho quero criar um para ele
+
+    """
 
     if not user_id or user_id != request.user.id:
         return Response({"error": "Acesso não autorizado."}, status=status.HTTP_403_FORBIDDEN)
+
+    """
+    quero verificar se o user nao tiver carrinho quero criar um para ele
+    """
+    if not Cart.objects.filter(user=request.user).exists():
+        Cart.objects.create(user=request.user)
+
+
 
     if request.method == 'GET':
         print("aqui")
