@@ -645,7 +645,9 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
     if request.method == 'GET':
         print("aqui")
         try:
-            cart = Cart.objects.get(user_id=user_id)
+            print("paroooooo")
+            cart = Cart.objects.get(user=request.user)
+            print("paroooooo1")
             cart_items = CartItem.objects.filter(cart=cart)
             serializer = CartItemSerializer(cart_items, many=True)
             return Response({"cart_items": serializer.data}, status=status.HTTP_200_OK)
@@ -654,7 +656,6 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
 
     elif request.method == 'POST':
         print("aqui no adicionar")
-        # Adicionar um item ao carrinho
         if product_id:
             print("aqui no adicionar")
             try:
