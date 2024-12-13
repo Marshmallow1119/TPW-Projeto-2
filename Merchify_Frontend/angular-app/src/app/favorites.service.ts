@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
+import { CONFIG } from './config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FavoritesService {
 
-  private baseUrl = 'http://localhost:8000/ws/';
+  private baseUrl: string = CONFIG.baseUrl;
 
 
   constructor() { }

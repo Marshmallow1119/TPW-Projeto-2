@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { base64toBlob } from './utils';
+import { CONFIG } from './config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductDetailsService {
-  private baseUrl: string = 'http://localhost:8000/ws/';  
+  private baseUrl: string = CONFIG.baseUrl;
 
    constructor(private router:Router) { }
 

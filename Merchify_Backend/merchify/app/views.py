@@ -51,6 +51,7 @@ from app.serializers import FavoriteArtistSerializer, FavoriteCompanySerializer,
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.authtoken.models import Token
 
 @api_view(['GET'])
@@ -367,74 +368,83 @@ def artistsProducts(request, name):
 #    return render(request, 'productDetails.html', context)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'DELETE', 'PUT'])
 def productDetails(request, identifier):
-    product = get_object_or_404(Product, id=identifier)
-    product.count += 1
-    product.save()
+    if request.method == 'GET':
+        product = get_object_or_404(Product, id=identifier)
+        product.count += 1
+        product.save()
 
-    # Base product data
-    product_data = {
-        'id': product.id,
-        'name': product.name,
-        'description': product.description,
-        'price': product.price,
-        'image': product.image.url if product.image else None,
-        'artist': {'name': product.artist.name} if product.artist else None,
-        'company': {'name': product.company.name} if product.company else None,
-        'category': product.category,
-        'addedProduct': product.addedProduct.strftime('%Y-%m-%d') if product.addedProduct else None,
-        'count': product.count,
-        'average_rating': product.get_average_rating(),
-        'product_type': product.get_product_type(),
-        'stock': product.get_stock(),
-    }
+        # Base product data
+        product_data = {
+            'id': product.id,
+            'name': product.name,
+            'description': product.description,
+            'price': product.price,
+            'image': product.image.url if product.image else None,
+            'artist': {'name': product.artist.name} if product.artist else None,
+            'company': {'name': product.company.name} if product.company else None,
+            'category': product.category,
+            'addedProduct': product.addedProduct.strftime('%Y-%m-%d') if product.addedProduct else None,
+            'count': product.count,
+            'average_rating': product.get_average_rating(),
+            'product_type': product.get_product_type(),
+            'stock': product.get_stock(),
+        }
 
-    # Add clothing-specific data if applicable
-    if hasattr(product, 'clothing'):
-        product_data['sizes'] = [
-            {'id': size.id, 'size': size.size, 'stock': size.stock}
-            for size in product.clothing.sizes.all()
+        # Add clothing-specific data if applicable
+        if hasattr(product, 'clothing'):
+            product_data['sizes'] = [
+                {'id': size.id, 'size': size.size, 'stock': size.stock}
+                for size in product.clothing.sizes.all()
+            ]
+
+        # Add vinil-specific data if applicable
+        if hasattr(product, 'vinil'):
+            product_data['vinil'] = {
+                'genre': product.vinil.genre,
+                'lpSize': product.vinil.lpSize,
+                'releaseDate': product.vinil.releaseDate.strftime('%Y-%m-%d') if product.vinil.releaseDate else None,
+                'stock': product.vinil.stock,
+            }
+
+        # Add CD-specific data if applicable
+        if hasattr(product, 'cd'):
+            product_data['cd'] = {
+                'genre': product.cd.genre,
+                'releaseDate': product.cd.releaseDate.strftime('%Y-%m-%d') if product.cd.releaseDate else None,
+                'stock': product.cd.stock,
+            }
+
+        # Add accessory-specific data if applicable
+        if hasattr(product, 'accessory'):
+            product_data['accessory'] = {
+                'material': product.accessory.material,
+                'color': product.accessory.color,
+                'size': product.accessory.size,
+                'stock': product.accessory.stock,
+            }
+
+        # Add reviews
+        product_data['reviews'] = [
+            {
+                'user': {'username': review.user.username},
+                'rating': review.rating,
+                'text': review.text,
+                'date': review.date.strftime('%Y-%m-%d') if review.date else None,
+            }
+            for review in product.reviews.all()
         ]
 
-    # Add vinil-specific data if applicable
-    if hasattr(product, 'vinil'):
-        product_data['vinil'] = {
-            'genre': product.vinil.genre,
-            'lpSize': product.vinil.lpSize,
-            'releaseDate': product.vinil.releaseDate.strftime('%Y-%m-%d') if product.vinil.releaseDate else None,
-            'stock': product.vinil.stock,
-        }
+        return JsonResponse(product_data, safe=False)
+    elif request.method == 'DELETE':
+        if not (request.user.user_type == 'admin' or request.user.user_type == 'company'):
+            print("User is not admin or company")
+            raise PermissionDenied
+        product = get_object_or_404(Product, id=identifier)
+        product.delete()
+        return JsonResponse({'message': 'Produto excluído com sucesso!'})
 
-    # Add CD-specific data if applicable
-    if hasattr(product, 'cd'):
-        product_data['cd'] = {
-            'genre': product.cd.genre,
-            'releaseDate': product.cd.releaseDate.strftime('%Y-%m-%d') if product.cd.releaseDate else None,
-            'stock': product.cd.stock,
-        }
-
-    # Add accessory-specific data if applicable
-    if hasattr(product, 'accessory'):
-        product_data['accessory'] = {
-            'material': product.accessory.material,
-            'color': product.accessory.color,
-            'size': product.accessory.size,
-            'stock': product.accessory.stock,
-        }
-
-    # Add reviews
-    product_data['reviews'] = [
-        {
-            'user': {'username': review.user.username},
-            'rating': review.rating,
-            'text': review.text,
-            'date': review.date.strftime('%Y-%m-%d') if review.date else None,
-        }
-        for review in product.reviews.all()
-    ]
-
-    return JsonResponse(product_data, safe=False)
 
 
 
@@ -497,6 +507,18 @@ def register_view(request):
        }, status=status.HTTP_201_CREATED)
    print(serializer.errors)
    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def ban_user(request, user_id):
+    print(request.headers.get('Authorization'))  # Ensure the token is received
+    print(request.user)  # Check the authenticated user
+
+    user = get_object_or_404(User, id=user_id)
+    user.is_banned = True
+    user.save()
+    return JsonResponse({'message': 'User banned successfully!'})
 
 
 @api_view(['POST'])
@@ -1713,11 +1735,11 @@ def edit_product(request, product_id):
             return Response({"success": True})
 
 
-@api_view(['DELETE'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
-@permission_classes([IsAuthenticated])
 def delete_product(request, product_id):
+    print(request.user.user_type)
+    print(request)
     if not (request.user.user_type == 'admin' or request.user.user_type == 'company'):
+        print("User is not admin or company")
         raise PermissionDenied
     product = get_object_or_404(Product, id=product_id)
     company_id = product.company.id 

@@ -1,5 +1,4 @@
 <div id="product-section" class="content-table">
-    <h1>Lista de Produtos:</h1>
     <div *ngIf="errorMessage" class="alert alert-danger">
       {{ errorMessage }}
     </div>
@@ -56,7 +55,7 @@
               </button>
               <button
                 class="btn btn-danger btn-sm"
-                (click) = "openDeleteModal(product)"
+                (click) = "openDeleteModal(product)">
                 Apagar
               </button>
             </td>
@@ -75,5 +74,5 @@
   [productName]="selectedProduct.name"
   [productId]="selectedProduct.id"
   (confirmDelete)="onConfirmDelete($event)"
->
-</app-delete-product-modal>
+  (closeModal)="closeDeleteModal()"
+></app-delete-product-modal>

@@ -5,8 +5,56 @@
     border-radius: 50%;
 }
 #product-section, #user-section, #company-section {
-    max-height: 800px; /* adjust as needed */
+    max-height: 800px; 
     overflow-y: auto;
+}
+
+#product-section {
+    justify-content: center; /* Centers the table horizontally */
+    align-items: center; /* Centers the table vertically in its container */
+    width: 100%; /* Keeps the container full width */
+    height: auto; /* Ensures the height adjusts to content */
+    background-color: #fff;
+    padding: 20px; /* Adds padding around the container */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-x: hidden; /* Prevents horizontal overflow */
+}
+
+.table {
+    width: 100%; /* Increases the width of the table relative to its container */
+    max-width: 1500px; /* Ensures the table doesn’t grow too large */
+    margin: 0 auto; /* Centers the table */
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+    text-align: center; /* Aligns table content */
+}
+
+.table td,
+.table th {
+    padding: 10px;
+    vertical-align: middle; /* Ensures proper alignment */
+}
+
+.content-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; /* Centers all content */
+    width: 100%;
+    min-height: 100vh; /* Ensures content fills the full height of the viewport */
+}
+
+.container-fluid {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; /* Centers content horizontally */
+    height: 100%;
 }
 
 .product-image {
@@ -67,4 +115,27 @@
 
 .content-table.active {
     display: block;
+}
+
+.table th {
+    background-color: #f1f1f1; /* Light background for header */
+    text-align: center;
+    padding: 10px;
+}
+
+.table td {
+    padding: 10px;
+    text-align: center;
+}
+
+.table tr {
+    border-bottom: 1px solid #ddd; /* Add row separators */
+}
+
+.table tr:last-child {
+    border-bottom: none; /* Remove border for the last row */
+}
+
+.table tr:hover {
+    background-color: #f9f9f9; /* Highlight row on hover */
 }

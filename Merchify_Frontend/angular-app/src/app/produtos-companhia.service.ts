@@ -1,12 +1,13 @@
 
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { CONFIG } from './config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProdutosCompanhiaService {
-  private baseUrl: string = 'http://localhost:8000/ws/';
+  private baseUrl: string = CONFIG.baseUrl;
 
   constructor(private router:Router) {}
 

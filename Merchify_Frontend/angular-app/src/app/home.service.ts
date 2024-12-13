@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Product } from './models/produto';
 import { base64toBlob } from './utils';
+import { CONFIG } from './config';
 
 @Injectable({
   providedIn: 'root' 
 })
 export class HomeService {
-  private baseUrl: string = 'http://localhost:8000/ws/';
+   baseUrl: string = CONFIG.baseUrl;
 
   constructor() {}
 

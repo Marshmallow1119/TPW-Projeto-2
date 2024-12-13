@@ -26,7 +26,7 @@ export class LoginComponent {
         this.errorMessage = null; 
         localStorage.setItem('accessToken', response.access);
         localStorage.setItem('refreshToken', response.refresh);
-
+        console.log('User type:', response.user_type);
         switch (response.user_type) {
           case 'individual':
             this.router.navigate(['/']);

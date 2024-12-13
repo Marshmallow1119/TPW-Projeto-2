@@ -55,29 +55,22 @@ export class AdminProductsTableComponent implements OnInit {
     this.productService.deleteProduct(id);
     this.products = this.products.filter((product) => product.id !== id);
   }
-
-
+  
   openDeleteModal(product: Product): void {
+    console.log('Opening modal for product:', product);
     this.selectedProduct = product;
-    const modal = document.getElementById('deleteProductModal');
-    if (modal) {
-      modal.classList.add('show');
-      modal.style.display = 'block';
-    }
+    console.log('Selected product:', this.selectedProduct);
   }
-
+  
   closeDeleteModal(): void {
-    const modal = document.getElementById('deleteProductModal');
-    if (modal) {
-      modal.classList.remove('show');
-      modal.style.display = 'none';
-    }
+    console.log('Closing modal');
+    this.selectedProduct = null;
   }
-
+  
   onConfirmDelete(productId: number): void {
     console.log('Deleting product with ID:', productId);
+    this.deleteProduct(productId);
     this.closeDeleteModal();
   }
   
-
 }

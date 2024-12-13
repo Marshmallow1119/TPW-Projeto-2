@@ -23,7 +23,7 @@ export const routes: Routes = [
   { path: 'company/:company_id/products', component: CompanyProductsComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent }, 
-  { path: 'admin', component: AdminHomeComponent }, 
+  { path: 'admin-home', component: AdminHomeComponent }, 
   { path: 'favorites', component: FavoritesComponent }, 
  
 

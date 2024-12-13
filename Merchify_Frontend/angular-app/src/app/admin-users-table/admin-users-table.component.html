@@ -1,37 +1,30 @@
-<h1>Lista de Utilizadores:</h1>
+<app-ban-user-modal
+  [isModalOpen]="selectedUserId !== null"
+  [selectedUserId]="selectedUserId"
+  (closeModalEvent)="closeBanUserModal()"
+  (confirmActionEvent)="onConfirmBan($event)"
+></app-ban-user-modal>
+
 <div *ngIf="users?.length; else noUsers">
   <table class="table">
     <thead>
       <tr>
-        <th scope="col">Imagem</th>
+        <th scope="col">Image</th>
         <th scope="col">Username</th>
         <th scope="col">Email</th>
-        <th scope="col">Número de Compras</th>
-        <th scope="col">Ações</th>
+        <th scope="col">Actions</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let user of users">
-        <td>
-          <img
-            [src]="user.image"
-            [alt]="user.username"
-            class="user-image"
-          />
-        </td>
+        <td><img [src]="user.image" [alt]="user.username" class="user-image" /></td>
         <td>{{ user.username }}</td>
         <td>{{ user.email }}</td>
-        <td>{{ user.number_of_purchases }}</td>
         <td>
-          <a
-            href="#"
-            class="btn btn-danger btn-sm"
-            data-toggle="modal"
-            data-target="#exampleModal2"
-            [attr.data-user-id]="user.id"
-          >
-            <i class="fas fa-trash-alt"></i> Banir Utilizador
-          </a>
+          <button class="btn btn-danger btn-sm" (click)="openBanUserModal(user.id)">
+            <i class="fas fa-trash-alt"></i> 
+            Ban User
+          </button>
         </td>
       </tr>
     </tbody>

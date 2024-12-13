@@ -45,7 +45,7 @@ urlpatterns = [
     path('ws/company/<int:company_id>/product/<int:product_id>/detail/', views.company_product_detail, name='company_product_detail'),
     path('ws/review/<int:review_id>', views.delete_review, name='delete_review'),  
     path('ws/product/<int:product_id>/edit/', views.edit_product, name='edit_product'),
-    path('ws/product/<int:product_id>', views.delete_product, name='delete_product'),
+    path('ws/product/<int:product_id>/delete/', views.delete_product, name='delete_product'),
     path('ws/favorites/', views.checkfavoriteOld, name='favorites'),
     path('ws/favorites/<str:category>/', views.checkfavorite, name='favorites2'),
     path('ws/favorites/add/<int:product_id>/', views.addtofavorite, name='addtofavorite'),
@@ -75,6 +75,7 @@ urlpatterns = [
     path('ws/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('ws/token/validate/', views.validate_token, name='validate_token'),
     path('ws/users/', views.get_users, name='user'),
+    path('ws/user/<int:user_id>/ban/', views.ban_user, name='ban_user'),
 
 ]   
 

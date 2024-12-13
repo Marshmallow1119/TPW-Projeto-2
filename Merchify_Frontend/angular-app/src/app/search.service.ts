@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { base64toBlob } from './utils'; // Adjust the path to your utility functions
 import { Product } from './models/produto'; // Adjust the path to your models
 import { Artist } from './models/artista'; // Adjust the path to your models
+import { CONFIG } from './config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SearchService {
-  private baseUrl: string = 'http://localhost:8000/ws/';
+  private baseUrl: string = CONFIG.baseUrl;
 
   constructor() {}
 

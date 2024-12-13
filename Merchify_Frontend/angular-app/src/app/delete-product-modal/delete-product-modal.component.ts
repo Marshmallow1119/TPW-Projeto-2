@@ -10,10 +10,15 @@ export class DeleteProductModalComponent {
   @Input() productName: string = ''; 
   @Input() productId: number | null = null; 
   @Output() confirmDelete: EventEmitter<number> = new EventEmitter<number>();
+  @Output() closeModal: EventEmitter<void> = new EventEmitter<void>();
 
   onDelete(): void {
     if (this.productId) {
       this.confirmDelete.emit(this.productId);
     }
+  }
+
+  onClose(): void {
+    this.closeModal.emit();
   }
 }
