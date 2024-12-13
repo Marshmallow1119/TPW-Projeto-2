@@ -86,20 +86,8 @@
                 <div class="d-flex">
                     {% if user.is_authenticated %}
                         {%  if user.user_type == 'individual' %}
-                            <a href="{% url 'profile' %}" class="btn btn-outline-dark me-2"><i   class="fa fa-user"></i></a>
-                            <a href="{% url 'cart' %}" class="btn btn-outline-dark me-2"><i   class="fa fa-shopping-cart"></i></a>
-                            <a href="{% url 'favorites' %}" class="btn btn-outline-dark me-2"><i   class="fa fa-heart text-danger"></i></a>
-                            <a href="{% url 'logout' %}" class="btn btn-outline-dark"><i   class="fas fa-sign-out-alt"></i></a>
-                        {%  elif user.user_type == 'admin' %}
-                            <a href="{% url 'profile' %}" class="btn btn-outline-dark me-2"><i   class="fa fa-user"></i></a>
-                            <a href="{% url 'add_company' %}" class="btn btn-outline-dark me-2"><i  class="fa fa-plus"></i> Adicionar Empresa </a>
-                            <a href="{% url 'logout' %}" class="btn btn-outline-dark"><i   class="fas fa-sign-out-alt"></i></a>
-                        {% elif user.user_type == 'company' %}
-                            <a href="{% url 'company_products' user.company.id %}" class="btn btn-outline-dark me-2"><i class="bi bi-archive-fill"></i> Ver os meus produtos </a>
-                            <a href="{% url 'profile' %}" class="btn btn-outline-dark me-2"><i class="fa fa-user"></i></a>
-                            <a href="{% url 'logout' %}" class="btn btn-outline-dark"><i class="fas fa-sign-out-alt"></i></a>
                         {% else %}
-                            {%  endif %}
+                        {%  endif %}
                     {% else %}
                         <a href="{% url 'login' %}" class="btn btn-outline-dark"><img src="/media/user.png" width="20"> Login</a>
                     {% endif %}

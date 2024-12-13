@@ -53,19 +53,18 @@ export class FavoritesComponent implements OnInit {
     console.log('Companhias favoritas:', this.favoriteCompanies);
   }
 
-  // Funções para remover favoritos
   async removeProductFromFavorites(id: number): Promise<void> {
     await this.favoritesService.removeFavorite(id);
-    this.favoriteProducts = this.favoriteProducts.filter(product => product.id !== id);
+    this.favoriteProducts = this.favoriteProducts.filter(product => product.product.id !== id);
   }
 
   async removeArtistFromFavorites(id: number): Promise<void> {
     await this.favoritesService.removeFavoriteArtist(id);
-    this.favoriteArtists = this.favoriteArtists.filter(artist => artist.id !== id);
+    this.favoriteArtists = this.favoriteArtists.filter(artist => artist.artist.id !== id);
   }
 
   async removeCompanyFromFavorites(id: number): Promise<void> {
     await this.favoritesService.removeFavoriteCompany(id);
-    this.favoriteCompanies = this.favoriteCompanies.filter(company => company.id !== id);
+    this.favoriteCompanies = this.favoriteCompanies.filter(company => company.company.id !== id);
   }
 }

@@ -18,7 +18,7 @@ export class FavoritesService {
 
   async getFavorites(category: string): Promise<any> {
     const token = this.getAccessToken();
-    const response = await fetch(`${this.baseUrl}/favorites/${category}/`, {
+    const response = await fetch(`${this.baseUrl}/favorites/get/${category}/`, {
       method: 'GET',
       headers: {
         'Authorization': token ? `Bearer ${token}` : ''

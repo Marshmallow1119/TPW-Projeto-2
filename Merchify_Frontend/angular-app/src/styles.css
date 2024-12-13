@@ -86,3 +86,16 @@
   .dark-theme .navbar-text {
     color: #f8f9fa !important;
   }
+
+  .no-link-color {
+    color: inherit; /* Or specify a color like black, e.g., #000 */
+    text-decoration: none;
+  }
+  
+  .no-link-color:hover,
+  .no-link-color:visited,
+  .no-link-color:active {
+    color: inherit; /* Ensure consistent color across states */
+    text-decoration: none; /* Optional: Remove underline in all states */
+  }
+  
