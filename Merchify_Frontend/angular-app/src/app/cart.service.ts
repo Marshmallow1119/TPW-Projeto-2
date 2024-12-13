@@ -45,7 +45,6 @@ export class CartService {
   async addToCart(userId: number, productId: number, data: any): Promise<any> {
     const token = await this.getToken();
     try {
-      console.log('Entrou no add to cart');
       const response = await fetch(`${this.baseUrl}/cart/${userId}/product/${productId}/`, {
         method: 'POST',
         credentials: 'include',
@@ -58,7 +57,6 @@ export class CartService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`Erro HTTP ${response.status}: ${errorText}`);
         throw new Error(`Erro HTTP ${response.status}: ${errorText}`);
       }
 
@@ -84,7 +82,6 @@ export class CartService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`Erro HTTP ${response.status}: ${errorText}`);
         throw new Error(`Erro HTTP ${response.status}: ${errorText}`);
       }
 
@@ -109,7 +106,6 @@ export class CartService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`Erro HTTP ${response.status}: ${errorText}`);
         throw new Error(`Erro HTTP ${response.status}: ${errorText}`);
       }
 
