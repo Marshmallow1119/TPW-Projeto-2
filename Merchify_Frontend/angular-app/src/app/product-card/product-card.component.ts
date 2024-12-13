@@ -30,7 +30,7 @@ export class ProductCardComponent {
     }
 
     if (this.isProcessing) {
-      return; // Evita múltiplos cliques durante a requisição
+      return; 
     }
 
     this.isProcessing = true;
