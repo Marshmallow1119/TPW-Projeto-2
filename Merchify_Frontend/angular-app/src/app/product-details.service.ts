@@ -13,7 +13,7 @@ export class ProductDetailsService {
    constructor(private router:Router) { }
 
   async getProductDetails(productId: number): Promise<Observable<any>> {
-    const url = `${this.baseUrl}product/${productId}/`;
+    const url = `${this.baseUrl}/product/${productId}/`;
     const data: Response = await fetch(url);
     const product: any = await data.json() ?? [];
     if (product.image) {

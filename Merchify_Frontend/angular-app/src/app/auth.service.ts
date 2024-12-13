@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, tap, catchError, throwError } from 'rxjs';
 import { User } from './models/user';
 import { isPlatformBrowser } from '@angular/common';
 import { ReplaySubject } from 'rxjs';
+import { CONFIG } from './config';
 
 @Injectable({
   providedIn: 'root',
@@ -11,10 +12,11 @@ import { ReplaySubject } from 'rxjs';
 export class AuthService {
   private userSubject = new BehaviorSubject<User | null>(null); // Initialize with null
   user$ = this.userSubject.asObservable();
+  private baseUrl: string = CONFIG.baseUrl;
   
-  private registerUrl = 'http://localhost:8000/ws/register/';
-  private validateTokenUrl = 'http://localhost:8000/ws/token/validate/';
-  private loginUrl = 'http://localhost:8000/ws/login/';
+  private registerUrl =  this.baseUrl + '/register/';
+  private validateTokenUrl = this.baseUrl + '/token/validate/';
+  private loginUrl = this.baseUrl + '/login/';
 
   constructor(
     private http: HttpClient,

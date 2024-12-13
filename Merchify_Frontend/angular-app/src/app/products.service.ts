@@ -47,7 +47,7 @@ export class ProductsService {
 
   async deleteProduct(id: number): Promise<void> {
     try {
-      await fetch(`${this.baseUrl}product/${id}/delete/`, {
+      await fetch(`${this.baseUrl}/product/${id}/delete/`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
