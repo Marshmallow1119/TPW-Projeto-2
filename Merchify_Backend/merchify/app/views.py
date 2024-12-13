@@ -621,6 +621,8 @@ def logout(request):
 #    return JsonResponse({"error": "Invalid request"}, status=400)
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def manage_cart(request, user_id=None, product_id=None, item_id=None):
     """
     View Geral para Gerenciamento de Carrinho:
@@ -630,13 +632,22 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
     - DELETE: Remover um item do carrinho
     """
     print("olaaaaa")
+    print("aqqui")
+    print(user_id)
+    print(product_id)
+    print(item_id)
+    print(request.user.id)
+
     if not user_id or user_id != request.user.id:
+        print("aquiiiiiiiiiiiiiiiiiiiii")
         return Response({"error": "Acesso não autorizado."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == 'GET':
         print("aqui")
         try:
-            cart = Cart.objects.get(user_id=user_id)
+            print("paroooooo")
+            cart = Cart.objects.get(user=request.user)
+            print("paroooooo1")
             cart_items = CartItem.objects.filter(cart=cart)
             serializer = CartItemSerializer(cart_items, many=True)
             return Response({"cart_items": serializer.data}, status=status.HTTP_200_OK)
@@ -645,7 +656,6 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
 
     elif request.method == 'POST':
         print("aqui no adicionar")
-        # Adicionar um item ao carrinho
         if product_id:
             print("aqui no adicionar")
             try:
