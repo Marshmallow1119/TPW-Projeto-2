@@ -562,7 +562,7 @@ def validate_token(request):
 
 
 @api_view(['POST'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 @login_required
 def logout(request):
@@ -571,7 +571,7 @@ def logout(request):
     return redirect('home')
 
 @api_view(['POST'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def add_to_cart(request, product_id):
     if request.method == "POST":
@@ -611,6 +611,107 @@ def add_to_cart(request, product_id):
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
+@api_view(['GET', 'DELETE'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def company(request, company_id):
+    if request.method == 'GET':
+        company = get_object_or_404(Company, id=company_id)
+        serializer = CompanySerializer(company)
+        return Response(serializer.data)
+    elif request.method == 'DELETE':
+        if not (request.user.user_type == 'admin' or request.user.user_type == 'company'):
+            raise PermissionDenied
+        company = get_object_or_404(Company, id=company_id)
+        company.delete()
+        return JsonResponse({'message': 'Company deleted successfully!'})
+
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def favorites(request, category):
+    user = request.user
+    if category == 'products':
+        favorites = Favorite.objects.filter(user=user)
+        serializer = FavoriteSerializer(favorites, many=True)
+        return Response(serializer.data)
+    elif category == 'artists':
+        favorites = FavoriteArtist.objects.filter(user=user)
+        serializer = FavoriteArtistSerializer(favorites, many=True)
+        return Response(serializer.data)
+    elif category == 'companies':
+        favorites = FavoriteCompany.objects.filter(user=user)
+        serializer = FavoriteCompanySerializer(favorites, many=True)
+        return Response(serializer.data)
+    return Response({'error': 'Invalid category'}, status=400)
+
+
+@api_view(['GET', 'POST', 'DELETE'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def product_favorites(request, product_id):
+    if request.method == 'GET':
+        product = get_object_or_404(Product, id=product_id)
+        favorited = Favorite.objects.filter(user=request.user, product=product).exists()
+        return JsonResponse({'favorited': favorited})
+    elif request.method == 'POST':
+        product = get_object_or_404(Product, id=product_id)
+        favorite, created = Favorite.objects.get_or_create(user=request.user, product=product)
+        if created:
+            return JsonResponse({'message': 'Product favorited successfully!'})
+        return JsonResponse({'message': 'Product is already favorited.'})
+    elif request.method == 'DELETE':
+        product = get_object_or_404(Product, id=product_id)
+        favorite = Favorite.objects.filter(user=request.user, product=product).first()
+        if favorite:
+            favorite.delete()
+            return JsonResponse({'message': 'Product unfavorited successfully!'})
+        return JsonResponse({'message': 'Product is not favorited.'})
+    
+@api_view(['GET', 'POST', 'DELETE'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def artist_favorites(request, artist_id):
+    if request.method == 'GET':
+        artist = get_object_or_404(Artist, id=artist_id)
+        favorited = FavoriteArtist.objects.filter(user=request.user, artist=artist).exists()
+        return JsonResponse({'favorited': favorited})
+    elif request.method == 'POST':
+        artist = get_object_or_404(Artist, id=artist_id)
+        favorite, created = FavoriteArtist.objects.get_or_create(user=request.user, artist=artist)
+        if created:
+            return JsonResponse({'message': 'Artist favorited successfully!'})
+        return JsonResponse({'message': 'Artist is already favorited.'})
+    elif request.method == 'DELETE':
+        artist = get_object_or_404(Artist, id=artist_id)
+        favorite = FavoriteArtist.objects.filter(user=request.user, artist=artist).first()
+        if favorite:
+            favorite.delete()
+            return JsonResponse({'message': 'Artist unfavorited successfully!'})
+        return JsonResponse({'message': 'Artist is not favorited.'})
+    
+@api_view(['GET', 'POST', 'DELETE'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def company_favorites(request, company_id):
+    if request.method == 'GET':
+        company = get_object_or_404(Company, id=company_id)
+        favorited = FavoriteCompany.objects.filter(user=request.user, company=company).exists()
+        return JsonResponse({'favorited': favorited})
+    elif request.method == 'POST':
+        company = get_object_or_404(Company, id=company_id)
+        favorite, created = FavoriteCompany.objects.get_or_create(user=request.user, company=company)
+        if created:
+            return JsonResponse({'message': 'Company favorited successfully!'})
+        return JsonResponse({'message': 'Company is already favorited.'})
+    elif request.method == 'DELETE':
+        company = get_object_or_404(Company, id=company_id)
+        favorite = FavoriteCompany.objects.filter(user=request.user, company=company).first()
+        if favorite:
+            favorite.delete()
+            return JsonResponse({'message': 'Company unfavorited successfully!'})
+        return JsonResponse({'message': 'Company is not favorited.'})
 
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])

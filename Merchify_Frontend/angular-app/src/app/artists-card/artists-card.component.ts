@@ -15,7 +15,7 @@ export class ArtistsCardComponent {
   @Input() isAuthenticated: boolean = false;
   @Input() userType: string = ''
 
-  toggleFavorite(): void {
+  toggleFavorite(id: number): void {
     console.log(`Toggled favorite for artist ID: ${this.artist.id}`);
   }
 

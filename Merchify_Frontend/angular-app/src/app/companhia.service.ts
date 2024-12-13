@@ -49,4 +49,24 @@ export class CompaniesService {
       throw error;
     }
   }
+
+  async banCompany(companyId: number): Promise<Company> {
+    const url = `${this.baseUrl}/company/${companyId}/`;
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to ban company');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error banning company:', error);
+      throw error;
+    }
+  }
 }

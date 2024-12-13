@@ -7,10 +7,12 @@
       <p class="card-text">{{ artist.name }}</p>
     </div>
   </a>
-  <i
-    *ngIf="!isAuthenticated || userType === 'individual'"
+  <div>
+    <i
+
     class="fa fa-heart favorite-icon"
     [ngClass]="{ filled: artist.is_favorited }"
-    (click)="toggleFavorite()"
-  ></i>
+    (click)="toggleFavorite(artist.id)">
+  </i>
+  </div> 
 </div>

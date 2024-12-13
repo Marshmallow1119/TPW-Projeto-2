@@ -17,7 +17,7 @@ export class SearchService {
       return { artists: [], products: [] };
     }
   
-    const url = `${this.baseUrl}search/?search=${encodeURIComponent(query)}`;
+    const url = `${this.baseUrl}/search/?search=${encodeURIComponent(query)}`;
   
     try {
       const response = await fetch(url);

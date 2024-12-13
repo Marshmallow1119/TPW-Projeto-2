@@ -14,6 +14,7 @@ export class HomeService {
 
   async getHomeData(): Promise<{ artists: any[], recent_products: any[] }> {
     const url = this.baseUrl + '/home/';
+    console.log('Fetching home data from:', url);
     try {
       const response: Response = await fetch(url);
 

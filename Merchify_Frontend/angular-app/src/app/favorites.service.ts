@@ -11,75 +11,79 @@ export class FavoritesService {
 
   constructor() { }
 
-  // Obtém favoritos por categoria
   async getFavorites(category: string): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/${category}/`, {
-      method: 'POST',
+    const response = await fetch(`${this.baseUrl}/favorites/${category}/`, {
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
       },
-      body: JSON.stringify({})
     });
     return response.json();
   }
 
-  // Adiciona um produto aos favoritos
   async addFavorite(productId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/add/${productId}/`, {
+    const response = await fetch(`${this.baseUrl}/favorites/${productId}/`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
       },
       body: JSON.stringify({})
     });
     return response.json();
   }
 
-  // Adiciona um artista aos favoritos
   async addFavoriteArtist(artistId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/add/artist/${artistId}/`, {
+    const response = await fetch(`${this.baseUrl}/artist/${artistId}/`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
       },
       body: JSON.stringify({})
     });
     return response.json();
   }
 
-  // Adiciona uma companhia aos favoritos
   async addFavoriteCompany(companyId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/add/company/${companyId}/`, {
+    const response = await fetch(`${this.baseUrl}/company/${companyId}/`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
       },
       body: JSON.stringify({})
     });
     return response.json();
   }
 
-  // Remove um produto dos favoritos
   async removeFavorite(productId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/remove/${productId}/`, {
-      method: 'DELETE'
-    });
+    const response = await fetch(`${this.baseUrl}/${productId}/`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+    }});
     return response.json();
   }
 
-  // Remove um artista dos favoritos
   async removeFavoriteArtist(artistId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/remove/artist/${artistId}/`, {
-      method: 'DELETE'
-    });
+    const response = await fetch(`${this.baseUrl}/artist/${artistId}/`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+    }});
     return response.json();
   }
 
-  // Remove uma companhia dos favoritos
   async removeFavoriteCompany(companyId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/remove/company/${companyId}/`, {
-      method: 'DELETE'
-    });
+    const response = await fetch(`${this.baseUrl}/company/${companyId}/`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+    }});
     return response.json();
   }
 }

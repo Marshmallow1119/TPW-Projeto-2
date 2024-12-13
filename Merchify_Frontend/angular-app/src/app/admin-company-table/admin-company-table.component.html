@@ -1,0 +1,73 @@
+<app-ban-company-modal
+  [isModalOpen]="selectedCompanyId !== null"
+  [selectedCompanyId]="selectedCompanyId"
+  (closeModalEvent)="closeBanCompanyModal()"
+  (confirmActionEvent)="onConfirmBan($event)"
+></app-ban-company-modal>
+
+<div id="company-section" class="content-table">
+    <div *ngIf="companies && companies.length > 0; else noCompanies">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Logo</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Email</th>
+            <th scope="col">Telemóvel</th>
+            <th scope="col">Morada</th>
+            <th scope="col">Numero de Produtos</th>
+            <th scope="col">Média de Avaliações</th>
+            <th scope="col">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let company of companies">
+            <ng-container>
+              <td>
+                <img
+                  *ngIf="company.logo_base64"
+                  [src]="'data:image/png;base64,' + company.logo_base64"
+                  [alt]="company.name"
+                  class="user-image"
+                />
+                <img
+                  *ngIf="!company.logo_base64"
+                  src="/media/company_default.png"
+                  alt="Default Logo"
+                  class="user-image"
+                />
+              </td>
+              <td>{{ company.name }}</td>
+              <td>{{ company.email }}</td>
+              <td>{{ company.phone }}</td>
+              <td>{{ company.address }}</td>
+              <td>{{ company.product_count }}</td>
+              <td>{{ company.average_rating }}</td>
+              <td>
+                <button
+                  class="btn btn-danger btn-sm"
+                  (click)="openBanCompanyModal(company.id)"
+                >
+                  <i class="fas fa-trash-alt"></i> Ban Company
+                </button>
+              </td>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #noCompanies>
+      <p class="text-muted">Não foram encontradas empresas.</p>
+    </ng-template>
+    <div class="row mt-3">
+      <div class="col-12">
+        <button
+          type="button"
+          class="btn btn-dark w-100"
+        >
+          Adicionar Nova Empresa
+        </button>
+      </div>
+    </div>
+  </div>
+  

@@ -18,8 +18,8 @@ interface AppConfig {
       if (hostname === 'localhost' || hostname === '127.0.0.1') {
         return LOCAL_CONFIG;
       }
-      return MACHINE_CONFIG;
+      return LOCAL_CONFIG;
     }
-    return MACHINE_CONFIG;
+    return LOCAL_CONFIG;
   }
   
