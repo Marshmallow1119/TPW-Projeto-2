@@ -3,6 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CartService } from '../cart.service';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../auth.service';
+import { User } from '../models/user';
+
 
 @Component({
   selector: 'app-cart',
@@ -14,17 +17,24 @@ import { FormsModule } from '@angular/forms';
 export class CartComponent implements OnInit {
   cartItems: any[] = [];
   cartTotal: number = 0;
+  user: User | null = null; // Armazena o usuário autenticado
 
-  constructor(private cartService: CartService, private router: Router) {}
+  constructor(private cartService: CartService, private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.loadCart();
+    // Obter o usuário autenticado
+    this.authService.user$.subscribe((user) => {
+      this.user = user;
+      if (this.user?.id) {
+        this.loadCart(this.user.id); // Carregar o carrinho após obter o userId
+      }
+    });
   }
 
-  async loadCart() {
+  async loadCart(userId: number) {
     try {
-      const userId = 1; // Substitua pelo ID do usuário autenticado
-      const response = await this.cartService.getCart(userId);
+      console.log('userId:', userId);
+      const response = await this.cartService.getCart(userId); // Usando o userId correto
       this.cartItems = response.cart_items || [];
       this.calculateTotal();
     } catch (error) {

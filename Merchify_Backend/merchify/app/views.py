@@ -621,6 +621,8 @@ def logout(request):
 #    return JsonResponse({"error": "Invalid request"}, status=400)
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def manage_cart(request, user_id=None, product_id=None, item_id=None):
     """
     View Geral para Gerenciamento de Carrinho:

@@ -10,9 +10,9 @@ export class CartService {
   constructor() {}
   async getCart(userId: number): Promise<any> {
     try {
-      const response = await fetch(`${this.baseUrl}${userId}/`, {
+      const response = await fetch(`${this.baseUrl}/cart/${userId}/`, {
         method: 'GET',
-        credentials: 'include', // Enviar cookies (se necessário)
+        credentials: 'include', 
         headers: {
           'Content-Type': 'application/json',
         }
