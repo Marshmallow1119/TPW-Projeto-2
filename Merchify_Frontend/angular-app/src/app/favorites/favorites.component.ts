@@ -32,7 +32,7 @@ export class FavoritesComponent implements OnInit {
       this.loadProducts();
     } else if (category === 'artists') {
       this.loadArtists();
-    } else if (category === 'companies') {
+    } else if (category === 'company') {
       this.loadCompanies();
     }
   }
@@ -40,14 +40,17 @@ export class FavoritesComponent implements OnInit {
   // Funções para carregar favoritos
   async loadProducts(): Promise<void> {
     this.favoriteProducts = await this.favoritesService.getFavorites('products');
+    console.log('Produtos favoritos:', this.favoriteProducts);
   }
 
   async loadArtists(): Promise<void> {
     this.favoriteArtists = await this.favoritesService.getFavorites('artists');
+    console.log('Artistas favoritos:', this.favoriteArtists);
   }
 
   async loadCompanies(): Promise<void> {
-    this.favoriteCompanies = await this.favoritesService.getFavorites('companies');
+    this.favoriteCompanies = await this.favoritesService.getFavorites('company');
+    console.log('Companhias favoritas:', this.favoriteCompanies);
   }
 
   // Funções para remover favoritos

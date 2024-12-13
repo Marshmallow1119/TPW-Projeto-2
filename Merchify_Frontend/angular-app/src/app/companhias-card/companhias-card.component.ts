@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Company } from '../models/company';
+import { FavoritesService } from '../favorites.service';
 
 @Component({
   selector: 'app-companhias-card',
@@ -11,11 +12,23 @@ import { Company } from '../models/company';
   styleUrls: ['./companhias-card.component.css']
 })
 export class CompanhiasCardComponent {
+
+  constructor(private favoriteService: FavoritesService) {}
   @Input() company!: Company;
   @Input() isAuthenticated!: boolean;
   @Input() userType!: string;
 
-  toggleFavorite(): void {
+  toggleFavorite(event: Event): void {
+    event.preventDefault(); 
+    event.stopPropagation(); 
     console.log(`Toggle favorite for company: ${this.company.id}`);
+    if (this.company.is_favorited) {
+      this.favoriteService.removeFavoriteCompany(this.company.id);
+      this.company.is_favorited = false;
+    }
+    else {
+      this.favoriteService.addFavoriteCompany(this.company.id);
+      this.company.is_favorited = true;
+    }
   }
 }

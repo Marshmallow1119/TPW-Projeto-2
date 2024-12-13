@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Artist } from '../models/artista';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FavoritesService } from '../favorites.service';
 
 @Component({
   selector: 'app-artists-card',
@@ -15,8 +16,19 @@ export class ArtistsCardComponent {
   @Input() isAuthenticated: boolean = false;
   @Input() userType: string = ''
 
-  toggleFavorite(id: number): void {
-    console.log(`Toggled favorite for artist ID: ${this.artist.id}`);
-  }
+  constructor(private favoriteService: FavoritesService) {}
 
+  toggleFavorite(event: Event, artistId: number): void {
+    event.preventDefault(); // Prevents default behavior of the <a> tag
+    event.stopPropagation(); // Stops the event from propagating to p
+    if (this.artist.is_favorited) {
+      this.favoriteService.removeFavoriteArtist(artistId);
+      this.artist.is_favorited = false;
+    }
+    else {
+      this.favoriteService.addFavoriteArtist(artistId);
+      this.artist.is_favorited = true;
+    }
+  }
+  
 }
