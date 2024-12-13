@@ -18,7 +18,7 @@
           <tr *ngFor="let product of products">
             <td>
               <img
-                [src]="product.image || '/media/default-product.png'"
+                [src]="product.image_url || '/media/default-product.png'"
                 [alt]="product.name"
                 class="product-image"
               />
