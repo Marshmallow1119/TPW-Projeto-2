@@ -65,6 +65,29 @@ export class AuthService {
   }
   
   
+  private refreshTokenUrl = this.baseUrl + '/token/refresh/';
+
+  refreshToken(): Observable<any> {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      return throwError(() => new Error('No refresh token available'));
+    }
+  
+    return this.http.post(this.refreshTokenUrl, { refresh: refreshToken }).pipe(
+      tap((response: any) => {
+        if (!response.access) {
+          throw new Error('Missing access token in the refresh response');
+        }
+        localStorage.setItem('accessToken', response.access);
+      }),
+      catchError((error) => {
+        console.error('Token refresh failed:', error);
+        this.logout(); // Log out if refresh fails
+        return throwError(() => error);
+      })
+    );
+  }
+  
   loadUserFromToken(): void {
     if (!isPlatformBrowser(this.platformId)) {
       return;
@@ -90,14 +113,26 @@ export class AuthService {
           country: response.country,
         };
   
-        this.userSubject.next(user); 
+        this.userSubject.next(user);
       },
-      error: () => {
-        this.logout();
+      error: (error) => {
+        if (error.status === 401) {
+          console.log('Access token expired, attempting to refresh');
+          this.refreshToken().subscribe({
+            next: () => {
+              console.log('Token refreshed successfully');
+              this.loadUserFromToken();
+            },
+            error: () => {
+              console.log('Token refresh failed');
+            },
+          });
+        } else {
+          this.logout();
+        }
       },
     });
   }
-  
   
   
   logout(): void {

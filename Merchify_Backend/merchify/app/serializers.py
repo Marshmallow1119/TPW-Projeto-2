@@ -1,61 +1,46 @@
 import base64
-
-from app.models import *
 from rest_framework import serializers
 from django.contrib.auth.models import User as AuthUser
 from django.conf import settings
+from app.models import *
 
-
-# Helper para codificar imagens em Base64
+# Helper function for encoding images in Base64
 def encode_image_to_base64(image_field):
     if image_field and hasattr(image_field, 'file') and image_field.file:
         return base64.b64encode(image_field.file.read()).decode('utf-8')
     return None
 
-# Serializer para o modelo Company
+# Company Serializer
 class CompanySerializer(serializers.ModelSerializer):
-    logo_base64 = serializers.SerializerMethodField()  
-    product_count = serializers.SerializerMethodField()  
-    average_rating = serializers.SerializerMethodField() 
+    logo_base64 = serializers.SerializerMethodField()
+    product_count = serializers.IntegerField(source='getNumberOfProducts', read_only=True)
+    average_rating = serializers.FloatField(source='get_average_rating', read_only=True)
 
     class Meta:
         model = Company
         fields = [
-            'id',
-            'name',
-            'address',
-            'email',
-            'phone',
-            'logo_base64',
-            'product_count',
-            'average_rating',
+            'id', 'name', 'address', 'email', 'phone', 'logo_base64',
+            'product_count', 'average_rating'
         ]
 
     def get_logo_base64(self, obj):
-        """Converte a imagem do logo para Base64"""
-        if obj.logo:
-            return encode_image_to_base64(obj.logo)
-        return None
+        return encode_image_to_base64(obj.logo) if obj.logo else None
 
-    def get_product_count(self, obj):
-        """Retorna o número de produtos associados à empresa"""
-        return obj.getNumberOfProducts()
-
-    def get_average_rating(self, obj):
-        """Calcula a média das avaliações dos produtos da empresa"""
-        return obj.get_average_rating()
-    
-# Serializer para o modelo User
+# User Serializer
 class UserSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'firstname', 'lastname', 'user_type', 'email', 'phone', 'country', 'image']
+        fields = [
+            'id', 'username', 'firstname', 'lastname', 'user_type',
+            'email', 'phone', 'country', 'image'
+        ]
 
     def get_image(self, obj):
-        return encode_image_to_base64(obj.image)
+        return encode_image_to_base64(obj.image) if obj.image else None
 
+# Artist Serializer
 class ArtistSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
     background_image_url = serializers.SerializerMethodField()
@@ -65,76 +50,53 @@ class ArtistSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'image_url', 'background_image_url']
 
     def get_image_url(self, obj):
-        if obj.image:
-            return self.context['request'].build_absolute_uri(obj.image.url)
-        return None
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.image.url) if obj.image and request else None
 
     def get_background_image_url(self, obj):
-        if obj.background_image:
-            return self.context['request'].build_absolute_uri(obj.background_image.url)
-        return None
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.background_image.url) if obj.background_image and request else None
 
+# Product Serializer
 class ProductSerializer(serializers.ModelSerializer):
-    average_rating = serializers.SerializerMethodField()
-    product_type = serializers.SerializerMethodField()
-    stock = serializers.SerializerMethodField()
+    average_rating = serializers.FloatField(source='get_average_rating', read_only=True)
+    product_type = serializers.CharField(source='get_product_type', read_only=True)
+    stock = serializers.IntegerField(source='get_stock', read_only=True)
     specific_details = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = [
-            'id', 'name', 'description', 'price', 'image', 'artist', 'company',
-            'category', 'addedProduct', 'count', 'average_rating', 'product_type', 'stock', 'specific_details'
+            'id', 'name', 'description', 'price', 'image_url', 'artist', 'company',
+            'category', 'addedProduct', 'count', 'average_rating',
+            'product_type', 'stock', 'specific_details'
         ]
 
-    def get_average_rating(self, obj):
-        """Calcula a média de avaliações do produto."""
-        return obj.get_average_rating()
-
-    def get_product_type(self, obj):
-        """Determina o tipo do produto (Vinil, CD, etc.)."""
-        return obj.get_product_type()
-
-    def get_stock(self, obj):
-        """Obtém o estoque do produto."""
-        return obj.get_stock()
-    
     def get_specific_details(self, obj):
+        """Return specific details based on product type."""
         product_type = obj.get_product_type()
-        if product_type == 'Vinil':
-            try:
-                vinil_instance = obj.vinil  
-                return VinilSerializer(vinil_instance).data
-            except AttributeError:
-                return {}
-        elif product_type == 'CD':
-            try:
-                cd_instance = obj.cd
-                return CDSerializer(cd_instance).data
-            except AttributeError:
-                return {}
-        elif product_type == 'Clothing':
-            try:
-                clothing_instance = obj.clothing  
-                return ClothingSerializer(clothing_instance).data
-            except AttributeError:
-                return {}
-        elif product_type == 'Accessory':
-            try:
-                accessory_instance = obj.accessory  
-                return AccessorySerializer(accessory_instance).data
-            except AttributeError:
-                return {}
-        return {}
+        serializers_map = {
+            'Vinil': VinilSerializer,
+            'CD': CDSerializer,
+            'Clothing': ClothingSerializer,
+            'Accessory': AccessorySerializer,
+        }
+        serializer_class = serializers_map.get(product_type)
+        instance = getattr(obj, product_type.lower(), None)
+        return serializer_class(instance, context=self.context).data if instance else {}
 
-
-# Serializer para o modelo Size
+    def get_image_url(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.image.url) if obj.image and request else None
+    
+# Size Serializer
 class SizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Size
         fields = ['id', 'size', 'stock']
 
-# Serializer para o modelo Vinil
+# Vinil Serializer
 class VinilSerializer(serializers.ModelSerializer):
     image_base64 = serializers.SerializerMethodField()
 
@@ -145,7 +107,7 @@ class VinilSerializer(serializers.ModelSerializer):
     def get_image_base64(self, obj):
         return encode_image_to_base64(obj.image)
 
-# Serializer para o modelo CD
+# CD Serializer
 class CDSerializer(serializers.ModelSerializer):
     image_base64 = serializers.SerializerMethodField()
 
@@ -156,7 +118,7 @@ class CDSerializer(serializers.ModelSerializer):
     def get_image_base64(self, obj):
         return encode_image_to_base64(obj.image)
 
-# Serializer para o modelo Clothing
+# Clothing Serializer
 class ClothingSerializer(serializers.ModelSerializer):
     image_base64 = serializers.SerializerMethodField()
     sizes = SizeSerializer(many=True, read_only=True)
@@ -168,7 +130,7 @@ class ClothingSerializer(serializers.ModelSerializer):
     def get_image_base64(self, obj):
         return encode_image_to_base64(obj.image)
 
-# Serializer para o modelo Accessory
+# Accessory Serializer
 class AccessorySerializer(serializers.ModelSerializer):
     image_base64 = serializers.SerializerMethodField()
 
@@ -179,7 +141,7 @@ class AccessorySerializer(serializers.ModelSerializer):
     def get_image_base64(self, obj):
         return encode_image_to_base64(obj.image)
 
-# Serializer para o modelo Cart
+# Cart Serializer
 class CartSerializer(serializers.ModelSerializer):
     total = serializers.ReadOnlyField()
 
@@ -187,7 +149,7 @@ class CartSerializer(serializers.ModelSerializer):
         model = Cart
         fields = ['id', 'user', 'date', 'total']
 
-# Serializer para o modelo CartItem
+# CartItem Serializer
 class CartItemSerializer(serializers.ModelSerializer):
     total = serializers.ReadOnlyField()
 
@@ -195,42 +157,46 @@ class CartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ['id', 'cart', 'product', 'quantity', 'size', 'total']
 
-
+# Favorite Serializers
 class FavoriteSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)  
+    product = ProductSerializer(read_only=True)
 
     class Meta:
         model = Favorite
         fields = ['id', 'user', 'product']
 
 class FavoriteArtistSerializer(serializers.ModelSerializer):
-    artist = ArtistSerializer(read_only=True) 
+    artist = ArtistSerializer(read_only=True)
 
     class Meta:
         model = FavoriteArtist
         fields = ['id', 'user', 'artist']
 
 class FavoriteCompanySerializer(serializers.ModelSerializer):
-    company = CompanySerializer(read_only=True) 
+    company = CompanySerializer(read_only=True)
 
     class Meta:
         model = FavoriteCompany
         fields = ['id', 'user', 'company']
 
+# Purchase Serializer
 class PurchaseSerializer(serializers.ModelSerializer):
     total = serializers.ReadOnlyField()
 
     class Meta:
         model = Purchase
-        fields = ['id', 'user', 'date', 'paymentMethod', 'shippingAddress', 'status', 'total_amount', 'discount_applied', 'discount_value', 'total']
+        fields = [
+            'id', 'user', 'date', 'paymentMethod', 'shippingAddress',
+            'status', 'total_amount', 'discount_applied', 'discount_value', 'total'
+        ]
 
-# Serializer para o modelo Review
+# Review Serializer
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ['id', 'user', 'product', 'text', 'rating', 'date']
 
-# Serializer para o modelo PurchaseProduct
+# PurchaseProduct Serializer
 class PurchaseProductSerializer(serializers.ModelSerializer):
     total = serializers.ReadOnlyField()
 
@@ -238,19 +204,22 @@ class PurchaseProductSerializer(serializers.ModelSerializer):
         model = PurchaseProduct
         fields = ['id', 'purchase', 'product', 'quantity', 'total']
 
-
+# Login Serializer
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
 
+# Register Serializer
 class RegisterSerializer(serializers.ModelSerializer):
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2', 'user_type', 'phone', 'country', 'image']
-        extra_kwargs = {'password1': {'write_only': True}, 'password2': {'write_only': True}}
+        fields = [
+            'username', 'email', 'first_name', 'last_name',
+            'password1', 'password2', 'user_type', 'phone', 'country', 'image'
+        ]
 
     def validate(self, data):
         if data['password1'] != data['password2']:
@@ -258,7 +227,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        validated_data.pop('password2') 
+        validated_data.pop('password2')
         password = validated_data.pop('password1')
         user = User.objects.create_user(
             username=validated_data['username'],

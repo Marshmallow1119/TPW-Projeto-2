@@ -1,32 +1,39 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { CONFIG } from './config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FavoritesService {
-
   private baseUrl: string = CONFIG.baseUrl;
-
 
   constructor() { }
 
+  private getAccessToken(): string | null {
+    if (typeof window !== 'undefined' && localStorage) {
+      return localStorage.getItem('accessToken');
+    }
+    return null;
+  }
+
   async getFavorites(category: string): Promise<any> {
+    const token = this.getAccessToken();
     const response = await fetch(`${this.baseUrl}/favorites/${category}/`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        'Authorization': token ? `Bearer ${token}` : ''
       },
     });
     return response.json();
   }
 
   async addFavorite(productId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/favorites/${productId}/`, {
+    const token = this.getAccessToken();
+    const response = await fetch(`${this.baseUrl}/favorites/products/${productId}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        'Authorization': token ? `Bearer ${token}` : ''
       },
       body: JSON.stringify({})
     });
@@ -34,11 +41,12 @@ export class FavoritesService {
   }
 
   async addFavoriteArtist(artistId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/artist/${artistId}/`, {
+    const token = this.getAccessToken();
+    const response = await fetch(`${this.baseUrl}/favorites/artists/${artistId}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        'Authorization': token ? `Bearer ${token}` : ''
       },
       body: JSON.stringify({})
     });
@@ -46,11 +54,12 @@ export class FavoritesService {
   }
 
   async addFavoriteCompany(companyId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/company/${companyId}/`, {
+    const token = this.getAccessToken();
+    const response = await fetch(`${this.baseUrl}/favorites/company/${companyId}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        'Authorization': token ? `Bearer ${token}` : ''
       },
       body: JSON.stringify({})
     });
@@ -58,32 +67,35 @@ export class FavoritesService {
   }
 
   async removeFavorite(productId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/${productId}/`, {
+    const token = this.getAccessToken();
+    const response = await fetch(`${this.baseUrl}/favorites/products/${productId}/`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-    }});
+        'Authorization': token ? `Bearer ${token}` : ''
+      }});
     return response.json();
   }
 
   async removeFavoriteArtist(artistId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/artist/${artistId}/`, {
+    const token = this.getAccessToken();
+    const response = await fetch(`${this.baseUrl}/favorites/artists/${artistId}/`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-    }});
+        'Authorization': token ? `Bearer ${token}` : ''
+      }});
     return response.json();
   }
 
   async removeFavoriteCompany(companyId: number): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/company/${companyId}/`, {
+    const token = this.getAccessToken();
+    const response = await fetch(`${this.baseUrl}/favorites/company/${companyId}/`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-    }});
+        'Authorization': token ? `Bearer ${token}` : ''
+      }});
     return response.json();
   }
 }

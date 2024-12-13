@@ -13,7 +13,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="javascript:void(0);" (click)="switchCategory('companies')" [class.active]="category === 'companies'">
+            <a class="nav-link" href="javascript:void(0);" (click)="switchCategory('company')" [class.active]="category === 'company'">
               Empresas
             </a>
           </li>
@@ -37,13 +37,13 @@
             <tr *ngFor="let product of favoriteProducts">
               <td>
                 <div class="product-info">
-                  <img [src]="product.image" alt="{{ product.name }}" class="product-image mr-3">
+                  <img [src]="product.product.image" alt="{{ product.name }}" class="product-image mr-3">
                   <div>
-                    <h5>{{ product.name }}</h5>
+                    <h5>{{ product.product.name }}</h5>
                   </div>
                 </div>
               </td>
-              <td>{{ product.price }}€</td>
+              <td>{{ product.product.price }}€</td>
               <td class="text-right">
                 <button class="btn btn-danger mr-2" (click)="removeProductFromFavorites(product.id)">
                   <i class="fas fa-trash-alt"></i> Remover
@@ -73,9 +73,9 @@
           <tbody>
             <tr *ngFor="let artist of favoriteArtists">
               <td>
-                <img [src]="artist.image" alt="{{ artist.name }}" class="product-image mr-3">
+                <img [src]="artist.artist.image_url" alt="{{ artist.name }}" class="product-image mr-3">
               </td>
-              <td>{{ artist.name }}</td>
+              <td>{{ artist.artist.name }}</td>
               <td class="text-right">
                 <button class="btn btn-danger mr-2" (click)="removeArtistFromFavorites(artist.id)">
                   <i class="fas fa-trash-alt"></i> Remover
@@ -91,7 +91,7 @@
     </div>
   
     <!-- Empresas -->
-    <div *ngIf="category === 'companies'" class="favorite-section">
+    <div *ngIf="category === 'company'" class="favorite-section">
       <h2 class="text-center">As minhas empresas favoritas:</h2>
       <div *ngIf="favoriteCompanies.length > 0; else noFavorites">
         <table class="table text-center">
@@ -105,11 +105,11 @@
           <tbody>
             <tr *ngFor="let company of favoriteCompanies">
               <td>
-                <img [src]="company.image" alt="{{ company.name }}" class="product-image mr-3">
+                <img [src]="'data:image/png;base64,' + company.company.logo_base64" alt="{{ company.name }}" class="product-image mr-3">
               </td>
-              <td>{{ company.name }}</td>
+              <td>{{ company.company.name }}</td>
               <td class="text-right">
-                <button class="btn btn-danger mr-2" (click)="removeCompanyFromFavorites(company.id)">
+                <button class="btn btn-danger mr-2" (click)="removeCompanyFromFavorites(company.company.id)">
                   <i class="fas fa-trash-alt"></i> Remover
                 </button>
               </td>

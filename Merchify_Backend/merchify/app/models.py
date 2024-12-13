@@ -22,7 +22,7 @@ class Company(models.Model):
 
     def get_average_rating(self):
         average_rating = self.products.aggregate(avg_rating=Avg('reviews__rating'))['avg_rating']
-        return average_rating if average_rating is not None else "Sem Avaliações"
+        return average_rating if average_rating is not None else 0
 
     def __str__(self):
         return self.name
@@ -73,7 +73,7 @@ class Product(models.Model):
 
     def get_average_rating(self):
         average_rating = self.reviews.aggregate(avg_rating=Avg('rating'))['avg_rating']
-        return average_rating if average_rating is not None else "Sem Avaliações"
+        return average_rating if average_rating is not None else 0
 
 
     def get_product_type(self):

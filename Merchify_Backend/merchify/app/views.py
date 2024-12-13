@@ -547,20 +547,29 @@ def validate_token(request):
         return Response({"error": "Token is required"}, status=400)
 
     try:
+        # Decode the token
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        
+        # Fetch the user from the database
         user = User.objects.get(id=payload['user_id'])
+        
+        # Return user data
         return Response({
             "id": user.id,
             "username": user.username,
             "user_type": user.user_type,
-            "number_of_purchases": user.number_of_purchases 
+            "number_of_purchases": user.number_of_purchases
         })
+    
     except jwt.ExpiredSignatureError:
         return Response({"error": "Token has expired"}, status=401)
     except jwt.InvalidTokenError:
         return Response({"error": "Invalid token"}, status=401)
-
-
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+    
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -634,13 +643,13 @@ def favorites(request, category):
     user = request.user
     if category == 'products':
         favorites = Favorite.objects.filter(user=user)
-        serializer = FavoriteSerializer(favorites, many=True)
+        serializer = FavoriteSerializer(favorites, many=True, context={'request': request})
         return Response(serializer.data)
     elif category == 'artists':
         favorites = FavoriteArtist.objects.filter(user=user)
-        serializer = FavoriteArtistSerializer(favorites, many=True)
+        serializer = FavoriteArtistSerializer(favorites, many=True, context={'request': request})
         return Response(serializer.data)
-    elif category == 'companies':
+    elif category == 'company':
         favorites = FavoriteCompany.objects.filter(user=user)
         serializer = FavoriteCompanySerializer(favorites, many=True)
         return Response(serializer.data)

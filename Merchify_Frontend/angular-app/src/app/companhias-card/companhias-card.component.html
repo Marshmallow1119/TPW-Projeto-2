@@ -26,6 +26,6 @@
   <i
     class="fa fa-heart favorite-icon"
     [ngClass]="{ filled: company.is_favorited }"
-    (click)="toggleFavorite()"
+    (click)="toggleFavorite($event)"
   ></i>
 </div>
