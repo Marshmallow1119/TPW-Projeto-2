@@ -72,6 +72,9 @@ urlpatterns = [
     path('ws/users/', views.get_users, name='user'),
     path('ws/user/<int:user_id>/ban/', views.ban_user, name='ban_user'),
 
+    path('ws/cart/<int:user_id>/', views.manage_cart, name='manage_cart'),  # Para GET
+    path('ws/cart/<int:user_id>/<int:product_id>/', views.manage_cart, name='add_to_cart'),  # Para POST
+    path('ws/cart/<int:user_id>/<int:item_id>/', views.manage_cart, name='update_or_delete_cart_item'),  # Para PUT/DELETE
 ]   
 
 

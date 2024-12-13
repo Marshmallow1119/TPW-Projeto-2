@@ -46,7 +46,7 @@ from rest_framework import status
 from rest_framework.decorators import (
     api_view, authentication_classes, permission_classes
 )
-from app.serializers import FavoriteArtistSerializer, FavoriteCompanySerializer, FavoriteSerializer, LoginSerializer, RegisterSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
+from app.serializers import CartItemSerializer, FavoriteArtistSerializer, FavoriteCompanySerializer, FavoriteSerializer, LoginSerializer, RegisterSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
 
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -619,6 +619,87 @@ def add_to_cart(request, product_id):
             return JsonResponse({"error": "Invalid JSON data"}, status=400)
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def manage_cart(request, user_id=None, product_id=None, item_id=None):
+    """
+    View Geral para Gerenciamento de Carrinho:
+    - GET: Obter todos os itens do carrinho do usuário
+    - POST: Adicionar item ao carrinho
+    - PUT: Atualizar quantidade de um item no carrinho
+    - DELETE: Remover um item do carrinho
+    """
+    if not user_id or user_id != request.user.id:
+        return Response({"error": "Acesso não autorizado."}, status=status.HTTP_403_FORBIDDEN)
+    
+    if request.method == 'GET':
+        # Obter os itens do carrinho
+        try:
+            cart = Cart.objects.get(user_id=user_id)
+            cart_items = CartItem.objects.filter(cart=cart)
+            serializer = CartItemSerializer(cart_items, many=True)
+            return Response({"cart_items": serializer.data}, status=status.HTTP_200_OK)
+        except Cart.DoesNotExist:
+            return Response({"error": "Carrinho não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+    elif request.method == 'POST':
+        # Adicionar um item ao carrinho
+        try:
+            data = json.loads(request.body)
+            quantity = int(data.get("quantity", 1))
+            size_id = data.get("size")
+            product = get_object_or_404(Product, id=product_id)
+
+            size = None
+            if product.get_product_type() == 'Clothing' and size_id:
+                size = get_object_or_404(Size, id=size_id)
+
+            cart, created = Cart.objects.get_or_create(user_id=user_id)
+            cart_item, item_created = CartItem.objects.get_or_create(
+                cart=cart,
+                product=product,
+                size=size,
+                defaults={"quantity": quantity}
+            )
+
+            if not item_created:
+                cart_item.quantity += quantity
+                cart_item.save()
+
+            return Response({"message": "Produto adicionado ao carrinho!"}, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PUT':
+        # Atualizar um item do carrinho
+        try:
+            data = json.loads(request.body)
+            quantity = int(data.get("quantity", 1))
+            cart_item = get_object_or_404(CartItem, id=item_id)
+
+            cart_item.quantity = max(1, quantity)
+            cart_item.save()
+
+            return Response({"message": "Quantidade atualizada com sucesso!"}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        # Remover um item do carrinho
+        try:
+            cart_item = get_object_or_404(CartItem, id=item_id)
+            cart_item.delete()
+
+            return Response({"message": "Item removido com sucesso!"}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({"error": "Método não permitido."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 @api_view(['GET', 'DELETE'])
 @authentication_classes([JWTAuthentication])
