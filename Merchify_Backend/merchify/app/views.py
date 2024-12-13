@@ -623,7 +623,7 @@ def add_to_cart(request, product_id):
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-def manage_cart(request, user_id=None):
+def manage_cart(request, user_id=None, product_id=None, item_id=None):
     """
     View Geral para Gerenciamento de Carrinho:
     - GET: Obter todos os itens do carrinho do usuário
