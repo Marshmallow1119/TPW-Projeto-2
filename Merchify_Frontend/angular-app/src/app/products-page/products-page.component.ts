@@ -6,6 +6,14 @@ import { FiltroComponent } from '../filtro/filtro.component';
 import { CommonModule } from '@angular/common';
 import { ArtistsService } from '../artists.service';
 import { Artist } from '../models/artista';
+import { FavoritesService } from '../favorites.service';
+
+interface favoriteProducts {
+  product_id: number;
+  user_id: number;
+  product: Product;
+}
+
 
 @Component({
   selector: 'app-products-page',
@@ -19,6 +27,9 @@ export class ProductsPageComponent implements OnInit {
   artists: Artist[] = [];
   filteredProducts: Product[] = [];
   filters: any = {}; 
+
+  constructor(private favoritesService: FavoritesService) {}
+
   private productService: ProductsService = inject(ProductsService);
   private artistsService: ArtistsService = inject(ArtistsService);
   user: any = { is_authenticated: true, user_type: 'individual' }; 
@@ -29,7 +40,6 @@ export class ProductsPageComponent implements OnInit {
 
   private async loadProductsAndArtistsData(): Promise<void> {
     try {
-      // Fetch products and artists in parallel
       const [products, artists] = await Promise.all([
         this.productService.getProducts(),
         this.artistsService.getArtistas(),
@@ -54,7 +64,12 @@ export class ProductsPageComponent implements OnInit {
       });
       this.artists = artists;
       this.filteredProducts = [...this.products];
-
+    
+      let favoriteProducts: favoriteProducts[] = await this.favoritesService.getFavorites('products');
+      console.log('Produtos favoritos:', favoriteProducts);
+      for (let product of this.products) {
+        product.is_favorited = favoriteProducts.some(favoriteProduct => favoriteProduct.product.id === product.id);
+      } 
       console.log('Produtos e artistas carregados:', { products, artists });
     } catch (error) {
       console.error('Erro ao carregar produtos e artistas:', error);

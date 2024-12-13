@@ -86,7 +86,7 @@ export class AuthService {
         return throwError(() => error);
       })
     );
-  }
+  }  
   
   loadUserFromToken(): void {
     if (!isPlatformBrowser(this.platformId)) {

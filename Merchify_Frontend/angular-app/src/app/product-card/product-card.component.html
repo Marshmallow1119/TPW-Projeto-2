@@ -11,7 +11,7 @@
     *ngIf="user?.is_authenticated && user?.user_type === 'individual'"
     class="fa fa-heart favorite-icon"
     [ngClass]="{ filled: product.is_favorited }"
-    (click)="toggleFavorite(product.id)">
+    (click)="toggleFavorite($event,product.id)">
   </i>
 
   <!-- Product Details -->

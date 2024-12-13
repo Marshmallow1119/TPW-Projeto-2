@@ -34,3 +34,15 @@
     padding: 20px;
   }
   
+  .align-center {
+    text-align: center; 
+    vertical-align: middle; 
+  }
+  
+  .product-info {
+    display: flex;
+    align-items: center; 
+    justify-content: center; 
+  }
+
+  

@@ -53,7 +53,6 @@ export class FavoritesComponent implements OnInit {
     console.log('Companhias favoritas:', this.favoriteCompanies);
   }
 
-  // Funções para remover favoritos
   async removeProductFromFavorites(id: number): Promise<void> {
     await this.favoritesService.removeFavorite(id);
     this.favoriteProducts = this.favoriteProducts.filter(product => product.id !== id);

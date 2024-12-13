@@ -183,7 +183,7 @@ def produtos(request):
             logger.debug("Invalid maximum price provided.")
 
     # Serialize the filtered products
-    serializer = ProductSerializer(produtos, many=True)
+    serializer = ProductSerializer(produtos, many=True, context={'request': request})
     return Response(serializer.data)
 
     #for product in produtos:

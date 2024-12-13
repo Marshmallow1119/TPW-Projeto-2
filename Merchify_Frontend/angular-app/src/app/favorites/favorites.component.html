@@ -28,6 +28,7 @@
         <table class="table text-center">
           <thead>
             <tr>
+              <th scope="col">Imagem</th>
               <th scope="col">Produto</th>
               <th scope="col">Preço</th>
               <th scope="col">Ações</th>
@@ -35,12 +36,16 @@
           </thead>
           <tbody>
             <tr *ngFor="let product of favoriteProducts">
-              <td>
-                <div class="product-info">
-                  <img [src]="product.product.image" alt="{{ product.name }}" class="product-image mr-3">
-                  <div>
-                    <h5>{{ product.product.name }}</h5>
+              <td class="align-center">
+                <a [routerLink]="['/product', product.product.id]" class="text-decoration-none no-link-color" style="text-decoration: none;">
+                  <div class="product-info d-flex align-items-center">
+                    <img [src]="product.product.image_url" alt="{{ product.name }}" class="product-image mr-3">
                   </div>
+                </a>
+              </td>
+              <td>
+                <div>
+                  <h5>{{ product.product.name }}</h5>
                 </div>
               </td>
               <td>{{ product.product.price }}€</td>
