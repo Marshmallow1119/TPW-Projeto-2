@@ -579,49 +579,48 @@ def logout(request):
         auth_logout(request)  
     return redirect('home')
 
-@api_view(['POST'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-def add_to_cart(request, product_id):
-    if request.method == "POST":
-        try:
-            if not isinstance(request.user, User):
-                return JsonResponse({"error": "User is not authenticated."}, status=400)
-            
-            data = json.loads(request.body)
-            quantity = int(data.get("quantity", 1))
-            size_id = data.get("size") 
-
-            product = get_object_or_404(Product, id=product_id)
-            
-            size = None
-            if product.get_product_type() == 'Clothing':
-                if not size_id:
-                    return JsonResponse({"error": "Size is required for clothing items."}, status=400)
-                size = get_object_or_404(Size, id=size_id)
-            
-            cart, created = Cart.objects.get_or_create(user=request.user, defaults={"date": date.today()})
-            
-            cart_item, item_created = CartItem.objects.get_or_create(
-                cart=cart, 
-                product=product, 
-                size=size,  
-                defaults={"quantity": quantity}
-            )
-
-            if not item_created:
-                cart_item.quantity += quantity
-                cart_item.save()
-
-            return JsonResponse({"message": "Produto adicionado ao carrinho!"})
-
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON data"}, status=400)
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
+#@api_view(['POST'])
+#@authentication_classes([JWTAuthentication])
+#@permission_classes([IsAuthenticated])
+#def add_to_cart(request, product_id):
+#    if request.method == "POST":
+#        try:
+#            if not isinstance(request.user, User):
+#                return JsonResponse({"error": "User is not authenticated."}, status=400)
+#            
+#            data = json.loads(request.body)
+#            quantity = int(data.get("quantity", 1))
+#            size_id = data.get("size") 
+#
+#            product = get_object_or_404(Product, id=product_id)
+#            
+#            size = None
+#            if product.get_product_type() == 'Clothing':
+#                if not size_id:
+#                    return JsonResponse({"error": "Size is required for clothing items."}, status=400)
+#                size = get_object_or_404(Size, id=size_id)
+#            
+#            cart, created = Cart.objects.get_or_create(user=request.user, defaults={"date": date.today()})
+#            
+#            cart_item, item_created = CartItem.objects.get_or_create(
+#                cart=cart, 
+#                product=product, 
+#                size=size,  
+#                defaults={"quantity": quantity}
+#            )
+#
+#            if not item_created:
+#                cart_item.quantity += quantity
+#                cart_item.save()
+#
+#            return JsonResponse({"message": "Produto adicionado ao carrinho!"})
+#
+#        except json.JSONDecodeError:
+#            return JsonResponse({"error": "Invalid JSON data"}, status=400)
+#
+#    return JsonResponse({"error": "Invalid request"}, status=400)
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
-@permission_classes([IsAuthenticated])
 def manage_cart(request, user_id=None, product_id=None, item_id=None):
     """
     View Geral para Gerenciamento de Carrinho:
@@ -630,11 +629,12 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
     - PUT: Atualizar quantidade de um item no carrinho
     - DELETE: Remover um item do carrinho
     """
+    print("olaaaaa")
     if not user_id or user_id != request.user.id:
         return Response({"error": "Acesso não autorizado."}, status=status.HTTP_403_FORBIDDEN)
-    
+
     if request.method == 'GET':
-        # Obter os itens do carrinho
+        print("aqui")
         try:
             cart = Cart.objects.get(user_id=user_id)
             cart_items = CartItem.objects.filter(cart=cart)
@@ -644,62 +644,72 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
             return Response({"error": "Carrinho não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
     elif request.method == 'POST':
+        print("aqui no adicionar")
         # Adicionar um item ao carrinho
-        try:
-            data = json.loads(request.body)
-            quantity = int(data.get("quantity", 1))
-            size_id = data.get("size")
-            product = get_object_or_404(Product, id=product_id)
+        if product_id:
+            print("aqui no adicionar")
+            try:
+                data = json.loads(request.body)
+                quantity = int(data.get("quantity", 1))
+                size_id = data.get("size")
+                product = get_object_or_404(Product, id=product_id)
 
-            size = None
-            if product.get_product_type() == 'Clothing' and size_id:
-                size = get_object_or_404(Size, id=size_id)
+                size = None
+                if product.get_product_type() == 'Clothing' and size_id:
+                    size = get_object_or_404(Size, id=size_id)
 
-            cart, created = Cart.objects.get_or_create(user_id=user_id)
-            cart_item, item_created = CartItem.objects.get_or_create(
-                cart=cart,
-                product=product,
-                size=size,
-                defaults={"quantity": quantity}
-            )
+                cart, created = Cart.objects.get_or_create(user_id=user_id)
+                cart_item, item_created = CartItem.objects.get_or_create(
+                    cart=cart,
+                    product=product,
+                    size=size,
+                    defaults={"quantity": quantity}
+                )
 
-            if not item_created:
-                cart_item.quantity += quantity
-                cart_item.save()
+                if not item_created:
+                    cart_item.quantity += quantity
+                    cart_item.save()
 
-            return Response({"message": "Produto adicionado ao carrinho!"}, status=status.HTTP_201_CREATED)
+                return Response({"message": "Produto adicionado ao carrinho!"}, status=status.HTTP_201_CREATED)
 
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"error": "Parâmetro product_id é obrigatório para adicionar itens."}, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'PUT':
         # Atualizar um item do carrinho
-        try:
-            data = json.loads(request.body)
-            quantity = int(data.get("quantity", 1))
-            cart_item = get_object_or_404(CartItem, id=item_id)
+        if item_id:
+            try:
+                data = json.loads(request.body)
+                quantity = int(data.get("quantity", 1))
+                cart_item = get_object_or_404(CartItem, id=item_id)
 
-            cart_item.quantity = max(1, quantity)
-            cart_item.save()
+                cart_item.quantity = max(1, quantity)
+                cart_item.save()
 
-            return Response({"message": "Quantidade atualizada com sucesso!"}, status=status.HTTP_200_OK)
+                return Response({"message": "Quantidade atualizada com sucesso!"}, status=status.HTTP_200_OK)
 
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"error": "Parâmetro item_id é obrigatório para atualizar itens."}, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
         # Remover um item do carrinho
-        try:
-            cart_item = get_object_or_404(CartItem, id=item_id)
-            cart_item.delete()
+        if item_id:
+            try:
+                cart_item = get_object_or_404(CartItem, id=item_id)
+                cart_item.delete()
 
-            return Response({"message": "Item removido com sucesso!"}, status=status.HTTP_200_OK)
+                return Response({"message": "Item removido com sucesso!"}, status=status.HTTP_200_OK)
 
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"error": "Parâmetro item_id é obrigatório para remover itens."}, status=status.HTTP_400_BAD_REQUEST)
 
     return Response({"error": "Método não permitido."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
 
 @api_view(['GET', 'DELETE'])
 @authentication_classes([JWTAuthentication])
@@ -803,63 +813,63 @@ def company_favorites(request, company_id):
             return JsonResponse({'message': 'Company unfavorited successfully!'})
         return JsonResponse({'message': 'Company is not favorited.'})
 
-@api_view(['POST'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def viewCart(request):
-    user = request.user
-    try:
-        cart = Cart.objects.get(user=user)
-    except Cart.DoesNotExist:
-        cart = Cart.objects.create(user=user)
+#@api_view(['POST'])
+#@authentication_classes([SessionAuthentication, TokenAuthentication])
+#@permission_classes([IsAuthenticated])
+#def viewCart(request):
+#    user = request.user
+#    try:
+#        cart = Cart.objects.get(user=user)
+#    except Cart.DoesNotExist:
+#        cart = Cart.objects.create(user=user)
+#
+#    cart_items = CartItem.objects.filter(cart=cart)
+#    cart_total = sum(item.product.price * item.quantity for item in cart_items)
+#
+#    context = {
+#        'cart_items': cart_items,
+#        'cart_total': cart_total,
+#    }
+#    return render(request, 'cart.html', context)
 
-    cart_items = CartItem.objects.filter(cart=cart)
-    cart_total = sum(item.product.price * item.quantity for item in cart_items)
 
-    context = {
-        'cart_items': cart_items,
-        'cart_total': cart_total,
-    }
-    return render(request, 'cart.html', context)
+#@api_view(['POST'])
+#@authentication_classes([SessionAuthentication, TokenAuthentication])
+#@permission_classes([IsAuthenticated])
+#def update_cart_item(request, item_id):
+#    if request.method == 'POST':
+#        try:
+#            quantity = int(request.POST.get('quantity', 1))
+#            cart_item = get_object_or_404(CartItem, id=item_id)
+#
+#            cart_item.quantity = max(1, quantity) 
+#            cart_item.save()
+#
+#            return redirect('viewCart')
+#        except Exception as e:
+#            messages.error(request, f"Erro ao atualizar o carrinho: {str(e)}")
+#            return redirect('viewCart')
+#    return redirect('viewCart')
 
-
-@api_view(['POST'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def update_cart_item(request, item_id):
-    if request.method == 'POST':
-        try:
-            quantity = int(request.POST.get('quantity', 1))
-            cart_item = get_object_or_404(CartItem, id=item_id)
-
-            cart_item.quantity = max(1, quantity) 
-            cart_item.save()
-
-            return redirect('viewCart')
-        except Exception as e:
-            messages.error(request, f"Erro ao atualizar o carrinho: {str(e)}")
-            return redirect('viewCart')
-    return redirect('viewCart')
-
-@api_view(['POST'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def remove_from_cart(request, product_id):
-    try:
-        cart = Cart.objects.get(user=request.user)
-        cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
-        cart_item.delete()
-
-        if request.session.get('discount_applied', False):
-            request.session['discount_applied'] = False
-            request.session.pop('discount_value', None)
-            messages.info(request, "O código de desconto foi removido porque o carrinho foi alterado.")
-
-        messages.success(request, "Item removido do carrinho com sucesso.")
-
-    except CartItem.DoesNotExist:
-        raise Http404("CartItem does not exist")
-    return redirect('cart')
+#@api_view(['POST'])
+#@authentication_classes([SessionAuthentication, TokenAuthentication])
+#@permission_classes([IsAuthenticated])
+#def remove_from_cart(request, product_id):
+#    try:
+#        cart = Cart.objects.get(user=request.user)
+#        cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
+#        cart_item.delete()
+#
+#        if request.session.get('discount_applied', False):
+#            request.session['discount_applied'] = False
+#            request.session.pop('discount_value', None)
+#            messages.info(request, "O código de desconto foi removido porque o carrinho foi alterado.")
+#
+#        messages.success(request, "Item removido do carrinho com sucesso.")
+#
+#    except CartItem.DoesNotExist:
+#        raise Http404("CartItem does not exist")
+#    return redirect('cart')
 
 
 @login_required(login_url='/login')

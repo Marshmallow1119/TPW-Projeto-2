@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
+import { CONFIG } from './config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
-  private apiUrl = 'http://localhost:8000/ws/cart/';
+  private baseUrl: string = CONFIG.baseUrl;
 
   constructor() {}
-
   async getCart(userId: number): Promise<any> {
     try {
-      const response = await fetch(`${this.apiUrl}${userId}/`, {
+      const response = await fetch(`${this.baseUrl}${userId}/`, {
         method: 'GET',
         credentials: 'include', // Enviar cookies (se necessário)
         headers: {
@@ -25,25 +25,34 @@ export class CartService {
   }
 
   async addToCart(userId: number, productId: number, data: any): Promise<any> {
+    console.log(this.baseUrl);
     try {
-      const response = await fetch(`${this.apiUrl}${userId}/${productId}/`, {
+      console.log('Entrou no add to cart');
+      const response = await fetch(`${this.baseUrl}/cart/${userId}/product/${productId}/`, {
         method: 'POST',
-        credentials: 'include', // Enviar cookies (se necessário)
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
       });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Erro HTTP ${response.status}: ${errorText}`);
+        throw new Error(`Erro HTTP ${response.status}: ${errorText}`);
+      }
+  
       return await response.json();
+  
     } catch (error) {
       console.error('Erro ao adicionar ao carrinho:', error);
       throw error;
     }
   }
+  
 
   async updateCartItem(userId: number, itemId: number, data: any): Promise<any> {
     try {
-      const response = await fetch(`${this.apiUrl}${userId}/${itemId}/`, {
+      const response = await fetch(`${this.baseUrl}${userId}/${itemId}/`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -60,7 +69,7 @@ export class CartService {
 
   async removeCartItem(userId: number, itemId: number): Promise<any> {
     try {
-      const response = await fetch(`${this.apiUrl}${userId}/${itemId}/`, {
+      const response = await fetch(`${this.baseUrl}${userId}/${itemId}/`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {

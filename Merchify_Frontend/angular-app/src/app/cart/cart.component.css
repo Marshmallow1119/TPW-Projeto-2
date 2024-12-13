@@ -1,0 +1,23 @@
+.product-image {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+  }
+  
+  .quantity-input {
+    width: 100px;
+  }
+  
+  .product-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .product-info h5 {
+    margin-bottom: 0;
+  }
+  
+  .table td {
+    vertical-align: middle;
+  }
+  

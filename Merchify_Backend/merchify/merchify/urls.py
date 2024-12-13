@@ -34,9 +34,9 @@ urlpatterns = [
     path('ws/product/<int:identifier>/',  views.productDetails, name='productDetails'),
     path('ws/search/', views.search, name='search'),
     path('ws/register/', views.register_view, name='register'),
-    path('ws/cart/', views.viewCart, name='cart'),
-    path('ws/add-to-cart/<int:product_id>/', views.add_to_cart, name = 'add_to_cart'),
-    path('ws/remove/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
+    #path('ws/cart/', views.viewCart, name='cart'),
+    #path('ws/add-to-cart/<int:product_id>/', views.add_to_cart, name = 'add_to_cart'),
+    #path('ws/remove/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
     path("ws/account/profile", views.profile, name="profile"),
     path("ws/product/<int:product_id>/submit_review/", views.submit_review, name="submit_review"),
     path('ws/company/<int:company_id>/products/', views.company_products, name='company_products'),
@@ -62,8 +62,8 @@ urlpatterns = [
     path('ws/delete/review/<int:review_id>/', views.delete_review, name='delete_review'),
     path('ws/apply_discount/', views.apply_discount, name='apply_discount'),
     path('ws/companhias/', views.companhias, name='companhias'),
-    path('ws/update-cart-item/<int:item_id>/', views.update_cart_item, name='update_cart_item'),
-    path('ws/carrinho/', views.viewCart, name='viewCart'),
+    #path('ws/update-cart-item/<int:item_id>/', views.update_cart_item, name='update_cart_item'),
+    #path('ws/carrinho/', views.viewCart, name='viewCart'),
     path('ws/product/<int:product_id>/add_clothing_stock/', views.add_clothing_stock, name='add_clothing_stock'),
     path('ws/product/<int:product_id>/add_stock/', views.add_stock, name='add_stock'),
     path('ws/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -71,10 +71,9 @@ urlpatterns = [
     path('ws/token/validate/', views.validate_token, name='validate_token'),
     path('ws/users/', views.get_users, name='user'),
     path('ws/user/<int:user_id>/ban/', views.ban_user, name='ban_user'),
-
-    path('ws/cart/<int:user_id>/', views.manage_cart, name='manage_cart'),  # Para GET
-    path('ws/cart/<int:user_id>/<int:product_id>/', views.manage_cart, name='add_to_cart'),  # Para POST
-    path('ws/cart/<int:user_id>/<int:item_id>/', views.manage_cart, name='update_or_delete_cart_item'),  # Para PUT/DELETE
+    path('ws/cart/<int:user_id>/', views.manage_cart, name='manage_cart'),  # Para GET e criação do carrinho
+    path('ws/cart/<int:user_id>/product/<int:product_id>/', views.manage_cart, name='add_to_cart'),
+    path('ws/cart/<int:user_id>/item/<int:item_id>/', views.manage_cart, name='update_or_delete_cart_item'),  # Para PUT/DELETE (atualizar/remover item do carrinho)
 ]   
 
 
