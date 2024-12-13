@@ -26,7 +26,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent }, 
   { path: 'admin-home', component: AdminHomeComponent }, 
   { path: 'favorites', component: FavoritesComponent }, 
-  { path: 'cart', component: CartComponent },
+  { path: 'manage_cart', component: CartComponent },
  
 
   

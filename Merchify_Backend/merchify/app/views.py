@@ -579,46 +579,46 @@ def logout(request):
         auth_logout(request)  
     return redirect('home')
 
-#@api_view(['POST'])
-#@authentication_classes([JWTAuthentication])
-#@permission_classes([IsAuthenticated])
-#def add_to_cart(request, product_id):
-#    if request.method == "POST":
-#        try:
-#            if not isinstance(request.user, User):
-#                return JsonResponse({"error": "User is not authenticated."}, status=400)
-#            
-#            data = json.loads(request.body)
-#            quantity = int(data.get("quantity", 1))
-#            size_id = data.get("size") 
-#
-#            product = get_object_or_404(Product, id=product_id)
-#            
-#            size = None
-#            if product.get_product_type() == 'Clothing':
-#                if not size_id:
-#                    return JsonResponse({"error": "Size is required for clothing items."}, status=400)
-#                size = get_object_or_404(Size, id=size_id)
-#            
-#            cart, created = Cart.objects.get_or_create(user=request.user, defaults={"date": date.today()})
-#            
-#            cart_item, item_created = CartItem.objects.get_or_create(
-#                cart=cart, 
-#                product=product, 
-#                size=size,  
-#                defaults={"quantity": quantity}
-#            )
-#
-#            if not item_created:
-#                cart_item.quantity += quantity
-#                cart_item.save()
-#
-#            return JsonResponse({"message": "Produto adicionado ao carrinho!"})
-#
-#        except json.JSONDecodeError:
-#            return JsonResponse({"error": "Invalid JSON data"}, status=400)
-#
-#    return JsonResponse({"error": "Invalid request"}, status=400)
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def add_to_cart(request, product_id):
+    if request.method == "POST":
+        try:
+            if not isinstance(request.user, User):
+                return JsonResponse({"error": "User is not authenticated."}, status=400)
+            
+            data = json.loads(request.body)
+            quantity = int(data.get("quantity", 1))
+            size_id = data.get("size") 
+
+            product = get_object_or_404(Product, id=product_id)
+            
+            size = None
+            if product.get_product_type() == 'Clothing':
+                if not size_id:
+                    return JsonResponse({"error": "Size is required for clothing items."}, status=400)
+                size = get_object_or_404(Size, id=size_id)
+            
+            cart, created = Cart.objects.get_or_create(user=request.user, defaults={"date": date.today()})
+            
+            cart_item, item_created = CartItem.objects.get_or_create(
+                cart=cart, 
+                product=product, 
+                size=size,  
+                defaults={"quantity": quantity}
+            )
+
+            if not item_created:
+                cart_item.quantity += quantity
+                cart_item.save()
+
+            return JsonResponse({"message": "Produto adicionado ao carrinho!"})
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data"}, status=400)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @authentication_classes([JWTAuthentication])
@@ -631,23 +631,15 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
     - PUT: Atualizar quantidade de um item no carrinho
     - DELETE: Remover um item do carrinho
     """
-    print("olaaaaa")
-    print("aqqui")
-    print(user_id)
-    print(product_id)
-    print(item_id)
-    print(request.user.id)
+
 
     if not user_id or user_id != request.user.id:
-        print("aquiiiiiiiiiiiiiiiiiiiii")
         return Response({"error": "Acesso não autorizado."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == 'GET':
         print("aqui")
         try:
-            print("paroooooo")
             cart = Cart.objects.get(user=request.user)
-            print("paroooooo1")
             cart_items = CartItem.objects.filter(cart=cart)
             serializer = CartItemSerializer(cart_items, many=True)
             return Response({"cart_items": serializer.data}, status=status.HTTP_200_OK)
@@ -823,63 +815,60 @@ def company_favorites(request, company_id):
             return JsonResponse({'message': 'Company unfavorited successfully!'})
         return JsonResponse({'message': 'Company is not favorited.'})
 
-#@api_view(['POST'])
-#@authentication_classes([SessionAuthentication, TokenAuthentication])
-#@permission_classes([IsAuthenticated])
-#def viewCart(request):
-#    user = request.user
-#    try:
-#        cart = Cart.objects.get(user=user)
-#    except Cart.DoesNotExist:
-#        cart = Cart.objects.create(user=user)
-#
-#    cart_items = CartItem.objects.filter(cart=cart)
-#    cart_total = sum(item.product.price * item.quantity for item in cart_items)
-#
-#    context = {
-#        'cart_items': cart_items,
-#        'cart_total': cart_total,
-#    }
-#    return render(request, 'cart.html', context)
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def viewCart(request):
+    user = request.user
+    try:
+        cart = Cart.objects.get(user=user)
+    except Cart.DoesNotExist:
+        cart = Cart.objects.create(user=user)
 
+    cart_items = CartItem.objects.filter(cart=cart)
+    cart_total = sum(item.product.price * item.quantity for item in cart_items)
 
-#@api_view(['POST'])
-#@authentication_classes([SessionAuthentication, TokenAuthentication])
-#@permission_classes([IsAuthenticated])
-#def update_cart_item(request, item_id):
-#    if request.method == 'POST':
-#        try:
-#            quantity = int(request.POST.get('quantity', 1))
-#            cart_item = get_object_or_404(CartItem, id=item_id)
-#
-#            cart_item.quantity = max(1, quantity) 
-#            cart_item.save()
-#
-#            return redirect('viewCart')
-#        except Exception as e:
-#            messages.error(request, f"Erro ao atualizar o carrinho: {str(e)}")
-#            return redirect('viewCart')
-#    return redirect('viewCart')
+    context = {
+        'cart_items': cart_items,
+        'cart_total': cart_total,
+    }
+    return render(request, 'cart.html', context)
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def update_cart_item(request, item_id):
+    if request.method == 'POST':
+        try:
+            quantity = int(request.POST.get('quantity', 1))
+            cart_item = get_object_or_404(CartItem, id=item_id)
 
-#@api_view(['POST'])
-#@authentication_classes([SessionAuthentication, TokenAuthentication])
-#@permission_classes([IsAuthenticated])
-#def remove_from_cart(request, product_id):
-#    try:
-#        cart = Cart.objects.get(user=request.user)
-#        cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
-#        cart_item.delete()
-#
-#        if request.session.get('discount_applied', False):
-#            request.session['discount_applied'] = False
-#            request.session.pop('discount_value', None)
-#            messages.info(request, "O código de desconto foi removido porque o carrinho foi alterado.")
-#
-#        messages.success(request, "Item removido do carrinho com sucesso.")
-#
-#    except CartItem.DoesNotExist:
-#        raise Http404("CartItem does not exist")
-#    return redirect('cart')
+            cart_item.quantity = max(1, quantity) 
+            cart_item.save()
+
+            return redirect('viewCart')
+        except Exception as e:
+            messages.error(request, f"Erro ao atualizar o carrinho: {str(e)}")
+            return redirect('viewCart')
+    return redirect('viewCart')
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def remove_from_cart(request, product_id):
+    try:
+        cart = Cart.objects.get(user=request.user)
+        cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
+        cart_item.delete()
+
+        if request.session.get('discount_applied', False):
+            request.session['discount_applied'] = False
+            request.session.pop('discount_value', None)
+            messages.info(request, "O código de desconto foi removido porque o carrinho foi alterado.")
+
+        messages.success(request, "Item removido do carrinho com sucesso.")
+
+    except CartItem.DoesNotExist:
+        raise Http404("CartItem does not exist")
+    return redirect('cart')
 
 
 @login_required(login_url='/login')
@@ -1037,186 +1026,186 @@ def submit_review(request, product_id):
         return redirect('productDetails', identifier=product_id)
 
 
-#@api_view(['POST'])
-#@authentication_classes([SessionAuthentication, TokenAuthentication])
-#@permission_classes([IsAuthenticated])
-#def checkfavorite(request, category):
-#    user = request.user
-#    if category == 'products':
-#        favorite_products = Favorite.objects.filter(user=user).select_related('product')
-#        products_list = [
-#            {
-#                'id': fav.product.id,
-#                'name': fav.product.name,
-#                'price': fav.product.price,
-#                'image': fav.product.image.url
-#            }
-#            for fav in favorite_products
-#        ]
-#        return render(request, "favorites.html", {"favorite_products": products_list})
-#
-#    elif category == 'artists':
-#        favorite_artists = FavoriteArtist.objects.filter(user=user).select_related('artist')
-#        artists_list = [
-#            {
-#                'id': fav.artist.id,
-#                'name': fav.artist.name,
-#                'image': fav.artist.image.url
-#            }
-#            for fav in favorite_artists
-#        ]
-#        return render(request, "favorites.html", {"favorite_artists": artists_list})
-#
-#    return JsonResponse({"success": False, "message": "Invalid category."}, status=400)
-#
-#@login_required
-#def checkfavoriteOld(request):
-#    user = request.user
-#
-#    favorite_products = Favorite.objects.filter(user=user, product__isnull=False).select_related('product')
-#    products_list = [
-#        {
-#            'id': fav.product.id,
-#            'name': fav.product.name,
-#            'price': fav.product.price,
-#            'image': fav.product.image.url
-#        }
-#        for fav in favorite_products if fav.product  
-#    ]
-#
-#    favorite_artists = FavoriteArtist.objects.filter(user=user, artist__isnull=False).select_related('artist')
-#    artists_list = [
-#        {
-#            'id': fav.artist.id,
-#            'name': fav.artist.name,
-#            'image': fav.artist.image.url
-#        }
-#        for fav in favorite_artists if fav.artist  
-#    ]
-#
-#    favorite_companies = FavoriteCompany.objects.filter(user=user, company__isnull=False).select_related('company')
-#    companies_list = [
-#        {
-#            'id': fav.company.id,
-#            'name': fav.company.name,
-#            'image': fav.company.logo.url
-#        }
-#        for fav in favorite_companies if fav.company  
-#    ]
-#
-#
-#    category = request.GET.get('category', 'products')
-#    return render(request, 'favorites.html', {
-#        'category': category,
-#        'favorite_products': products_list,
-#        'favorite_artists': artists_list,
-#        'favorite_companies': companies_list
-#    })
-#
-#
-#@require_POST
-#@login_required(login_url='/login/')
-#def addtofavorite(request, product_id):
-#    try:
-#        product = get_object_or_404(Product, id=product_id)
-#        user = request.user
-#
-#        favorite, created = Favorite.objects.get_or_create(user=user, product=product)
-#        favorited = created
-#
-#        if not created:
-#            favorite.delete()
-#
-#        return JsonResponse({"success": True, "favorited": favorited})
-#
-#    except Product.DoesNotExist:
-#        return JsonResponse({"success": False, "message": "Product not found."}, status=404)
-#
-#@require_POST
-#@login_required(login_url='/login/')
-#def addtofavoriteartist(request, artist_id):
-#    try:
-#        artist = get_object_or_404(Artist, id=artist_id)
-#        user = request.user
-#
-#        if not artist:
-#            return JsonResponse({"success": False, "message": "Invalid artist."}, status=400)
-#
-#        favorite_artist, created = FavoriteArtist.objects.get_or_create(user=user, artist=artist)
-#        favorited = created
-#
-#        if not created:
-#            favorite_artist.delete()
-#
-#        return JsonResponse({"success": True, "favorited": favorited})
-#
-#    except Artist.DoesNotExist:
-#        return JsonResponse({"success": False, "message": "Artist not found."}, status=404)
-#    except Exception as e:
-#        return JsonResponse({"success": False, "message": str(e)}, status=500)
-#
-#@require_POST
-#@login_required(login_url='/login/')
-#def addtofavoritecompany(request, company_id):
-#    try:
-#        company = get_object_or_404(Company, id=company_id)
-#        user = request.user
-#
-#        if not company:
-#            return JsonResponse({"success": False, "message": "Invalid artist."}, status=400)
-#
-#        favorite_company, created = FavoriteCompany.objects.get_or_create(user=user, company=company)
-#        favorited = created
-#
-#        if not created:
-#            favorite_company.delete()
-#
-#        return JsonResponse({"success": True, "favorited": favorited})
-#
-#    except Company.DoesNotExist:
-#        return JsonResponse({"success": False, "message": "Artist not found."}, status=404)
-#    except Exception as e:
-#        return JsonResponse({"success": False, "message": str(e)}, status=500)
-#
-#@api_view(['DELETE'])
-#@authentication_classes([SessionAuthentication, TokenAuthentication])
-#@permission_classes([IsAuthenticated])
-#def remove_from_favorites(request, product_id):
-#    try:
-#        product = get_object_or_404(Product, id=product_id)
-#        user = request.user
-#        Favorite.objects.filter(user=user, product=product).delete()
-#        return redirect('favorites')
-#
-#    except Product.DoesNotExist:
-#        return JsonResponse({"success": False, "message": "Product not found."}, status=404)
-#
-#@api_view(['DELETE'])
-#@authentication_classes([SessionAuthentication, TokenAuthentication])
-#@permission_classes([IsAuthenticated])
-#def remove_from_favorites_artist(request, artist_id):
-#    try:
-#        artist = get_object_or_404(Artist, id=artist_id)
-#        user = request.user
-#        FavoriteArtist.objects.filter(user=user, artist=artist).delete()
-#        return redirect('favorites')
-#
-#    except Artist.DoesNotExist:
-#        return JsonResponse({"success": False, "message": "Artist not found."}, status=404)
-#
-#
-#@api_view(['DELETE'])
-#@authentication_classes([SessionAuthentication, TokenAuthentication])
-#@permission_classes([IsAuthenticated])
-#def remove_from_favorites_company(request, company_id):
-#    try:
-#        company = get_object_or_404(Company, id=company_id)
-#        user = request.user
-#        FavoriteCompany.objects.filter(user=user, company=company).delete()
-#        return redirect('favorites')
-#
-#    except Company.DoesNotExist:
-#        return JsonResponse({"success": False, "message": "Company not found."}, status=404)
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def checkfavorite(request, category):
+    user = request.user
+    if category == 'products':
+        favorite_products = Favorite.objects.filter(user=user).select_related('product')
+        products_list = [
+            {
+                'id': fav.product.id,
+                'name': fav.product.name,
+                'price': fav.product.price,
+                'image': fav.product.image.url
+            }
+            for fav in favorite_products
+        ]
+        return render(request, "favorites.html", {"favorite_products": products_list})
+
+    elif category == 'artists':
+        favorite_artists = FavoriteArtist.objects.filter(user=user).select_related('artist')
+        artists_list = [
+            {
+                'id': fav.artist.id,
+                'name': fav.artist.name,
+                'image': fav.artist.image.url
+            }
+            for fav in favorite_artists
+        ]
+        return render(request, "favorites.html", {"favorite_artists": artists_list})
+
+    return JsonResponse({"success": False, "message": "Invalid category."}, status=400)
+
+@login_required
+def checkfavoriteOld(request):
+    user = request.user
+
+    favorite_products = Favorite.objects.filter(user=user, product__isnull=False).select_related('product')
+    products_list = [
+        {
+            'id': fav.product.id,
+            'name': fav.product.name,
+            'price': fav.product.price,
+            'image': fav.product.image.url
+        }
+        for fav in favorite_products if fav.product  
+    ]
+
+    favorite_artists = FavoriteArtist.objects.filter(user=user, artist__isnull=False).select_related('artist')
+    artists_list = [
+        {
+            'id': fav.artist.id,
+            'name': fav.artist.name,
+            'image': fav.artist.image.url
+        }
+        for fav in favorite_artists if fav.artist  
+    ]
+
+    favorite_companies = FavoriteCompany.objects.filter(user=user, company__isnull=False).select_related('company')
+    companies_list = [
+        {
+            'id': fav.company.id,
+            'name': fav.company.name,
+            'image': fav.company.logo.url
+        }
+        for fav in favorite_companies if fav.company  
+    ]
+
+
+    category = request.GET.get('category', 'products')
+    return render(request, 'favorites.html', {
+        'category': category,
+        'favorite_products': products_list,
+        'favorite_artists': artists_list,
+        'favorite_companies': companies_list
+    })
+
+
+@require_POST
+@login_required(login_url='/login/')
+def addtofavorite(request, product_id):
+    try:
+        product = get_object_or_404(Product, id=product_id)
+        user = request.user
+
+        favorite, created = Favorite.objects.get_or_create(user=user, product=product)
+        favorited = created
+
+        if not created:
+            favorite.delete()
+
+        return JsonResponse({"success": True, "favorited": favorited})
+
+    except Product.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Product not found."}, status=404)
+
+@require_POST
+@login_required(login_url='/login/')
+def addtofavoriteartist(request, artist_id):
+    try:
+        artist = get_object_or_404(Artist, id=artist_id)
+        user = request.user
+
+        if not artist:
+            return JsonResponse({"success": False, "message": "Invalid artist."}, status=400)
+
+        favorite_artist, created = FavoriteArtist.objects.get_or_create(user=user, artist=artist)
+        favorited = created
+
+        if not created:
+            favorite_artist.delete()
+
+        return JsonResponse({"success": True, "favorited": favorited})
+
+    except Artist.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Artist not found."}, status=404)
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+@require_POST
+@login_required(login_url='/login/')
+def addtofavoritecompany(request, company_id):
+    try:
+        company = get_object_or_404(Company, id=company_id)
+        user = request.user
+
+        if not company:
+            return JsonResponse({"success": False, "message": "Invalid artist."}, status=400)
+
+        favorite_company, created = FavoriteCompany.objects.get_or_create(user=user, company=company)
+        favorited = created
+
+        if not created:
+            favorite_company.delete()
+
+        return JsonResponse({"success": True, "favorited": favorited})
+
+    except Company.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Artist not found."}, status=404)
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+@api_view(['DELETE'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def remove_from_favorites(request, product_id):
+    try:
+        product = get_object_or_404(Product, id=product_id)
+        user = request.user
+        Favorite.objects.filter(user=user, product=product).delete()
+        return redirect('favorites')
+
+    except Product.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Product not found."}, status=404)
+
+@api_view(['DELETE'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def remove_from_favorites_artist(request, artist_id):
+    try:
+        artist = get_object_or_404(Artist, id=artist_id)
+        user = request.user
+        FavoriteArtist.objects.filter(user=user, artist=artist).delete()
+        return redirect('favorites')
+
+    except Artist.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Artist not found."}, status=404)
+
+
+@api_view(['DELETE'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def remove_from_favorites_company(request, company_id):
+    try:
+        company = get_object_or_404(Company, id=company_id)
+        user = request.user
+        FavoriteCompany.objects.filter(user=user, company=company).delete()
+        return redirect('favorites')
+
+    except Company.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Company not found."}, status=404)
 
 
 @api_view(['POST'])
