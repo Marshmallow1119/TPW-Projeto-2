@@ -1,6 +1,6 @@
 <div class="container mt-5">
     <div class="back-to-shop mt-4">
-      <a routerLink="/products" class="text-decoration-none">
+      <a routerLink="/products-page" class="text-decoration-none">
         <i class="fas fa-arrow-left"></i>
         <span class="text-muted">Continue a comprar</span>
       </a>
@@ -16,7 +16,7 @@
             <div class="col-3">
               <img
                 class="img-fluid rounded shadow-sm"
-                [src]="item.product.image"
+                [src]="getImageSrc(item.product.specificDetails.imageBase64)"
                 [alt]="item.product.name"
               />
             </div>

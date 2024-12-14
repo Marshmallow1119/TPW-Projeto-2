@@ -50,18 +50,74 @@ export class PaymentPageComponent implements OnInit {
 
   async loadCart(userId: number) {
     try {
+      console.log('userId:', userId);
+  
+      // Chamada ao serviço para obter o carrinho
       const response = await this.cartService.getCart(userId);
+  
+      // Verifica se os dados foram retornados corretamente
       if (response && response.cart_items) {
-        this.cartItems = response.cart_items;
-        this.calculateCartTotal();
-        this.calculateFinalTotal();
+        this.cartItems = response.cart_items.map((item: any) => ({
+          id: item.id,
+          cart: { 
+            id: item.cart, 
+            user: this.user as User, 
+            date: new Date(), // Ajuste conforme necessário
+            items: [], // Será populado depois
+            total: 0 // Será calculado
+          },
+          product: {
+            id: item.product.id,
+            name: item.product.name,
+            description: item.product.description,
+            price: item.product.price,
+            imageUrl: item.product.image_url,
+            artist: item.product.artist,
+            company: item.product.company,
+            category: item.product.category,
+            addedProduct: item.product.addedProduct,
+            count: item.product.count,
+            averageRating: item.product.average_rating,
+            productType: item.product.product_type,
+            stock: item.product.stock,
+            specificDetails: {
+              id: item.product.specific_details.id,
+              name: item.product.specific_details.name,
+              genre: item.product.specific_details.genre,
+              lpSize: item.product.specific_details.lpSize,
+              releaseDate: item.product.specific_details.releaseDate,
+              stock: item.product.specific_details.stock,
+              imageBase64: item.product.specific_details.image_base64,
+            }
+          },
+          quantity: item.quantity,
+          size: item.size,
+          total: item.total
+        }));
+  
+        // Atualiza o modelo do carrinho
+        this.cart = {
+          id: response.cart_id, // Ajuste se necessário
+          user: this.user as User,
+          date: new Date(), // Ajuste conforme necessário
+          items: this.cartItems, // Lista de itens já mapeada
+          total: this.cartItems.reduce((sum, item) => sum + item.total, 0)
+        };
+  
+        console.log('Cart:', this.cart);
+        console.log('CartItems:', this.cartItems);
+  
+        // Calcula o total do carrinho
+        this.calculateTotal();
+      } else {
+        console.error('Erro: Resposta do carrinho inválida.', response);
       }
     } catch (error) {
       console.error('Erro ao carregar o carrinho:', error);
     }
   }
 
-  calculateCartTotal() {
+  calculateTotal() {
     this.cartTotal = this.cartItems.reduce(
       (sum, item) => sum + item.product.price * item.quantity,
       0
@@ -94,11 +150,18 @@ export class PaymentPageComponent implements OnInit {
     try {
       await this.cartService.removeCartItem(this.user?.id || 0, itemId);
       this.cartItems = this.cartItems.filter((item) => item.product.id !== itemId);
-      this.calculateCartTotal();
+      this.calculateTotal();
       this.calculateFinalTotal();
     } catch (error) {
       console.error('Erro ao remover o item do carrinho:', error);
     }
+  }
+
+  getImageSrc(imageBase64: string | null): string {
+    if (!imageBase64) {
+      return 'assets/images/default-product.png'; // Caminho para uma imagem padrão
+    }
+    return `data:image/jpeg;base64,${imageBase64}`; // Adicione o prefixo correto
   }
 
   async submitPayment() {

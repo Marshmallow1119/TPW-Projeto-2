@@ -28,7 +28,7 @@ export const routes: Routes = [
   { path: 'admin-home', component: AdminHomeComponent }, 
   { path: 'favorites', component: FavoritesComponent }, 
   { path: 'manage_cart', component: CartComponent },
-  { path: 'payment_page', component: PaymentPageComponent },
+  { path: 'payment-page', component: PaymentPageComponent },
  
 
   
