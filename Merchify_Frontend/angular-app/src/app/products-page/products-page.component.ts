@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ProductsService } from '../products.service';
-import { Product } from '../models/produto';
+import { Accessory, CD, Clothing, Product, Vinil } from '../models/produto';
 import { ProductCardComponent } from '../product-card/product-card.component';
 import { FiltroComponent } from '../filtro/filtro.component';
 import { CommonModule } from '@angular/common';
@@ -76,17 +76,64 @@ export class ProductsPageComponent implements OnInit {
     }
   }
 
+
   applyFilters(filters: any): void {
     this.filters = filters;
-
+  
+    console.log('Applying filters:', filters);
+  
     this.filteredProducts = this.products.filter((product) => {
-      const matchesType = !filters.type || product.category === filters.type;
+      console.log('Checking product:', product);
+      const matchesType = !filters.type || product.product_type === filters.type;
+  
       const matchesPrice =
         (!filters.min_price || product.price >= filters.min_price) &&
         (!filters.max_price || product.price <= filters.max_price);
-      return matchesType && matchesPrice;
+  
+      // Check genre, color, and size in specific_details
+      const matchesGenre =
+        (!filters.genreVinyl || (this.isVinil(product) && product.specific_details?.genre === filters.genreVinyl)) &&
+        (!filters.genreCD || (this.isCD(product) && product.specific_details?.genre === filters.genreCD));
+  
+      const matchesColor =
+        (!filters.colorClothing || (this.isClothing(product) && product.specific_details?.color === filters.colorClothing)) &&
+        (!filters.colorAccessory || (this.isAccessory(product) && product.specific_details?.color === filters.colorAccessory));
+  
+      const matchesSize =
+        !filters.size ||
+        (this.isAccessory(product) && product.specific_details?.size === filters.size) ||
+        (this.isClothing(product) && product.specific_details?.sizes?.some((size: any) => size === filters.size));
+  
+      // Log matching criteria for debugging
+      console.log(`Product: ${product.name}`, {
+        matchesType,
+        matchesPrice,
+        matchesGenre,
+        matchesColor,
+        matchesSize,
+      });
+  
+      return matchesType && matchesPrice && matchesGenre && matchesColor && matchesSize;
     });
+  
+    console.log('Filtered products:', this.filteredProducts);
+  }
+  
+  
 
-    console.log('Filtros aplicados:', this.filters);
+  private isVinil(product: Product): product is Vinil {
+    return product.product_type === 'Vinil';
+  }
+
+  private isCD(product: Product): product is CD {
+    return product.product_type === 'CD';
+  }
+
+  private isClothing(product: Product): product is Clothing {
+    return product.product_type === 'Clothing';
+  }
+
+  private isAccessory(product: Product): product is Accessory {
+    return product.product_type === 'Accessory';
   }
 }

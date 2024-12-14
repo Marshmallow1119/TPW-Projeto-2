@@ -14,7 +14,6 @@ export class ProductsService {
 
   //getProduct
   async getProduct(id:number):Promise<Product>{
-    //path('ws/product/<int:identifier>/',  views.productDetails, name='productDetails'),
     const url = this.baseUrl + '/produtos/' + id;
     const data: Response =  await fetch(url);
     const product: Product = await data.json() ?? [];
@@ -66,6 +65,25 @@ export class ProductsService {
       });
     } catch (error) {
       console.error('Error editing product:', error);
+    }
+  }
+
+  async getFilters(): Promise<any> {
+    try {
+      const response = await fetch(`${this.baseUrl}/filters/`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      console.log('Fetched filters:', response);
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching filters:', error);
+      return {
+        genres: [],
+        colors: [],
+        sizes: [],
+        materials: [],
+      };
     }
   }
   

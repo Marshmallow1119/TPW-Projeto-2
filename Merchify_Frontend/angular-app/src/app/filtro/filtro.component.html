@@ -1,5 +1,5 @@
 <div class="sidebar-filter bg-light p-3 rounded mb-3">
-    <form (ngSubmit)="applyFilters()" #filterForm="ngForm">
+    <form #filterForm="ngForm">
       <h5>Tipo de Produto</h5>
       <div class="form-group">
         <div *ngFor="let type of productTypes">
@@ -9,16 +9,15 @@
             [value]="type.value"
             [(ngModel)]="selectedType"
             [id]="type.value"
-            (change)="showFilters(type.value)"
-          />
+            (change)="onFilterChange()"
+            />
           <label [for]="type.value">{{ type.label }}</label><br />
         </div>
       </div>
-  
       <div *ngIf="selectedType === 'Vinil'" id="vinil-filters">
         <h5>Gênero</h5>
         <div class="form-group">
-          <select name="genreVinyl" [(ngModel)]="filters.genreVinyl" class="form-control">
+          <select name="genreVinyl" [(ngModel)]="filters.genreVinyl" class="form-control" (change)="onFilterChange()" >
             <option value="">Todos</option>
             <option *ngFor="let genre of genres" [value]="genre">{{ genre }}</option>
           </select>
@@ -28,7 +27,7 @@
       <div *ngIf="selectedType === 'CD'" id="cd-filters">
         <h5>Gênero</h5>
         <div class="form-group">
-          <select name="genreCD" [(ngModel)]="filters.genreCD" class="form-control">
+          <select name="genreCD" [(ngModel)]="filters.genreCD" class="form-control" (change)="onFilterChange()"   >
             <option value="">Todos</option>
             <option *ngFor="let genre of genres" [value]="genre">{{ genre }}</option>
           </select>
@@ -38,7 +37,7 @@
       <div *ngIf="selectedType === 'Clothing'" id="clothing-filters">
         <h5>Cor</h5>
         <div class="form-group">
-          <select name="colorClothing" [(ngModel)]="filters.colorClothing" class="form-control">
+          <select name="colorClothing" [(ngModel)]="filters.colorClothing" class="form-control" (change)="onFilterChange()" >
             <option value="">Todas</option>
             <option *ngFor="let color of colors" [value]="color">{{ color }}</option>
           </select>
@@ -48,14 +47,14 @@
       <div *ngIf="selectedType === 'Accessory'" id="accessory-filters">
         <h5>Cor</h5>
         <div class="form-group">
-          <select name="colorAccessory" [(ngModel)]="filters.colorAccessory" class="form-control">
+          <select name="colorAccessory" [(ngModel)]="filters.colorAccessory" class="form-control" (change)="onFilterChange()" >
             <option value="">Todas</option>
             <option *ngFor="let color of colors" [value]="color">{{ color }}</option>
           </select>
         </div>
         <h5>Tamanho</h5>
         <div class="form-group">
-          <select name="size" [(ngModel)]="filters.size" class="form-control">
+          <select name="size" [(ngModel)]="filters.size" class="form-control" (change)="onFilterChange()" >
             <option value="">Todos</option>
             <option *ngFor="let size of sizes" [value]="size">{{ size }}</option>
           </select>
@@ -73,6 +72,8 @@
             [(ngModel)]="filters.min_price"
             class="form-control"
             placeholder="€0"
+            (change)="onFilterChange()"
+
           />
         </div>
         <div class="col">
@@ -84,6 +85,8 @@
             [(ngModel)]="filters.max_price"
             class="form-control"
             placeholder="€50"
+            (change)="onFilterChange()"
+
           />
         </div>
       </div>
@@ -91,9 +94,6 @@
       <div class="form-group d-flex justify-content-between mt-3">
         <button type="button" class="btn btn-secondary" style="width: 48%" (click)="resetFilters()">
           Reiniciar Filtros
-        </button>
-        <button type="submit" class="btn btn-success" style="width: 48%">
-          Aplicar Filtros
         </button>
       </div>
     </form>

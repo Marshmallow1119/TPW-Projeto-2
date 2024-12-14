@@ -13,9 +13,7 @@
         <div class="col-md-3">
           <h4>Filtros</h4>
           <app-filtro
-            [genres]="genres"
-            [colors]="colors"
-            (filtersChanged)="onFiltersApplied($event)">
+            (filtersChanged)="applyFilters($event)">
           </app-filtro>
         </div>
   
