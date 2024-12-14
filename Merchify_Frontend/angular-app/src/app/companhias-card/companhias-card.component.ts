@@ -21,7 +21,6 @@ export class CompanhiasCardComponent {
   toggleFavorite(event: Event): void {
     event.preventDefault(); 
     event.stopPropagation(); 
-    console.log(`Toggle favorite for company: ${this.company.id}`);
     if (this.company.is_favorited) {
       this.favoriteService.removeFavoriteCompany(this.company.id);
       this.company.is_favorited = false;

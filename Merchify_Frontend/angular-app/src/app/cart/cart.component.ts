@@ -41,7 +41,6 @@ export class CartComponent implements OnInit {
   
       // Verifica se os dados foram retornados corretamente
       if (response && response.cart_items) {
-        // Mapeia os itens do carrinho para o modelo CartItem
         this.cartItems = response.cart_items.map((item: any) => ({
           id: item.id,
           cart: { 
@@ -119,21 +118,19 @@ export class CartComponent implements OnInit {
   
 
   async updateCartItem(item: any) {
-    try {
-      const userId = this.user?.id || 0; // Obtém o ID do usuário
-      await this.cartService.updateCartItem(userId, item.id, { quantity: item.quantity }); // Chama o serviço
-      this.calculateTotal(); // Recalcula o total do carrinho
-    } catch (error) {
-      console.error('Erro ao atualizar o item do carrinho:', error);
-    }
+  try {
+    const userId = this.user?.id || 0; // Obtém o ID do usuário
+    await this.cartService.updateCartItem(userId, item.id, { quantity: item.quantity }); // Chama o serviço
+    this.calculateTotal(); // Recalcula o total do carrinho
+  } catch (error) {
+    console.error('Erro ao atualizar o item do carrinho:', error);
   }
+}
 
   async removeCartItem(itemId: number) {
     try {
       await this.cartService.removeCartItem(this.user?.id || 0, itemId); // Passa o ID do usuário e do item
       this.cartItems = this.cartItems.filter(item => item.id !== itemId); // Remove o item do array local
-      console.log('Item removido:', itemId);
-      console.log('CartItems:', this.cartItems);
       this.calculateTotal(); // Recalcula o total do carrinho
     } catch (error) {
       console.error('Erro ao remover o item do carrinho:', error);

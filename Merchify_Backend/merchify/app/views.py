@@ -813,9 +813,13 @@ def process_payment(request):
             cart = Cart.objects.get(user=user)
             cart_items = CartItem.objects.filter(cart=cart)
 
-            payment_method = request.POST.get('payment_method')
-            shipping_address = request.POST.get('shipping_address')
-            discount_code = request.POST.get('discount_code')
+            if not cart_items.exists():
+                return Response({"error": "O carrinho está vazio."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+            payment_method = request.data.get('payment_method')
+            shipping_address = request.data.get('shipping_address')
+            discount_code = request.data.get('discount_code')
             
             if not cart_items.exists() and 'discount_applied' in request.session:
                 request.session['discount_applied'] = False

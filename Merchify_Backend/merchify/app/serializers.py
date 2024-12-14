@@ -190,7 +190,7 @@ class PurchaseSerializer(serializers.ModelSerializer):
             'id', 'user', 'date', 'paymentMethod', 'shippingAddress',
             'status', 'total_amount', 'discount_applied', 'discount_value', 'total'
         ]
-
+   
 # Review Serializer
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
