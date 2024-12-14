@@ -32,16 +32,13 @@ from .forms import (
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth import password_validation
 
-# Application Models
 from app.models import (
     Product, Company, Cart, CartItem, Purchase, User, Vinil, CD, Clothing, Accessory,
     Size, Favorite, FavoriteArtist, FavoriteCompany, Artist, Review, PurchaseProduct
 )
 
-# Logging
 logger = logging.getLogger(__name__)
 
-# Rest Framework Imports
 from rest_framework import status
 from rest_framework.decorators import (
     api_view, authentication_classes, permission_classes
@@ -60,7 +57,6 @@ def home(request):
         artists = Artist.objects.all()
         recent_products = Product.objects.order_by('-addedProduct')[:20]
 
-        # Pass `request` in the serializer context
         artists_data = ArtistSerializer(artists, many=True, context={'request': request}).data
         recent_products_data = ProductSerializer(recent_products, many=True, context={'request': request}).data
 
@@ -72,56 +68,18 @@ def home(request):
         logger.error(f"Error in home view: {e}")
         return Response({'error': str(e)}, status=500)
 
-#def home(request):
-#    artists = Artist.objects.all()
-#    recent_products = Product.objects.order_by('-addedProduct')[:20]
-#
-    #if request.session.get('clear_cart'):
-    #    cart = Cart.objects.filter(user=request.user).first()
-    #    if cart:
-    #        cart.items.all().delete()
-    #        cart.delete()
-#
-    #    del request.session['clear_cart']
-#
-    #user = request.user
-    #show_promotion= False
-    #if user.is_authenticated:
-    #    if user.user_type == 'admin':
-    #        return redirect('admin_home')
-    #    elif user.user_type == 'company':
-    #         return redirect('company_products',user.company.id)
-    #    show_promotion= not Purchase.objects.filter(user=user).exists()
-    #else:
-    #    show_promotion= True
-#
-    #recently_viewed_ids = request.session.get('recently_viewed', [])
-    #recently_viewed_products = Product.objects.filter(id__in=recently_viewed_ids)
-    #recently_viewed_products = sorted(
-    #    recently_viewed_products,
-    #    key=lambda product: recently_viewed_ids.index(product.id)
-    #)
-#
-    #most_viewed_products = Product.objects.order_by('-count')[:8]
-         
-
-    #return render(request, 'home.html', {'artists': artists, 'products': recent_products, 'show_promotion': show_promotion, 'recently_viewed_products': recently_viewed_products, 'most_viewed_products': most_viewed_products})
-
 @api_view(['GET'])
 def companhias(request):
     companies = Company.objects.all()
 
-    # Fetch favorited companies for the authenticated user
     if request.user.is_authenticated:
         favorited_company_ids = FavoriteCompany.objects.filter(user=request.user).values_list('company_id', flat=True)
     else:
         favorited_company_ids = []
 
-    # Serialize company data
     serializer = CompanySerializer(companies, many=True)
     companies_data = serializer.data
 
-    # Add `is_favorited` and other custom fields
     for company in companies_data:
         company_id = company['id']
         company['is_favorited'] = company_id in favorited_company_ids
@@ -132,7 +90,6 @@ def companhias(request):
 def produtos(request):
     produtos = Product.objects.all()
 
-    # Sorting logic
     sort = request.GET.get('sort', 'featured')
     if sort == 'priceAsc':
         produtos = produtos.order_by('price')
@@ -168,7 +125,6 @@ def produtos(request):
             if size:
                 produtos = produtos.filter(accessory__size=size)
 
-    # Filtering by price range
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     if min_price:
@@ -182,17 +138,8 @@ def produtos(request):
         except ValueError:
             logger.debug("Invalid maximum price provided.")
 
-    # Serialize the filtered products
     serializer = ProductSerializer(produtos, many=True, context={'request': request})
     return Response(serializer.data)
-
-    #for product in produtos:
-    #   product.is_favorited = product.id in favorited_product_ids
-
-    #genres = Vinil.objects.values_list('genre', flat=True).distinct()
-    #colors = Clothing.objects.values_list('color', flat=True).distinct()
-
-    #return render(request, 'products.html', {'produtos': produtos, 'genres': genres, 'colors': colors })
 
 @api_view(['GET'])
 def artistas(request):
@@ -206,95 +153,11 @@ def artistas(request):
     serializer = ArtistSerializer(artists, many=True, context={'request': request})
     artists_data = serializer.data
 
-    # Add "is_favorited" field to each artist
     for artist_data in artists_data:
         artist_data['is_favorited'] = int(artist_data['id']) in favorited_artist_ids
 
     return Response(artists_data)
 
-#@api_view(['GET'])
-#def artistsProducts(request, name):
-#    artist = get_object_or_404(Artist, name=name)
-#
-#    products = Product.objects.filter(artist=artist)
-#    print(products)
-#    
-#    sort = request.GET.get('sort', 'featured')
-#    if sort == 'priceAsc':
-#        products = products.order_by('price')
-#    elif sort == 'priceDesc':
-#        products = products.order_by('-price')
-#
-#    if request.user.is_authenticated:
-#        favorited_product_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
-#    else:
-#        favorited_product_ids = []
-#
-#    for product in products:
-#        product.is_favorited = product.id in favorited_product_ids
-#
-#
-#    background_url = artist.background_image.url
-#
-#    product_type = request.GET.get('type')
-#    if product_type:
-#        if product_type == 'Vinil':
-#            products = products.filter(vinil__isnull=False)
-#            genre = request.GET.get('genreVinyl')
-#            if genre:
-#                products = products.filter(vinil__genre=genre)
-#            logger.debug(f"Filtered by 'Vinil' type and genre {genre}, products count: {products.count()}")
-#
-#        elif product_type == 'CD':
-#            products = products.filter(cd__isnull=False)
-#            genre = request.GET.get('genreCD')
-#            if genre:
-#                products = products.filter(cd__genre=genre)
-#            logger.debug(f"Filtered by 'CD' type and genre {genre}, products count: {products.count()}")
-#
-#        elif product_type == 'Clothing':
-#            products = products.filter(clothing__isnull=False)
-#            color = request.GET.get('colorClothing')
-#            if color:
-#                products = products.filter(clothing__color=color)
-#            logger.debug(f"Filtered by 'Clothing' type and color {color}, products count: {products.count()}")
-#
-#        elif product_type == 'Accessory':
-#            products = products.filter(accessory__isnull=False)
-#            color = request.GET.get('colorAccessory')
-#            if color:
-#                products = products.filter(accessory__color=color)
-#            size = request.GET.get('size')
-#            if size:
-#                products = products.filter(accessory__size=size)
-#            logger.debug(f"Filtered by 'Accessory' type, color {color}, and size {size}, products count: {products.count()}")
-#
-#    min_price = request.GET.get('min_price')
-#    max_price = request.GET.get('max_price')
-#    if min_price:
-#        try:
-#            products = products.filter(price__gte=float(min_price))
-#            logger.debug(f"Applied min price filter {min_price}, products count: {products.count()}")
-#        except ValueError:
-#            logger.debug("Invalid minimum price provided.")
-#    if max_price:
-#        try:
-#            products = products.filter(price__lte=float(max_price))
-#            logger.debug(f"Applied max price filter {max_price}, products count: {products.count()}")
-#        except ValueError:
-#            logger.debug("Invalid maximum price provided.")
-#
-#    genres = Vinil.objects.values_list('genre', flat=True).distinct()
-#    colors = Clothing.objects.values_list('color', flat=True).distinct()
-#
-#    context = {
-#        'artist': artist,
-#        'products': products,
-#        'background_url': background_url,
-#        'genres': genres,
-#        'colors': colors
-#    }
-#    return render(request, 'artists_products.html', context)
 
 @api_view(['GET'])
 def artistsProducts(request, name):
@@ -306,26 +169,21 @@ def artistsProducts(request, name):
     try:
         products = Product.objects.filter(artist=artist)
 
-        # Determine favorite products for authenticated users
         if request.user.is_authenticated:
             favorited_product_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
         else:
             favorited_product_ids = []
 
-        # Serialize products
         serializer_context = {'request': request}
         product_serializer = ProductSerializer(products, many=True, context=serializer_context)
         products_data = product_serializer.data
 
-        # Add "is_favorited" field to serialized product data
         for product_data in products_data:
             product_data['is_favorited'] = product_data['id'] in favorited_product_ids
 
-        # Additional data
         genres = list(Vinil.objects.values_list('genre', flat=True).distinct())
         colors = list(Clothing.objects.values_list('color', flat=True).distinct())
 
-        # Serialize artist
         artist_serializer = ArtistSerializer(artist, context=serializer_context)
 
         response_data = {
@@ -339,35 +197,6 @@ def artistsProducts(request, name):
     except Exception as e:
         return JsonResponse({'error': 'Erro interno do servidor'}, status=500)
 
-
-#@api_view(['GET'])
-#def productDetails(request, identifier):
-#    product = get_object_or_404(Product, id=identifier)
-#    product.count += 1
-#    product.save()
-#
-#    recently_viewed = request.session.get('recently_viewed', [])
-#    if product.id in recently_viewed:
-#        recently_viewed.remove(product.id)
-#    recently_viewed.insert(0, product.id)
-#    recently_viewed = recently_viewed[:4]
-#    request.session['recently_viewed'] = recently_viewed
-#
-#    context = {
-#        'product': product,
-#    }
-#
-#    if isinstance(product, Clothing):
-#        sizes = product.sizes.all()
-#        context['sizes'] = sizes
-#
-#    average_rating = product.reviews.aggregate(Avg('rating'))['rating__avg'] or 0
-#    context['average_rating'] = average_rating
-#
-#    user = request.user
-#    return render(request, 'productDetails.html', context)
-
-
 @api_view(['GET', 'DELETE', 'PUT'])
 def productDetails(request, identifier):
     if request.method == 'GET':
@@ -375,7 +204,6 @@ def productDetails(request, identifier):
         product.count += 1
         product.save()
 
-        # Base product data
         product_data = {
             'id': product.id,
             'name': product.name,
@@ -392,14 +220,12 @@ def productDetails(request, identifier):
             'stock': product.get_stock(),
         }
 
-        # Add clothing-specific data if applicable
         if hasattr(product, 'clothing'):
             product_data['sizes'] = [
                 {'id': size.id, 'size': size.size, 'stock': size.stock}
                 for size in product.clothing.sizes.all()
             ]
 
-        # Add vinil-specific data if applicable
         if hasattr(product, 'vinil'):
             product_data['vinil'] = {
                 'genre': product.vinil.genre,
@@ -408,7 +234,6 @@ def productDetails(request, identifier):
                 'stock': product.vinil.stock,
             }
 
-        # Add CD-specific data if applicable
         if hasattr(product, 'cd'):
             product_data['cd'] = {
                 'genre': product.cd.genre,
@@ -416,7 +241,6 @@ def productDetails(request, identifier):
                 'stock': product.cd.stock,
             }
 
-        # Add accessory-specific data if applicable
         if hasattr(product, 'accessory'):
             product_data['accessory'] = {
                 'material': product.accessory.material,
@@ -425,7 +249,6 @@ def productDetails(request, identifier):
                 'stock': product.accessory.stock,
             }
 
-        # Add reviews
         product_data['reviews'] = [
             {
                 'user': {'username': review.user.username},
@@ -512,8 +335,8 @@ def register_view(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def ban_user(request, user_id):
-    print(request.headers.get('Authorization'))  # Ensure the token is received
-    print(request.user)  # Check the authenticated user
+    print(request.headers.get('Authorization'))  
+    print(request.user)  
 
     user = get_object_or_404(User, id=user_id)
     user.is_banned = True
@@ -547,13 +370,10 @@ def validate_token(request):
         return Response({"error": "Token is required"}, status=400)
 
     try:
-        # Decode the token
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
         
-        # Fetch the user from the database
         user = User.objects.get(id=payload['user_id'])
         
-        # Return user data
         return Response({
             "id": user.id,
             "username": user.username,
@@ -649,19 +469,18 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
 
 
     if request.method == 'GET':
-        print("aqui")
         try:
             cart = Cart.objects.get(user=request.user)
             cart_items = CartItem.objects.filter(cart=cart)
+            print(cart_items)
             serializer = CartItemSerializer(cart_items, many=True)
+            print(serializer.data)
             return Response({"cart_items": serializer.data}, status=status.HTTP_200_OK)
         except Cart.DoesNotExist:
             return Response({"error": "Carrinho não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
     elif request.method == 'POST':
-        print("aqui no adicionar")
         if product_id:
-            print("aqui no adicionar")
             try:
                 data = json.loads(request.body)
                 quantity = int(data.get("quantity", 1))
@@ -684,6 +503,7 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
                     cart_item.quantity += quantity
                     cart_item.save()
 
+                
                 return Response({"message": "Produto adicionado ao carrinho!"}, status=status.HTTP_201_CREATED)
 
             except Exception as e:
@@ -692,7 +512,6 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
         return Response({"error": "Parâmetro product_id é obrigatório para adicionar itens."}, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'PUT':
-        # Atualizar um item do carrinho
         if item_id:
             try:
                 data = json.loads(request.body)
@@ -710,7 +529,6 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
         return Response({"error": "Parâmetro item_id é obrigatório para atualizar itens."}, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        # Remover um item do carrinho
         if item_id:
             try:
                 cart_item = get_object_or_404(CartItem, id=item_id)

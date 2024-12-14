@@ -12,6 +12,7 @@ import { RegisterComponent } from './register/register.component';
 import { AdminHomeComponent } from './admin-home/admin-home.component';
 import { FavoritesComponent } from './favorites/favorites.component';
 import { CartComponent } from './cart/cart.component';
+import { PaymentPageComponent } from './payment-page/payment-page.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent }, // Home Route
@@ -27,6 +28,7 @@ export const routes: Routes = [
   { path: 'admin-home', component: AdminHomeComponent }, 
   { path: 'favorites', component: FavoritesComponent }, 
   { path: 'manage_cart', component: CartComponent },
+  { path: 'payment_page', component: PaymentPageComponent },
  
 
   

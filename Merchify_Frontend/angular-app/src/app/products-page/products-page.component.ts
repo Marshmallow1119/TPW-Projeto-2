@@ -55,7 +55,6 @@ export class ProductsPageComponent implements OnInit {
           ? artistMap[productArtist] 
           : productArtist; 
   
-        console.log(`Produto: ${product.name}, Artista Associado:`, associatedArtist);
   
         return {
           ...product,
@@ -66,11 +65,9 @@ export class ProductsPageComponent implements OnInit {
       this.filteredProducts = [...this.products];
     
       let favoriteProducts: favoriteProducts[] = await this.favoritesService.getFavorites('products');
-      console.log('Produtos favoritos:', favoriteProducts);
       for (let product of this.products) {
         product.is_favorited = favoriteProducts.some(favoriteProduct => favoriteProduct.product.id === product.id);
       } 
-      console.log('Produtos e artistas carregados:', { products, artists });
     } catch (error) {
       console.error('Erro ao carregar produtos e artistas:', error);
     }

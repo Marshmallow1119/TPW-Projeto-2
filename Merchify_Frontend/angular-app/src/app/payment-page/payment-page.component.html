@@ -1,0 +1,127 @@
+<div class="container mt-5">
+    <div class="back-to-shop mt-4">
+      <a routerLink="/products" class="text-decoration-none">
+        <i class="fas fa-arrow-left"></i>
+        <span class="text-muted">Continue a comprar</span>
+      </a>
+    </div>
+    <div class="row mt-5">
+      <div class="col-md-8 cart shadow-lg rounded bg-white p-4">
+        <h3 class="mb-4 font-weight-bold">Carrinho:</h3>
+        <div class="cart-items">
+          <div
+            class="row border-bottom py-4 align-items-center"
+            *ngFor="let item of cartItems"
+          >
+            <div class="col-3">
+              <img
+                class="img-fluid rounded shadow-sm"
+                [src]="item.product.image"
+                [alt]="item.product.name"
+              />
+            </div>
+            <div class="col-5">
+              <h5 class="font-weight-bold">{{ item.product.name }}</h5>
+              <div class="text-muted small">{{ item.product.category }}</div>
+              <div class="d-flex align-items-center mt-2">
+                <h6 class="font-weight-bold">Quantidade: {{ item.quantity }}</h6>
+              </div>
+            </div>
+            <div class="col-3 text-right">
+              <h5 class="text-primary font-weight-bold">
+                &euro; {{ item.product.price | number: '1.2-2' }}
+              </h5>
+            </div>
+            <div class="col-1 text-right">
+              <button
+                class="close text-danger"
+                (click)="removeCartItem(item.product.id)"
+              >
+                &#10005;
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-between mt-4">
+          <h4 class="font-weight-bold">Total:</h4>
+          <h4 class="text-primary font-weight-bold">
+            &euro; {{ cartTotal | number: '1.2-2' }}
+          </h4>
+        </div>
+      </div>
+  
+      <div class="col-md-4 summary shadow-lg rounded bg-light p-4">
+        <h4 class="mb-4 font-weight-bold">Detalhes de pagamento</h4>
+        <hr class="mb-4" />
+        <form (submit)="submitPayment()">
+          <div class="form-group">
+            <label for="payment_method" class="font-weight-bold">Métodos de Pagamento</label>
+            <select
+              class="form-control"
+              id="payment_method"
+              [(ngModel)]="paymentMethod"
+              name="payment_method"
+              required
+            >
+              <option value="Credit Card">Cartão de Crédito</option>
+              <option value="PayPal">PayPal</option>
+              <option value="Bank Transfer">Transferência bancária</option>
+            </select>
+          </div>
+          <div class="form-group mt-3">
+            <label for="shipping_address" class="font-weight-bold">Endereço</label>
+            <input
+              type="text"
+              class="form-control"
+              id="shipping_address"
+              [(ngModel)]="shippingAddress"
+              name="shipping_address"
+              required
+            />
+          </div>
+          <div class="form-group mt-3">
+            <label for="discount_code" class="font-weight-bold">Código de Desconto</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                id="discount_code"
+                [(ngModel)]="discountCode"
+                name="discount_code"
+              />
+              <button type="button" class="btn btn-secondary" (click)="applyDiscount()">
+                Aplicar
+              </button>
+            </div>
+          </div>
+          <div class="border-top pt-3 mt-4">
+            <div class="d-flex justify-content-between">
+              <span class="font-weight-bold">Subtotal:</span>
+              <span>&euro; {{ subtotal | number: '1.2-2' }}</span>
+            </div>
+  
+            <div *ngIf="discountApplied" class="d-flex justify-content-between mt-2">
+              <span class="font-weight-bold text-danger">Desconto Aplicado:</span>
+              <span class="text-danger">-&euro; {{ discountValue | number: '1.2-2' }}</span>
+            </div>
+  
+            <div class="d-flex justify-content-between mt-2">
+              <span class="font-weight-bold">Portes de Envio:</span>
+              <span>&euro; {{ shippingCost | number: '1.2-2' }}</span>
+            </div>
+  
+            <div class="d-flex justify-content-between mt-2 border-top pt-2">
+              <span class="font-weight-bold">Total Final:</span>
+              <span class="text-primary font-weight-bold">
+                &euro; {{ finalTotal | number: '1.2-2' }}
+              </span>
+            </div>
+          </div>
+          <div class="text-end mt-4">
+            <button type="submit" class="btn btn-primary">Concluir Pagamento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  

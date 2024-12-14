@@ -1,70 +1,83 @@
-<div class="container">
-    <h1>O meu carrinho:</h1>
-  
-    <div *ngIf="cartItems.length > 0; else emptyCart">
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">Produto</th>
-            <th scope="col">Preço</th>
-            <th scope="col" style="margin-right: 50px !important;">Quantidade</th>
-            <th scope="col">Total</th>
-            <th scope="col">Apagar</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of cartItems">
-            <td>
-              <div class="product-info">
-                <img [src]="item.product.image" [alt]="item.product.name" class="product-image mr-3" />
-                <div>
-                  <a
-                    style="text-decoration: none; color: black"
-                    [routerLink]="['/product', item.product.id]"
-                  >
-                    <h5>{{ item.product.name }}</h5>
-                  </a>
-                </div>
-              </div>
-            </td>
-            <td>{{ item.product.price }}€</td>
-            <td style="width:100px; margin-right: 50px">
-              <input
-                type="number"
-                [(ngModel)]="item.quantity"
-                min="1"
-                [max]="item.product.stock"
-                class="quantity-input form-control"
-                (change)="updateCartItem(item)"
+<div class="container my-4">
+  <h1 class="mb-4">O meu carrinho:</h1>
+
+  <div *ngIf="cartItems.length > 0; else emptyCart">
+    <table class="table table-striped table-hover">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">Produto</th>
+          <th scope="col">Preço</th>
+          <th scope="col" style="width: 150px;">Quantidade</th>
+          <th scope="col">Total</th>
+          <th scope="col">Apagar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of cartItems">
+          <td>
+            <div class="d-flex align-items-center">
+              <img
+                [src]="getImageSrc(item.product.specificDetails.imageBase64) || 'assets/images/default-product.png'"
+                [alt]="item.product.name"
+                class="product-image mr-3 rounded"
               />
-            </td>
-            <td>{{ item.product.price * item.quantity }}€</td>
-            <td>
-              <button class="btn btn-danger btn-sm" (click)="removeCartItem(item.id)">
-                <i class="fas fa-trash-alt"></i>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="text-right">
-        <h4>Total: {{ cartTotal | number: '1.2-2' }}€</h4>
-      </div>
-  
-      <div class="text-right">
-        <button
-          type="button"
-          class="btn btn-success btn-lg"
-          (click)="finalizarCompra()"
-        >
-          Finalizar Compra
-        </button>
-      </div>
+              <div>
+                <a
+                  style="text-decoration: none; color: black"
+                  [routerLink]="['/product', item.product.id]"
+                >
+                  <h5 class="mb-0">{{ item.product.name }}</h5>
+                </a>
+                <small class="text-muted">{{ item.product.description }}</small>
+              </div>
+            </div>
+          </td>
+          <td>{{ item.product.price | currency: 'EUR' }}</td>
+          <td>
+            <input
+              type="number"
+              [(ngModel)]="item.quantity"
+              min="1"
+              [max]="item.product.stock"
+              class="form-control text-center"
+              (change)="updateCartItem(item)"
+            />
+          </td>
+          <td>{{ (item.product.price * item.quantity) | currency: 'EUR' }}</td>
+          <td>
+            <button
+              class="btn btn-danger btn-sm"
+              (click)="removeCartItem(item.id)"
+            >
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <h4 class="mb-0">Total: {{ cartTotal | currency: 'EUR' }}</h4>
+      <button
+        type="button"
+        class="btn btn-success btn-lg"
+        (click)="finalizarCompra()"
+      >
+        Finalizar Compra
+      </button>
     </div>
-  
-    <ng-template #emptyCart>
-      <p class="text-muted">O carrinho está vazio. Adicione produtos ao seu carrinho.</p>
-      <button class="btn btn-dark" type="button" [routerLink]="['/products-page']">Ver Produtos</button>
-    </ng-template>
   </div>
-  
+
+  <ng-template #emptyCart>
+    <div class="text-center mt-5">
+      <p class="text-muted">O carrinho está vazio. Adicione produtos ao seu carrinho.</p>
+      <button
+        class="btn btn-dark"
+        type="button"
+        [routerLink]="['/products-page']"
+      >
+        Ver Produtos
+      </button>
+    </div>
+  </ng-template>
+</div>

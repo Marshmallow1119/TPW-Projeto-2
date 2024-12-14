@@ -149,9 +149,10 @@ class CartSerializer(serializers.ModelSerializer):
         model = Cart
         fields = ['id', 'user', 'date', 'total']
 
-# CartItem Serializer
 class CartItemSerializer(serializers.ModelSerializer):
-    total = serializers.ReadOnlyField()
+    product = ProductSerializer(read_only=True)  # Nested serializer for product d
+    size = SizeSerializer(read_only=True)  # Nested serializer for size details
+    total = serializers.ReadOnlyField()  # Use the `total` property from the mode
 
     class Meta:
         model = CartItem

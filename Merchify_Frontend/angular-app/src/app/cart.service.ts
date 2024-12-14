@@ -68,7 +68,7 @@ export class CartService {
   }
 
   async updateCartItem(userId: number, itemId: number, data: any): Promise<any> {
-    const token = await this.getToken();
+    const token = await this.getToken(); // Obtém o token para autenticação
     try {
       const response = await fetch(`${this.baseUrl}/cart/${userId}/item/${itemId}/`, {
         method: 'PUT',
@@ -77,23 +77,24 @@ export class CartService {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(data), // Envia a nova quantidade no corpo da requisição
       });
-
+  
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Erro HTTP ${response.status}: ${errorText}`);
       }
-
-      return await response.json();
+  
+      return await response.json(); // Retorna a resposta do backend
     } catch (error) {
       console.error('Erro ao atualizar item do carrinho:', error);
       throw error;
     }
   }
+  
 
   async removeCartItem(userId: number, itemId: number): Promise<any> {
-    const token = await this.getToken();
+    const token = await this.getToken(); // Obtém o token para autenticação
     try {
       const response = await fetch(`${this.baseUrl}/cart/${userId}/item/${itemId}/`, {
         method: 'DELETE',
@@ -103,16 +104,17 @@ export class CartService {
           Authorization: `Bearer ${token}`,
         },
       });
-
+  
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Erro HTTP ${response.status}: ${errorText}`);
       }
-
+  
       return { success: true };
     } catch (error) {
       console.error('Erro ao remover item do carrinho:', error);
       throw error;
     }
   }
+  
 }
