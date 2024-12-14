@@ -30,12 +30,12 @@ export class SearchService {
   
       const artists: Artist[] = (data.artists || []).map((artist: any) => ({
         ...artist,
-        image: `http://localhost:8000${artist.image}`, // Prepend base URL
+        image_url: `http://localhost:8000${artist.image}`, // Prepend base URL
       }));
   
       const products: Product[] = (data.products || []).map((product: any) => ({
         ...product,
-        image: `http://localhost:8000${product.image}`, // Prepend base URL
+        image_url: `http://localhost:8000${product.image}`, // Prepend base URL
       }));
   
       return { artists, products };

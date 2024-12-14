@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Output, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ProductsService } from '../products.service';
 
 @Component({
   selector: 'app-filtro',
@@ -9,12 +10,11 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
 })
-export class FiltroComponent {
+export class FiltroComponent implements OnInit {
   @Output() filtersChanged = new EventEmitter<any>();
-  @Input() genres: string[] = [];
-  @Input() colors: string[] = [];
-
-  sizes: string[] = ['S', 'M', 'L'];
+  @Input() colors: string[] = []; // Added Input property
+  @Input() genres: string[] = []; // Add similar for other properties, if needed
+  @Input() sizes: string[] = []; // For sizes if being passed from parent
 
   productTypes = [
     { value: 'Vinil', label: 'Vinil' },
@@ -25,6 +25,7 @@ export class FiltroComponent {
 
   selectedType: string = '';
   filters = {
+    type: '',
     genreVinyl: '',
     genreCD: '',
     colorClothing: '',
@@ -34,16 +35,34 @@ export class FiltroComponent {
     max_price: null,
   };
 
-  showFilters(type: string): void {
-    this.selectedType = type;
+  constructor(private productsService: ProductsService) {}
+
+
+  ngOnInit(): void {
+    this.productsService.getFilters().then((filters) => {
+      this.genres = filters.genres;
+      this.colors = filters.colors;
+      this.sizes = filters.sizes;
+    });
   }
 
-  applyFilters(): void {
+  showFilters(type: string): void {
+    this.selectedType = type;
+    this.emitFilterChanges();
+  }
+
+  emitFilterChanges(): void {
+    this.filters.type = this.selectedType;
     this.filtersChanged.emit(this.filters);
+  }
+
+  onFilterChange(): void {
+    this.emitFilterChanges();
   }
 
   resetFilters(): void {
     this.filters = {
+      type: '',
       genreVinyl: '',
       genreCD: '',
       colorClothing: '',
@@ -53,6 +72,6 @@ export class FiltroComponent {
       max_price: null,
     };
     this.selectedType = '';
-    this.filtersChanged.emit(this.filters);
+    this.emitFilterChanges();
   }
 }

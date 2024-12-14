@@ -949,6 +949,7 @@ def company_products(request, company_id):
             'favorites_count': product.favorites.count(),
             'reviews_count': product.reviews.count(),
             'size_stock': size_stock,
+            'product_type': product.get_product_type(),
         })
 
     response = {
@@ -1144,3 +1145,33 @@ def add_company(request):
         'company_form': company_form,
         'user_form': user_form,
     })
+
+@api_view(['GET'])
+def get_filters(request):
+    try:
+        vinil_genres = Vinil.objects.values_list('genre', flat=True).distinct()
+        cd_genres = CD.objects.values_list('genre', flat=True).distinct()
+        genres = set(vinil_genres).union(cd_genres)  
+
+        clothing_colors = Clothing.objects.values_list('color', flat=True).distinct()
+        accessory_colors = Accessory.objects.values_list('color', flat=True).distinct()
+        colors = set(clothing_colors).union(accessory_colors) 
+
+        sizes = Size.objects.values_list('size', flat=True).distinct()
+
+        materials = Accessory.objects.values_list('material', flat=True).distinct()
+
+        filters = {
+            'genres': list(genres),
+            'colors': list(colors),
+            'sizes': list(sizes),
+            'materials': list(materials),
+        }
+
+        return Response(filters)
+
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e),
+        }, status=500)

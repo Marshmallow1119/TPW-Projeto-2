@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FiltroComponent } from '../filtro/filtro.component';
 import { ArtistsCardProductsComponent } from '../artists-card-products/artists-card-products.component';
 import { ActivatedRoute } from '@angular/router';
+import { Product } from '../models/produto';
+import { filter } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -14,10 +16,8 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class CompanyProductsComponent implements OnInit {
   company: any;
-  products: any[] = [];
-  genres: string[] = []; // Placeholder for genres, update based on API data
-  colors: string[] = []; // Placeholder for colors, update based on API data
-  filteredProducts: any[] = []; // For filtered product list
+  products: Product[] = [];
+  filteredProducts: Product[] = []; // For filtered product list
   isAuthenticated: boolean = false; // Placeholder, set based on actual authentication logic
   user: any = null; // Placeholder for user object
 
@@ -38,10 +38,7 @@ export class CompanyProductsComponent implements OnInit {
       if (data) {
         this.company = data.company;
         this.products = data.products;
-        this.filteredProducts = [...this.products]; // Initialize filtered products
-        // Placeholder genres/colors. Replace with data from API if available.
-        this.genres = ['Pop', 'Rock', 'Jazz', 'Hip-Hop'];
-        this.colors = ['Red', 'Blue', 'Green', 'Black'];
+        this.filteredProducts = [...this.products]; 
       } else {
         console.error('Nenhum dado retornado da API.');
       }
@@ -50,19 +47,50 @@ export class CompanyProductsComponent implements OnInit {
     }
   }
 
-  // Placeholder for applying filters
-  onFiltersApplied(filters: any): void {
-    console.log('Filters applied:', filters);
-    // Update `filteredProducts` based on filters
+  applyFilters(filters: any): void {
+  
+    console.log('Applying filters:', filters);
+  
     this.filteredProducts = this.products.filter((product) => {
-      // Example filter logic, customize as needed
-      if (filters.genre && product.genre !== filters.genre) return false;
-      if (filters.color && product.color !== filters.color) return false;
-      return true;
-    });
-  }
+      console.log('Checking product:', product);
 
-  // Placeholder for sorting products
+      console.log(filters.type);
+      console.log(product.product_type);
+  
+      const matchesType = !filters.type || product.product_type === filters.type;
+  
+      const matchesPrice =
+        (!filters.min_price || product.price >= filters.min_price) &&
+        (!filters.max_price || product.price <= filters.max_price);
+  
+      const matchesGenre =
+        (!filters.genreVinyl || (product.product_type === 'Vinil' && product.specific_details?.genre === filters.genreVinyl)) &&
+        (!filters.genreCD || (product.product_type === 'CD' && product.specific_details?.genre === filters.genreCD));
+  
+      const matchesColor =
+        (!filters.colorClothing || (product.product_type === 'Clothing' && product.specific_details?.color === filters.colorClothing)) &&
+        (!filters.colorAccessory || (product.product_type === 'Accessory' && product.specific_details?.color === filters.colorAccessory));
+  
+      const matchesSize =
+        !filters.size ||
+        (product.product_type === 'Accessory' && product.specific_details?.size === filters.size) ||
+        (product.product_type === 'Clothing' && product.specific_details?.sizes?.some((size: any) => size === filters.size));
+  
+      // Log matching criteria for debugging
+      console.log(`Product: ${product.name}`, {
+        matchesType,
+        matchesPrice,
+        matchesGenre,
+        matchesColor,
+        matchesSize,
+      });
+  
+      return matchesType && matchesPrice && matchesGenre && matchesColor && matchesSize;
+    });
+  
+    console.log('Filtered products:', this.filteredProducts);
+  }
+  
   sortProducts(order: string): void {
     console.log('Sorting products by:', order);
     if (order === 'priceAsc') {
@@ -70,14 +98,12 @@ export class CompanyProductsComponent implements OnInit {
     } else if (order === 'priceDesc') {
       this.filteredProducts.sort((a, b) => b.price - a.price);
     } else {
-      this.filteredProducts = [...this.products]; // Reset to original order
+      this.filteredProducts = [...this.products]; 
     }
   }
 
-  // Placeholder for toggling favorite
   onFavoriteToggled(product: any): void {
     console.log('Favorite toggled for product:', product);
-    // Implement favorite toggle logic
     product.isFavorite = !product.isFavorite;
   }
 }

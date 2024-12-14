@@ -74,6 +74,7 @@ urlpatterns = [
     path('ws/cart/<int:user_id>/', views.manage_cart, name='manage_cart'),  # Para GET e criação do carrinho
     path('ws/cart/<int:user_id>/product/<int:product_id>/', views.manage_cart, name='add_to_cart'),
     path('ws/cart/<int:user_id>/item/<int:item_id>/', views.manage_cart, name='update_or_delete_cart_item'),  # Para PUT/DELETE (atualizar/remover item do carrinho)
+    path('ws/filters/', views.get_filters, name='filters'),
 ]   
 
 

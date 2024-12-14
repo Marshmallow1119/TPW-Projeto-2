@@ -15,10 +15,10 @@
   </i>
 
   <!-- Product Details -->
-  <a [routerLink]="['/product', product.id]" class="d-block">
+  <a [routerLink]="['/product', product.id]" class="d-block" style="text-decoration: none;">
     <img [src]="product.image_url" [alt]="product.name" class="product-image" />
     <div class="p-3 text-center">
-      <p class="product-name mb-0">{{ product.name }}</p>
+      <p class="product-name mb-0 text-decoration-none no-link-color text-decoration-line-none" style="text-decoration: none !important; text-decoration-line: none !important"> {{ product.name }}</p>
       <p class="product-price">{{ product.price | currency: 'EUR' }}</p>
       <button class="btn btn-add-to-cart w-100" (click)="addToCart(product)">
         Adicionar ao carrinho

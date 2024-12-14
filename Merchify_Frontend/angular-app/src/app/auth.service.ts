@@ -3,34 +3,38 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap, catchError, throwError } from 'rxjs';
 import { User } from './models/user';
 import { isPlatformBrowser } from '@angular/common';
-import { ReplaySubject } from 'rxjs';
+import { Router, NavigationStart } from '@angular/router'; // Import Router and NavigationStart
 import { CONFIG } from './config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private userSubject = new BehaviorSubject<User | null>(null); // Initialize with null
+  private userSubject = new BehaviorSubject<User | null>(null);
   user$ = this.userSubject.asObservable();
   private baseUrl: string = CONFIG.baseUrl;
-  
-  private registerUrl =  this.baseUrl + '/register/';
+
+  private registerUrl = this.baseUrl + '/register/';
   private validateTokenUrl = this.baseUrl + '/token/validate/';
   private loginUrl = this.baseUrl + '/login/';
+  private refreshTokenUrl = this.baseUrl + '/token/refresh/';
 
   constructor(
     private http: HttpClient,
+    private router: Router, // Inject Router
     @Inject(PLATFORM_ID) private platformId: object
   ) {
     if (isPlatformBrowser(this.platformId)) {
       this.loadUserFromToken();
+
+      // Listen to router events to refresh token on navigation
+      this.router.events.subscribe((event) => {
+        if (event instanceof NavigationStart) {
+          this.refreshTokenIfNecessary();
+        }
+      });
     }
-  
-    this.user$.subscribe((user) => {
-      console.log('AuthService user$ Emission:', user);
-    });
   }
-  
 
   login(username: string, password: string): Observable<any> {
     return this.http.post(this.loginUrl, { username, password }).pipe(
@@ -38,7 +42,7 @@ export class AuthService {
         if (!response.access || !response.refresh) {
           throw new Error('Missing tokens in the response');
         }
-  
+
         const user: User = {
           id: response.id || 0,
           username,
@@ -49,10 +53,9 @@ export class AuthService {
           email: response.email,
           phone: response.phone,
           country: response.country,
-
           number_of_purchases: response.number_of_purchases || 0,
         };
-  
+
         this.userSubject.next(user);
         localStorage.setItem('accessToken', response.access);
         localStorage.setItem('refreshToken', response.refresh);
@@ -63,16 +66,13 @@ export class AuthService {
       })
     );
   }
-  
-  
-  private refreshTokenUrl = this.baseUrl + '/token/refresh/';
 
   refreshToken(): Observable<any> {
     const refreshToken = localStorage.getItem('refreshToken');
     if (!refreshToken) {
       return throwError(() => new Error('No refresh token available'));
     }
-  
+
     return this.http.post(this.refreshTokenUrl, { refresh: refreshToken }).pipe(
       tap((response: any) => {
         if (!response.access) {
@@ -82,23 +82,33 @@ export class AuthService {
       }),
       catchError((error) => {
         console.error('Token refresh failed:', error);
-        this.logout(); // Log out if refresh fails
+        this.logout();
         return throwError(() => error);
       })
     );
-  }  
-  
+  }
+
+  private refreshTokenIfNecessary(): void {
+    const token = localStorage.getItem('accessToken');
+    if (!token || this.isTokenExpired(token)) {
+      this.refreshToken().subscribe({
+        next: () => console.log('Token refreshed successfully'),
+        error: () => console.log('Failed to refresh token'),
+      });
+    }
+  }
+
   loadUserFromToken(): void {
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }
-  
+
     const token = localStorage.getItem('accessToken');
     if (!token) {
       return;
     }
-  
-    this.http.post(this.validateTokenUrl, { token }).subscribe({
+
+    this.http.post(this.validateTokenUrl,  { token }).subscribe({
       next: (response: any) => {
         const user: User = {
           id: response.id || 0,
@@ -112,7 +122,7 @@ export class AuthService {
           phone: response.phone,
           country: response.country,
         };
-  
+
         this.userSubject.next(user);
       },
       error: (error) => {
@@ -133,8 +143,7 @@ export class AuthService {
       },
     });
   }
-  
-  
+
   logout(): void {
     this.userSubject.next(null);
     if (isPlatformBrowser(this.platformId) && this.isLocalStorageAvailable()) {
@@ -153,7 +162,6 @@ export class AuthService {
       return false;
     }
   }
-
   register(formData: FormData): Observable<any> {
     return this.http.post(this.registerUrl, formData).pipe(
       tap((response: any) => {
@@ -193,7 +201,7 @@ export class AuthService {
     if (!token) {
       return false;
     }
-  
+
     return !this.isTokenExpired(token);
   }
 
@@ -202,11 +210,10 @@ export class AuthService {
       const payload = JSON.parse(atob(token.split('.')[1]));
       return payload.exp * 1000 < Date.now();
     } catch (e) {
-      console.error('Erro ao verificar expiração do token:', e);
+      console.error('Error checking token expiration:', e);
       return true;
     }
   }
-
   getUserId(): number | null {
     const token = localStorage.getItem('accessToken');
     if (!token) {
@@ -221,7 +228,4 @@ export class AuthService {
       return null;
     }
   }
-  
-  
-  
 }
