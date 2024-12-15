@@ -49,29 +49,30 @@ export class PaymentPageService {
   
   
 
-  async submitPayment(paymentData: { payment_method: string; shipping_address: string; discount_code?: string }): Promise<{ success: boolean; message?: string }> {
-    const token = await this.getToken();
+async submitPayment(paymentData: { payment_method: string; shipping_address: string; discountApplied: boolean }): Promise<{ success: boolean; message?: string }> {
+  const token = await this.getToken();
 
-    try {
+  try {
       const response = await fetch(`${this.baseUrl}/api/process-payment/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(paymentData),
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(paymentData),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        return { success: true };
+          return { success: true, message: 'Pagamento processado com sucesso!' };
       } else {
-        return { success: false, message: data.message || 'Falha ao processar o pagamento.' };
+          return { success: false, message: data.error || 'Falha ao processar o pagamento.' };
       }
-    } catch (error) {
+  } catch (error) {
       console.error('Erro ao processar o pagamento:', error);
       return { success: false, message: 'Erro no servidor ao processar o pagamento.' };
-    }
   }
+}
 }

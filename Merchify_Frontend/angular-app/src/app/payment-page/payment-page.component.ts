@@ -133,10 +133,7 @@ export class PaymentPageComponent implements OnInit {
       alert('Por favor, insira um código de desconto.');
       return;
     }
-    console.log("Passo1")
-
     const result = await this.paymentService.applyDiscount(this.discountCode);
-    console.log("Passo3")
 
     if (result.success) {
       this.discountApplied = true;
@@ -149,9 +146,13 @@ export class PaymentPageComponent implements OnInit {
   }
 
   async removeCartItem(itemId: number) {
+    
+    console.log('Cart Item ID being passed:', itemId);
     try {
       await this.cartService.removeCartItem(this.user?.id || 0, itemId);
-      this.cartItems = this.cartItems.filter((item) => item.product.id !== itemId);
+      this.cartItems = this.cartItems.filter((item) => item.cartItemId !== itemId);
+      await this.loadCart(this.user?.id || 0); // Reload the cart
+      console.log('Cart reloaded:', this.cartItems);
       this.calculateTotal();
       this.calculateFinalTotal();
     } catch (error) {
@@ -168,23 +169,29 @@ export class PaymentPageComponent implements OnInit {
 
   async submitPayment() {
     if (!this.paymentMethod || !this.shippingAddress) {
-      alert('Por favor, preencha todos os campos obrigatórios.');
-      return;
+        alert('Por favor, preencha todos os campos obrigatórios.');
+        return;
     }
 
     const paymentData = {
-      payment_method: this.paymentMethod,
-      shipping_address: this.shippingAddress,
-      discount_code: this.discountCode || undefined,
+        payment_method: this.paymentMethod,
+        shipping_address: this.shippingAddress,
+        discountApplied: this.discountApplied,
     };
+
+    // Add loading indicator
+    const loader = document.getElementById('loading-indicator');
+    if (loader) loader.style.display = 'block';
 
     const result = await this.paymentService.submitPayment(paymentData);
 
+    if (loader) loader.style.display = 'none'; 
+
     if (result.success) {
-      alert('Pagamento processado com sucesso!');
-      this.router.navigate(['/thank-you']); // Redirect to thank-you page
+        alert(result.message);
+        this.router.navigate(['/']);
     } else {
-      alert(result.message || 'Erro ao processar o pagamento.');
+        alert(result.message || 'Erro ao processar o pagamento.');
     }
-  }
+}
 }

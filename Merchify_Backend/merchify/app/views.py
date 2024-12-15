@@ -22,6 +22,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 import jwt
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.utils.timezone import now
+
 
 # Django Forms and Validation
 from .forms import (
@@ -43,7 +45,7 @@ from rest_framework import status
 from rest_framework.decorators import (
     api_view, authentication_classes, permission_classes
 )
-from app.serializers import CartItemSerializer, FavoriteArtistSerializer, FavoriteCompanySerializer, FavoriteSerializer, LoginSerializer, PurchaseSerializer, RegisterSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
+from app.serializers import CartItemSerializer, FavoriteArtistSerializer, FavoriteCompanySerializer, FavoriteSerializer, LoginSerializer, PurchaseProductSerializer, PurchaseSerializer, RegisterSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
 
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -594,10 +596,9 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
     elif request.method == 'DELETE':
         if item_id:
             try:
-                cart_item = get_object_or_404(CartItem, id=item_id)
+                cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
                 product = cart_item.product
     
-                # Verifica o tipo de produto e ajusta o estoque
                 if product.get_product_type() == 'Clothing' and cart_item.size:
                     cart_item.size.stock += cart_item.quantity
                     cart_item.size.save()
@@ -613,7 +614,6 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
                 else:
                     raise ValueError("Tipo de produto desconhecido ou inválido.")
     
-                # Remove o item do carrinho
                 cart_item.delete()
     
                 return Response({"message": "Item removido com sucesso!"}, status=status.HTTP_200_OK)
@@ -911,13 +911,14 @@ def apply_discount(request):
 
     return Response({"success": False, "message": "Código de desconto inválido."}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
+@api_view(['G'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def process_payment(request):
     user = request.user
 
     try:
+        # Validate cart existence
         cart = Cart.objects.get(user=user)
         cart_items = CartItem.objects.filter(cart=cart)
 
@@ -927,32 +928,25 @@ def process_payment(request):
         # Extract payment data
         payment_method = request.data.get('payment_method')
         shipping_address = request.data.get('shipping_address')
-        discount_code = request.data.get('discount_code')
+        discount_applied = request.data.get('discountApplied')
 
         if not payment_method or not shipping_address:
-            return Response({"error": "Por favor, preencha todos os campos obrigatórios."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Por favor, preencha todos os campos obrigatórios."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         total = cart.total
         discount_value = 0
-        discount_applied = False
+        if discount_applied:
+            discount_value = request.session.get('discount_value', 0)
+            total -= discount_value
+    
 
-        # Apply discount logic
-        if discount_code and discount_code.lower() == 'primeiracompra':
-            if not Purchase.objects.filter(user=user).exists():
-                discount_value = total * 0.10
-                total -= discount_value
-                discount_applied = True
-            else:
-                return Response(
-                    {"error": "O código de desconto só é válido para a primeira compra."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-        shipping_cost = 5.0  # Assume a flat shipping cost; adjust as needed
+        shipping_cost = calculate_shipping_cost(cart)  # Replace with dynamic calculation if needed
         final_total = total + shipping_cost
 
         with transaction.atomic():
-            # Create Purchase
             purchase_data = {
                 "user": user.id,
                 "date": now(),
@@ -974,48 +968,24 @@ def process_payment(request):
 
             # Deduct stock and create PurchaseProduct
             for item in cart_items:
-                product = item.product
-                product_type = product.get_product_type()
-                stock_available = product.get_stock()
-
-                if stock_available is not None and stock_available >= item.quantity:
-                    if product_type == 'Vinil':
-                        product.vinil.stock -= item.quantity
-                        product.vinil.save()
-
-                    elif product_type == 'CD':
-                        product.cd.stock -= item.quantity
-                        product.cd.save()
-
-                    elif product_type == 'Accessory':
-                        product.accessory.stock -= item.quantity
-                        product.accessory.save()
-
-                    elif product_type == 'Clothing' and item.size:
-                        size = item.size
-                        size.stock -= item.quantity
-                        size.save()
-                else:
+                if not update_stock(item):
                     return Response(
-                        {"error": f"Estoque insuficiente para {product.name}. Disponível: {stock_available}"},
+                        {"error": f"Estoque insuficiente para {item.product.name}."},
                         status=status.HTTP_400_BAD_REQUEST,
                     )
 
                 purchase_product_data = {
                     "purchase": purchase.id,
-                    "product": product.id,
+                    "product": item.product.id,
                     "quantity": item.quantity,
-                    "total": item.quantity * product.price,
+                    "total": item.quantity * item.product.price,
                 }
                 purchase_product_serializer = PurchaseProductSerializer(data=purchase_product_data)
                 if purchase_product_serializer.is_valid():
                     purchase_product_serializer.save()
                 else:
                     return Response(
-                        {
-                            "error": "Erro ao criar o item da compra.",
-                            "details": purchase_product_serializer.errors,
-                        },
+                        {"error": "Erro ao criar o item da compra.", "details": purchase_product_serializer.errors},
                         status=status.HTTP_400_BAD_REQUEST,
                     )
 
@@ -1030,9 +1000,31 @@ def process_payment(request):
     except Cart.DoesNotExist:
         return Response({"error": "Carrinho não encontrado."}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        # Log the error for debugging
         print(f"Erro inesperado: {str(e)}")
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"error": "Erro interno do servidor."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+def calculate_shipping_cost(cart):
+    if cart.user.country == 'Portugal':
+        if cart.total < 100:
+            return 5
+        else:
+            return 0
+    else:
+        if cart.total < 100:
+            return 7.99
+        else:
+            return 0
+
+# Utility to update stock
+def update_stock(item):
+    product = item.product
+    stock_available = product.get_stock()
+    if stock_available is None or stock_available < item.quantity:
+        return False
+
+    product.reduce_stock(item.quantity)
+    product.save()
+    return True
 
 
 
