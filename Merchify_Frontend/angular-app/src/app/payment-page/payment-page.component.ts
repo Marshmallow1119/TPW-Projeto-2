@@ -133,8 +133,10 @@ export class PaymentPageComponent implements OnInit {
       alert('Por favor, insira um código de desconto.');
       return;
     }
+    console.log("Passo1")
 
     const result = await this.paymentService.applyDiscount(this.discountCode);
+    console.log("Passo3")
 
     if (result.success) {
       this.discountApplied = true;

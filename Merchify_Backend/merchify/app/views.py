@@ -43,13 +43,14 @@ from rest_framework import status
 from rest_framework.decorators import (
     api_view, authentication_classes, permission_classes
 )
-from app.serializers import CartItemSerializer, FavoriteArtistSerializer, FavoriteCompanySerializer, FavoriteSerializer, LoginSerializer, RegisterSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
+from app.serializers import CartItemSerializer, FavoriteArtistSerializer, FavoriteCompanySerializer, FavoriteSerializer, LoginSerializer, PurchaseSerializer, RegisterSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
 
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.authtoken.models import Token
+
 
 @api_view(['GET'])
 def home(request):
@@ -883,118 +884,156 @@ def remove_from_favorites_company(request, company_id):
 
     except Company.DoesNotExist:
         return JsonResponse({"success": False, "message": "Company not found."}, status=404)
+    
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def apply_discount(request):
+    discount_code = request.query_params.get('discount_code', '').strip().lower()
+    print("Received discount code:", discount_code)
 
+    user = request.user
+
+    if not discount_code:
+        return Response({"success": False, "message": "Código de desconto não fornecido."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if discount_code == 'primeiracompra':
+        if not Purchase.objects.filter(user=user).exists():  # Checking if this is the user's first purchase
+            return Response(
+                {"success": True, "discount_value": 10.0, "message": "Código de desconto válido!"},
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {"success": False, "message": "O código de desconto só é válido para a primeira compra."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    return Response({"success": False, "message": "Código de desconto inválido."}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def process_payment(request):
-    if request.method == 'POST' and 'complete_payment' in request.POST:
-        user = request.user
-        try:
-            cart = Cart.objects.get(user=user)
-            cart_items = CartItem.objects.filter(cart=cart)
+    user = request.user
 
-            if not cart_items.exists():
-                return Response({"error": "O carrinho está vazio."}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        cart = Cart.objects.get(user=user)
+        cart_items = CartItem.objects.filter(cart=cart)
 
+        if not cart_items.exists():
+            return Response({"error": "O carrinho está vazio."}, status=status.HTTP_400_BAD_REQUEST)
 
-            payment_method = request.data.get('payment_method')
-            shipping_address = request.data.get('shipping_address')
-            discount_code = request.data.get('discount_code')
-            
-            if not cart_items.exists() and 'discount_applied' in request.session:
-                request.session['discount_applied'] = False
-                request.session.pop('discount_value', None)
-                messages.info(request, "O código de desconto foi removido porque o carrinho está vazio.")
+        # Extract payment data
+        payment_method = request.data.get('payment_method')
+        shipping_address = request.data.get('shipping_address')
+        discount_code = request.data.get('discount_code')
 
+        if not payment_method or not shipping_address:
+            return Response({"error": "Por favor, preencha todos os campos obrigatórios."}, status=status.HTTP_400_BAD_REQUEST)
 
-            if not payment_method or not shipping_address:
-                messages.error(request, "Por favor, preencha todos os campos obrigatórios.")
-                return redirect('payment_page')
+        total = cart.total
+        discount_value = 0
+        discount_applied = False
 
-            total = cart.total
-            discount_value = 0
-            discount_applied = False
-
-
-            if discount_code and discount_code.lower() == 'primeiracompra':
-                if not Purchase.objects.filter(user=user).exists():
-                    discount_value = total * 0.10
-                    total -= discount_value
-                    request.session['discount_applied'] = True
-                    request.session['discount_value'] = discount_value
-                    messages.success(request, "Código de desconto aplicado com sucesso!")
-                else:
-                    messages.warning(request, "O código de desconto só é válido para a primeira compra.")
-                    request.session['discount_applied'] = False
-
-            shipping_cost = request.session.get('shipping_cost', 0)
-            final_total = total + shipping_cost
-
-            with transaction.atomic():
-                purchase = Purchase.objects.create(
-                    user=user,
-                    date=timezone.now().date(),
-                    paymentMethod=payment_method,
-                    shippingAddress=shipping_address,
-                    total_amount=final_total,
-                    status='Em processamento',
-                    discount_applied=discount_applied,
-                    discount_value=discount_value
+        # Apply discount logic
+        if discount_code and discount_code.lower() == 'primeiracompra':
+            if not Purchase.objects.filter(user=user).exists():
+                discount_value = total * 0.10
+                total -= discount_value
+                discount_applied = True
+            else:
+                return Response(
+                    {"error": "O código de desconto só é válido para a primeira compra."},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
-                for item in cart_items:
-                    product = item.product
-                    product_type = product.get_product_type()
-                    stock_available = product.get_stock()
+        shipping_cost = 5.0  # Assume a flat shipping cost; adjust as needed
+        final_total = total + shipping_cost
 
-                    if stock_available is not None and stock_available >= item.quantity:
-                        if product_type == 'Vinil':
-                            product.vinil.stock -= item.quantity
-                            product.vinil.stock = max(0, product.vinil.stock)
-                            product.vinil.save()
+        with transaction.atomic():
+            # Create Purchase
+            purchase_data = {
+                "user": user.id,
+                "date": now(),
+                "paymentMethod": payment_method,
+                "shippingAddress": shipping_address,
+                "total_amount": final_total,
+                "status": "Em processamento",
+                "discount_applied": discount_applied,
+                "discount_value": discount_value,
+            }
+            purchase_serializer = PurchaseSerializer(data=purchase_data)
+            if purchase_serializer.is_valid():
+                purchase = purchase_serializer.save()
+            else:
+                return Response(
+                    {"error": "Erro ao criar a compra.", "details": purchase_serializer.errors},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-                        elif product_type == 'CD':
-                            product.cd.stock -= item.quantity
-                            product.cd.stock = max(0, product.cd.stock)
-                            product.cd.save()
+            # Deduct stock and create PurchaseProduct
+            for item in cart_items:
+                product = item.product
+                product_type = product.get_product_type()
+                stock_available = product.get_stock()
 
-                        elif product_type == 'Accessory':
-                            product.accessory.stock -= item.quantity
-                            product.accessory.stock = max(0, product.accessory.stock)
-                            product.accessory.save()
+                if stock_available is not None and stock_available >= item.quantity:
+                    if product_type == 'Vinil':
+                        product.vinil.stock -= item.quantity
+                        product.vinil.save()
 
-                        elif product_type == 'Clothing' and item.size:
-                            size = item.size
-                            size.stock -= item.quantity
-                            size.stock = max(0, size.stock)
-                            size.save()
-                    else:
-                        messages.error(request, f"Estoque insuficiente para {product.name}. Disponível: {stock_available}")
-                        return redirect('payment_page')
+                    elif product_type == 'CD':
+                        product.cd.stock -= item.quantity
+                        product.cd.save()
 
-                    PurchaseProduct.objects.create(
-                        purchase=purchase,
-                        product=product,
-                        quantity=item.quantity
+                    elif product_type == 'Accessory':
+                        product.accessory.stock -= item.quantity
+                        product.accessory.save()
+
+                    elif product_type == 'Clothing' and item.size:
+                        size = item.size
+                        size.stock -= item.quantity
+                        size.save()
+                else:
+                    return Response(
+                        {"error": f"Estoque insuficiente para {product.name}. Disponível: {stock_available}"},
+                        status=status.HTTP_400_BAD_REQUEST,
                     )
 
-                request.session['clear_cart'] = True
-                request.session['discount_applied'] = False
-                request.session.pop('discount_value', None)
+                purchase_product_data = {
+                    "purchase": purchase.id,
+                    "product": product.id,
+                    "quantity": item.quantity,
+                    "total": item.quantity * product.price,
+                }
+                purchase_product_serializer = PurchaseProductSerializer(data=purchase_product_data)
+                if purchase_product_serializer.is_valid():
+                    purchase_product_serializer.save()
+                else:
+                    return Response(
+                        {
+                            "error": "Erro ao criar o item da compra.",
+                            "details": purchase_product_serializer.errors,
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
 
-                url_with_success = f"{reverse('payment_page')}?success=1"
-                return redirect(url_with_success)
+            # Clear cart
+            cart_items.delete()
 
-        except Cart.DoesNotExist:
-            messages.error(request, "Carrinho não encontrado.")
-            return redirect('cart')
-        except Exception as e:
-            messages.error(request, f"Ocorreu um erro durante o processamento do pagamento: {str(e)}")
-            return redirect('payment_page')
+        return Response(
+            {"message": "Pagamento processado com sucesso!", "purchase": purchase_serializer.data},
+            status=status.HTTP_201_CREATED,
+        )
 
-    return redirect('payment_page')
+    except Cart.DoesNotExist:
+        return Response({"error": "Carrinho não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Erro inesperado: {str(e)}")
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 @api_view(['GET'])

@@ -17,21 +17,20 @@ export class PaymentPageService {
     return token;
   }
 
-  async applyDiscount(discountCode: string): Promise<{ success: boolean; discountValue?: number; message?: string }> {
+  async applyDiscount(discountCode: string): Promise<{ success: boolean; message?: string; discountValue?: number }> {
     const token = await this.getToken();
 
     if (!discountCode) {
       return { success: false, message: 'Por favor, insira um código de desconto.' };
     }
-
     try {
-      const response = await fetch(`${this.baseUrl}/api/apply-discount`, {
-        method: 'POST',
+      const response = await fetch(`${this.baseUrl}/apply_discount/?discount_code=${discountCode}`, { 
+        method: 'GET',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ discount_code: discountCode }),
       });
 
       const data = await response.json();
@@ -45,13 +44,16 @@ export class PaymentPageService {
       console.error('Erro ao aplicar o desconto:', error);
       return { success: false, message: 'Erro no servidor ao aplicar o desconto.' };
     }
-  }
+}
+
+  
+  
 
   async submitPayment(paymentData: { payment_method: string; shipping_address: string; discount_code?: string }): Promise<{ success: boolean; message?: string }> {
     const token = await this.getToken();
 
     try {
-      const response = await fetch(`${this.baseUrl}/api/process-payment`, {
+      const response = await fetch(`${this.baseUrl}/api/process-payment/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

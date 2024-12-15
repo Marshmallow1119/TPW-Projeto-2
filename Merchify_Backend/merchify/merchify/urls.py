@@ -53,7 +53,6 @@ urlpatterns = [
     path('ws/favorites/company/<int:company_id>/', views.company_favorites, name='company_favorite'),
     #path('ws/payment/', views.payment_page, name='payment_page'),
     path('ws/delete_user/<int:user_id>/', views.delete_user, name='delete_user'),
-    path('ws/process_payment/', views.process_payment, name='process_payment'),
     #path('ws/payment-confirmation/', views.payment_confirmation, name='payment_confirmation'),
     path('ws/admin_home/delete/<int:product_id>', views.admin_product_delete, name='admin_product_delete'),
     #path('ws/admin_home/delete/company/<int:company_id>', views.admin_company_delete, name='admin_company_delete'),
@@ -75,6 +74,9 @@ urlpatterns = [
     path('ws/cart/<int:user_id>/product/<int:product_id>/', views.manage_cart, name='add_to_cart'),
     path('ws/cart/<int:user_id>/item/<int:item_id>/', views.manage_cart, name='update_or_delete_cart_item'),  # Para PUT/DELETE (atualizar/remover item do carrinho)
     path('ws/filters/', views.get_filters, name='filters'),
+    path('ws/process_payment/', views.process_payment, name='process_payment'),
+    path('ws/apply_discount/', views.apply_discount, name='apply_discount'),
+
 ]   
 
 
