@@ -350,6 +350,7 @@ def login(request):
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
         user = authenticate(username=username, password=password)
+        user_data = UserSerializer(user).data
         if user:
             refresh = RefreshToken.for_user(user)
             return Response({
@@ -358,6 +359,7 @@ def login(request):
                 'username': user.username,
                 'id': user.id,
                 'user_type': user.user_type,
+                'user': user_data
             }, status=status.HTTP_200_OK)
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

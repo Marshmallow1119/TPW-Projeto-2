@@ -37,12 +37,13 @@ class BalanceSerializer(serializers.Serializer):
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
+    company = CompanySerializer(read_only=True)
 
     class Meta:
         model = User
         fields = [
             'id', 'username', 'firstname', 'lastname', 'user_type',
-            'email', 'phone', 'country', 'image', 'balance'
+            'email', 'phone', 'country', 'image', 'balance', 'company'
         ]
 
     def get_image(self, obj):
