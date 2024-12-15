@@ -240,6 +240,14 @@ export class AuthService {
   
     this.userSubject.next(newUser); // Notifica os observadores sobre a atualização
   }
+
+  updateUserBalance(newBalance: number): void {
+    const currentUser = this.userSubject.value;
+    if (currentUser) {
+      currentUser.balance = newBalance; // Atualiza o saldo
+      this.userSubject.next(currentUser); // Emite a atualização para os componentes
+    }
+  }
   
 
 }

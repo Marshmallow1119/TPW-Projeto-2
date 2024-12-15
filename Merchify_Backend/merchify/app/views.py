@@ -98,7 +98,6 @@ def balance(request):
                 })
 
             elif request.method == 'PUT':
-                # Deduct funds from the user's balance
                 if user.balance < Decimal(amount):
                     return Response({'error': 'Insufficient balance.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -927,7 +926,19 @@ def process_payment(request):
         shipping_cost = calculate_shipping_cost(cart)
         final_total = total + shipping_cost
 
+
         with transaction.atomic():
+
+            print("User balance before purchase:", user.balance)
+            print("Final total:", final_total)
+
+            user.balance -= Decimal(final_total)
+            user.number_of_purchases += 1
+            user.save()
+
+            print("User balance after purchase:", user.balance)
+
+
             purchase_data = {
                 "user": user.id,
                 "date": now().date(),
@@ -957,7 +968,7 @@ def process_payment(request):
             cart_items.delete()
 
         return Response(
-            {"message": "Pagamento processado com sucesso!", "purchase": purchase_serializer.data},
+            {"message": "Pagamento processado com sucesso!", "purchase": purchase_serializer.data, "new_balance": user.balance},
             status=status.HTTP_201_CREATED,
         )
 

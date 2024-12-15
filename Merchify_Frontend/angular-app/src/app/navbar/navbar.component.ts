@@ -35,8 +35,8 @@ export class NavbarComponent implements OnInit {
       console.log('NavbarComponent received user:', user);
       this.user = user;
       this.cdr.detectChanges();
+      this.loadBalance();
     });
-    this.loadBalance();
   }
 
   logout(): void {

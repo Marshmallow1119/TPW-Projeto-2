@@ -180,6 +180,11 @@ export class PaymentPageComponent implements OnInit {
   
     try {
       const result = await this.paymentService.submitPayment(paymentData);
+      alert('Pagamento processado com sucesso!');
+      //atualizar o balance utilizando o serviço de balanceService
+      console.log('Novo saldo:', result.new_balance);
+      this.authService.updateUserBalance(result.new_balance);
+
       this.router.navigate(['/']); 
     } catch (error: any) {
       alert('Erro inesperado: não foi possível processar o pagamento.');
