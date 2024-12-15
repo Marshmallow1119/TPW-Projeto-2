@@ -19,6 +19,7 @@ export class ListChatsComponent {
   ngOnInit(): void {
     this.chatService.getChats().subscribe(chats => {
       this.chats = chats;
+      console.log('ListChatsComponent received chats:', chats);
     });
   }
 

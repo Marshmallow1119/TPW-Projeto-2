@@ -35,7 +35,9 @@ export class NavbarComponent implements OnInit {
       console.log('NavbarComponent received user:', user);
       this.user = user;
       this.cdr.detectChanges();
+      if (this.authService.isAuthenticated()) {
       this.loadBalance();
+      }
     });
   }
 
@@ -69,7 +71,6 @@ export class NavbarComponent implements OnInit {
       },
       (error) => {
         console.error('Failed to fetch balance:', error);
-        alert('Erro ao carregar o saldo. Por favor, tente novamente mais tarde.');
       }
     );
   }
