@@ -64,6 +64,8 @@ class ProductSerializer(serializers.ModelSerializer):
     stock = serializers.IntegerField(source='get_stock', read_only=True)
     specific_details = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
+    artist= ArtistSerializer(read_only=True)
+    company = CompanySerializer(read_only=True)
 
     class Meta:
         model = Product

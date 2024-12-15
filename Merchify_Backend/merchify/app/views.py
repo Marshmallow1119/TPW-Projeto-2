@@ -45,7 +45,7 @@ from rest_framework import status
 from rest_framework.decorators import (
     api_view, authentication_classes, permission_classes
 )
-from app.serializers import CartItemSerializer, FavoriteArtistSerializer, FavoriteCompanySerializer, FavoriteSerializer, LoginSerializer, PurchaseProductSerializer, PurchaseSerializer, RegisterSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
+from app.serializers import CartItemSerializer, FavoriteArtistSerializer, FavoriteCompanySerializer, FavoriteSerializer, LoginSerializer, PurchaseProductSerializer, PurchaseSerializer, RegisterSerializer, ReviewSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
 
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -207,70 +207,22 @@ def productDetails(request, identifier):
         product.count += 1
         product.save()
 
-        product_data = {
-            'id': product.id,
-            'name': product.name,
-            'description': product.description,
-            'price': product.price,
-            'image': product.image.url if product.image else None,
-            'artist': {'name': product.artist.name} if product.artist else None,
-            'company': {'name': product.company.name} if product.company else None,
-            'category': product.category,
-            'addedProduct': product.addedProduct.strftime('%Y-%m-%d') if product.addedProduct else None,
-            'count': product.count,
-            'average_rating': product.get_average_rating(),
-            'product_type': product.get_product_type(),
-            'stock': product.get_stock(),
-        }
+        product_serializer = ProductSerializer(product, context={'request': request})
+        
+        reviews = product.reviews.all()
+        review_serializer = ReviewSerializer(reviews, many=True)
 
-        if hasattr(product, 'clothing'):
-            product_data['sizes'] = [
-                {'id': size.id, 'size': size.size, 'stock': size.stock}
-                for size in product.clothing.sizes.all()
-            ]
+        product_data = product_serializer.data
+        product_data['reviews'] = review_serializer.data
 
-        if hasattr(product, 'vinil'):
-            product_data['vinil'] = {
-                'genre': product.vinil.genre,
-                'lpSize': product.vinil.lpSize,
-                'releaseDate': product.vinil.releaseDate.strftime('%Y-%m-%d') if product.vinil.releaseDate else None,
-                'stock': product.vinil.stock,
-            }
+        return Response(product_data)
 
-        if hasattr(product, 'cd'):
-            product_data['cd'] = {
-                'genre': product.cd.genre,
-                'releaseDate': product.cd.releaseDate.strftime('%Y-%m-%d') if product.cd.releaseDate else None,
-                'stock': product.cd.stock,
-            }
-
-        if hasattr(product, 'accessory'):
-            product_data['accessory'] = {
-                'material': product.accessory.material,
-                'color': product.accessory.color,
-                'size': product.accessory.size,
-                'stock': product.accessory.stock,
-            }
-
-        product_data['reviews'] = [
-            {
-                'user': {'username': review.user.username},
-                'rating': review.rating,
-                'text': review.text,
-                'date': review.date.strftime('%Y-%m-%d') if review.date else None,
-            }
-            for review in product.reviews.all()
-        ]
-
-        return JsonResponse(product_data, safe=False)
     elif request.method == 'DELETE':
         if not (request.user.user_type == 'admin' or request.user.user_type == 'company'):
-            print("User is not admin or company")
             raise PermissionDenied
         product = get_object_or_404(Product, id=identifier)
         product.delete()
-        return JsonResponse({'message': 'Produto excluído com sucesso!'})
-
+        return Response({'message': 'Produto excluído com sucesso!'})
 
 
 
