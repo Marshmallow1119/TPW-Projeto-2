@@ -52,4 +52,8 @@ export class NavbarComponent implements OnInit {
       });
     }
   }
+  handleLogin(): void {
+    localStorage.setItem('redirectUrl', this.router.url);
+    this.router.navigate(['/login']);
+  }
 }

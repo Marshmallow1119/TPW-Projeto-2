@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Company } from './models/company';
 import { CONFIG } from './config';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -69,4 +70,25 @@ export class CompaniesService {
       throw error;
     }
   }
+
+  async addCompany(data: FormData): Promise<any> {
+    const url = `${this.baseUrl}/company/`;
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: data,
+      });
+      if (!response.ok) {
+        throw new Error('Failed to add company');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error adding company:', error);
+      throw error;
+    }
+  }
+
 }

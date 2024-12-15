@@ -232,13 +232,13 @@ class UserForm(forms.ModelForm):
 
 class ReviewForm(forms.Form):
     rating = forms.IntegerField(required=False)
-    review = forms.CharField(required=False, widget=forms.Textarea)
+    text = forms.CharField(required=False, widget=forms.Textarea)
 
     def clean(self):
         cleaned_data = super().clean()
         rating = cleaned_data.get('rating')
-        review = cleaned_data.get('review', '').strip()
+        text = cleaned_data.get('text', '').strip()
 
-        if not rating and not review:
+        if not rating and not text:
             raise forms.ValidationError("Por favor, forneça uma avaliação com estrelas ou escreva um texto.")
         return cleaned_data

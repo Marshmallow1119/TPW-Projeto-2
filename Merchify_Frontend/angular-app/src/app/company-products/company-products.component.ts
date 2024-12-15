@@ -6,6 +6,7 @@ import { ArtistsCardProductsComponent } from '../artists-card-products/artists-c
 import { ActivatedRoute } from '@angular/router';
 import { Product } from '../models/produto';
 import { filter } from 'rxjs';
+import { Company } from '../models/company';
 
 @Component({
   standalone: true,
@@ -37,6 +38,7 @@ export class CompanyProductsComponent implements OnInit {
 
       if (data) {
         this.company = data.company;
+        console.log('Companhia:', this.company);
         this.products = data.products;
         this.filteredProducts = [...this.products]; 
       } else {
@@ -46,16 +48,11 @@ export class CompanyProductsComponent implements OnInit {
       console.error('Erro ao carregar companhia e produtos:', error);
     }
   }
-
   applyFilters(filters: any): void {
-  
     console.log('Applying filters:', filters);
   
     this.filteredProducts = this.products.filter((product) => {
       console.log('Checking product:', product);
-
-      console.log(filters.type);
-      console.log(product.product_type);
   
       const matchesType = !filters.type || product.product_type === filters.type;
   
@@ -64,17 +61,27 @@ export class CompanyProductsComponent implements OnInit {
         (!filters.max_price || product.price <= filters.max_price);
   
       const matchesGenre =
-        (!filters.genreVinyl || (product.product_type === 'Vinil' && product.specific_details?.genre === filters.genreVinyl)) &&
-        (!filters.genreCD || (product.product_type === 'CD' && product.specific_details?.genre === filters.genreCD));
+        (!filters.genreVinyl ||
+          (product.product_type === 'Vinil' && product.specific_details?.genre === filters.genreVinyl)) &&
+        (!filters.genreCD ||
+          (product.product_type === 'CD' && product.specific_details?.genre === filters.genreCD));
   
       const matchesColor =
-        (!filters.colorClothing || (product.product_type === 'Clothing' && product.specific_details?.color === filters.colorClothing)) &&
-        (!filters.colorAccessory || (product.product_type === 'Accessory' && product.specific_details?.color === filters.colorAccessory));
+        (!filters.colorClothing ||
+          (product.product_type === 'Clothing' && product.specific_details?.color === filters.colorClothing)) &&
+        (!filters.colorAccessory ||
+          (product.product_type === 'Accessory' && product.specific_details?.color === filters.colorAccessory));
   
       const matchesSize =
         !filters.size ||
         (product.product_type === 'Accessory' && product.specific_details?.size === filters.size) ||
-        (product.product_type === 'Clothing' && product.specific_details?.sizes?.some((size: any) => size === filters.size));
+        (product.product_type === 'Clothing' &&
+          product.specific_details?.sizes?.some((size: any) => size === filters.size));
+
+        console.log(product.artist.id);
+        console.log(filters.artist);
+      const matchesArtist =
+        !filters.artist || product.artist.id.toString() === filters.artist; 
   
       // Log matching criteria for debugging
       console.log(`Product: ${product.name}`, {
@@ -83,13 +90,15 @@ export class CompanyProductsComponent implements OnInit {
         matchesGenre,
         matchesColor,
         matchesSize,
+        matchesArtist,
       });
   
-      return matchesType && matchesPrice && matchesGenre && matchesColor && matchesSize;
+      return matchesType && matchesPrice && matchesGenre && matchesColor && matchesSize && matchesArtist;
     });
   
     console.log('Filtered products:', this.filteredProducts);
   }
+  
   
   sortProducts(order: string): void {
     console.log('Sorting products by:', order);

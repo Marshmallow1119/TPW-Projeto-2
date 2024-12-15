@@ -1,16 +1,61 @@
-<div class="seven">
-    <h1>Lista de Utilizadores:</h1>
+<div class="container-fluid">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h3>Dashboard do Administrador</h3>
+      <a 
+        (click)="showSection('users-section')"
+        [class.active]="activeSection === 'users-section'"
+      >
+        Lista de Utilizadores
+      </a>
+      <a 
+        (click)="showSection('products-section')"
+        [class.active]="activeSection === 'products-section'"
+      >
+        Lista de Produtos
+      </a>
+      <a 
+        (click)="showSection('companies-section')"
+        [class.active]="activeSection === 'companies-section'"
+      >
+        Lista de Empresas
+      </a>
     </div>
-    
-<app-admin-users-table></app-admin-users-table>
-<div class="seven">
-<h1>Lista de Produtos:</h1>
-</div>
-
-<app-admin-products-table></app-admin-products-table>
-
-<div class="seven">
-    <h1>Lista de Companhias:</h1>
-</div>
-
-<app-admin-company-table></app-admin-company-table>
+  
+    <!-- Main Content -->
+    <div class="content-section">
+      <div
+        id="users-section"
+        class="content-table"
+        [class.active]="activeSection === 'users-section'"
+      >
+        <div class="seven">
+        <h1 >Lista de Utilizadores:</h1>
+        </div>
+        <app-admin-users-table></app-admin-users-table>
+      </div>
+  
+      <div
+        id="products-section"
+        class="content-table"
+        [class.active]="activeSection === 'products-section'"
+      >
+        <div class="seven">
+        <h1>Lista de Produtos:</h1>
+        </div>
+        <app-admin-products-table></app-admin-products-table>
+      </div>
+  
+      <div
+        id="companies-section"
+        class="content-table"
+        [class.active]="activeSection === 'companies-section'"
+      >
+      <div class="seven">
+        <h1>Lista de Empresas:</h1>
+        </div>
+        <app-admin-company-table></app-admin-company-table>
+      </div>
+    </div>
+  </div>
+  

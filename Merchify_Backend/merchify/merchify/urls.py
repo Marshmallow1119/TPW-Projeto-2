@@ -38,13 +38,11 @@ urlpatterns = [
     path('ws/add-to-cart/<int:product_id>/', views.add_to_cart, name = 'add_to_cart'),
     path('ws/remove/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
     #path("ws/account/profile", views.profile, name="profile"),
-    path("ws/product/<int:product_id>/submit_review/", views.submit_review, name="submit_review"),
     path('ws/company/<int:company_id>/products/', views.company_products, name='company_products'),
     path('ws/company/<int:company_id>/', views.company, name='company'),
     #path('ws/company/products/<int:company_id>', views.company_products_user, name='company_products_user'),
     #path('ws/company/<int:company_id>/add-product/', views.add_product_to_company, name='add_product_to_company'),
     path('ws/company/<int:company_id>/product/<int:product_id>/detail/', views.company_product_detail, name='company_product_detail'),
-    path('ws/review/<int:review_id>', views.delete_review, name='delete_review'),  
     path('ws/product/<int:product_id>/edit/', views.edit_product, name='edit_product'),
     #path('ws/product/<int:product_id>/delete/', views.delete_product, name='delete_product'),
     path('ws/favorites/get/<str:category>/', views.favorites, name='favorites'),
@@ -58,7 +56,6 @@ urlpatterns = [
     #path('ws/admin_home/delete/company/<int:company_id>', views.admin_company_delete, name='admin_company_delete'),
     path('ws/admin_home/add/company',views.add_company, name='add_company'),
     #path('ws/account/order_details/<int:order_id>/', views.order_details, name='order_details'),
-    path('ws/delete/review/<int:review_id>/', views.delete_review, name='delete_review'),
     #path('ws/apply_discount/', views.apply_discount, name='apply_discount'),
     path('ws/companhias/', views.companhias, name='companhias'),
     path('ws/update-cart-item/<int:item_id>/', views.update_cart_item, name='update_cart_item'),
@@ -76,7 +73,14 @@ urlpatterns = [
     path('ws/filters/', views.get_filters, name='filters'),
     path('ws/process_payment/', views.process_payment, name='process_payment'),
     path('ws/apply_discount/', views.apply_discount, name='apply_discount'),
-
+    path('ws/reviews/<int:product_id>/', views.reviews, name='get_reviews'),
+    path('ws/chat/company/<int:company_id>/messages/', views.get_chat_messages, name='get_chat_messages_company'),
+    path('ws/chat/company/<int:company_id>/send/', views.send_message, name='send_message_to_company'),
+    path('ws/chat/user/<int:user_id>/messages/', views.get_chat_messages, name='get_chat_messages_user'),
+    path('ws/chat/user/<int:user_id>/send/', views.send_message, name='send_message_to_user'),
+    path('ws/chat/', views.get_chat, name='get_chat'),
+    path('ws/user/', views.get_user_info, name='get_user'),
+    path('ws/company/', views.add_company, name='get_company'),
 ]   
 
 

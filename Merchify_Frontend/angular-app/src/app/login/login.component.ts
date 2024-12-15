@@ -27,6 +27,12 @@ export class LoginComponent {
         localStorage.setItem('accessToken', response.access);
         localStorage.setItem('refreshToken', response.refresh);
         console.log('User type:', response.user_type);
+        if (localStorage.getItem('redirectUrl')) {
+          const redirectUrl = localStorage.getItem('redirectUrl');
+          localStorage.removeItem('redirectUrl');
+          this.router.navigate([redirectUrl]);
+          return;
+        }
         switch (response.user_type) {
           case 'individual':
             this.router.navigate(['/']);

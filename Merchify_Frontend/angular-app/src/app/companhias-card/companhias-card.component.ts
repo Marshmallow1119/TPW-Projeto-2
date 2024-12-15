@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Company } from '../models/company';
+import { Router } from '@angular/router';
 import { FavoritesService } from '../favorites.service';
 
 @Component({
@@ -12,8 +13,7 @@ import { FavoritesService } from '../favorites.service';
   styleUrls: ['./companhias-card.component.css']
 })
 export class CompanhiasCardComponent {
-
-  constructor(private favoriteService: FavoritesService) {}
+  constructor(private favoriteService: FavoritesService, private router: Router) {}
   @Input() company!: Company;
   @Input() isAuthenticated!: boolean;
   @Input() userType!: string;
@@ -21,6 +21,10 @@ export class CompanhiasCardComponent {
   toggleFavorite(event: Event): void {
     event.preventDefault(); 
     event.stopPropagation(); 
+    if (!this.isAuthenticated) {
+      this.router.navigate(['/login']);
+      return;
+    }
     if (this.company.is_favorited) {
       this.favoriteService.removeFavoriteCompany(this.company.id);
       this.company.is_favorited = false;

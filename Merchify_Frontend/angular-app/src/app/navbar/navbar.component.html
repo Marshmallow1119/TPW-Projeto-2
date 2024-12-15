@@ -40,7 +40,7 @@
           <!-- Login Section -->
           <ng-template #loginSection>
             <div class="login-button-container">
-              <a routerLink="/login" class="btn btn-outline-dark"><i class="fa fa-user"></i> Login</a>
+              <a class="btn btn-outline-dark"(click)="handleLogin()"><i class="fa fa-user"></i> Login</a>
             </div>
             <form class="d-flex align-items-center" (submit)="onSearch()">
               <input
@@ -63,7 +63,7 @@
             <!-- User-specific options -->
             <div *ngIf="user" class="ms-auto d-flex align-items-center">
               <div class="navbar-text me-3 fw-bold fs-5">
-                Bem-Vindo(a), {{ user.user_type | titlecase }} {{ user.username }}
+                Bem-Vindo(a), {{ user.username }}
               </div>
               <form class="d-flex align-items-center" style="margin-right: 10px;" (submit)="onSearch()">
                 <input

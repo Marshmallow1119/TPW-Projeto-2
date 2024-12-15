@@ -80,7 +80,19 @@
         <button class="btn btn-dark w-100" (click)="addToCart()">Adicionar ao carrinho</button>
       </div>
     </div>
-  
+              <!-- Chat with the Company -->
+      <div class="chat-section mt-5">
+        <div class="alert alert-info">
+          <h5>Está com dúvidas?</h5>
+          <p>Converse diretamente com a empresa para tirar suas dúvidas sobre este produto.</p>
+          <a
+            [routerLink]="'/chat/' + product.company?.id"
+            class="btn btn-primary"
+          >
+            Converse com a Empresa
+          </a>
+        </div>
+      </div>
     <!-- Reviews Section -->
     <div class="reviews mt-5">
       <h5>Classificação Média:</h5>
@@ -123,14 +135,14 @@
       </div>
   
       <!-- Display Reviews -->
-      <div *ngFor="let review of product.reviews" class="card p-3 mb-3">
+      <div *ngFor="let review of reviews" class="card p-3 mb-3">
         <div class="d-flex justify-content-between align-items-center">
           <h6>{{ review.user.username }} <small>{{ review.date | date }}</small></h6>
           <div class="star-rating">
             <span
               *ngFor="let star of [1, 2, 3, 4, 5]"
               class="star"
-              [class.selected]="star <= review.rating"
+              [class.selected]="star <= (review?.rating || 0)"
               >★</span
             >
           </div>

@@ -64,6 +64,7 @@ class ProductSerializer(serializers.ModelSerializer):
     stock = serializers.IntegerField(source='get_stock', read_only=True)
     specific_details = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
+    artist = ArtistSerializer(read_only=True)
 
     class Meta:
         model = Product
@@ -193,6 +194,9 @@ class PurchaseSerializer(serializers.ModelSerializer):
    
 # Review Serializer
 class ReviewSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    product = ProductSerializer(read_only=True)
+    
     class Meta:
         model = Review
         fields = ['id', 'user', 'product', 'text', 'rating', 'date']
@@ -238,3 +242,25 @@ class RegisterSerializer(serializers.ModelSerializer):
             last_name=validated_data['last_name'],
         )
         return user
+
+class ChatSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    company = CompanySerializer(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = Chat
+        fields = ['id', 'user', 'company', 'created_at']
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender = UserSerializer(read_only=True)
+    chat = ChatSerializer(read_only=True)
+    is_from_company = serializers.BooleanField(read_only=True)
+    text = serializers.CharField()
+    date = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = Message
+        fields = ['id', 'chat', 'sender', 'is_from_company', 'text', 'date']
+

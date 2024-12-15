@@ -1,16 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ProductDetailsService } from '../product-details.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CartService } from '../cart.service';
 import { AuthService } from '../auth.service';
 import { User } from '../models/user';
+import { Review } from '../models/review';
+import { ReviewsService } from '../reviews.service';
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.css'],
 })
@@ -25,21 +27,31 @@ export class ProductDetailsComponent implements OnInit {
   loading: boolean = false;
   errorMessage: string = '';
   user: User | null = null;
+  reviews: Review[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private productDetailsService: ProductDetailsService,
     private cartService: CartService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private reviewService: ReviewsService
   ) {}
 
   ngOnInit(): void {
     const productId = Number(this.route.snapshot.paramMap.get('identifier'));
     this.loadProductDetails(productId);
+    this.reviewService.getReviews(productId).then((reviews) => {
+      this.reviews = reviews;
+    }).catch((error) => {
+      console.error('Error loading reviews:', error);
+    });
+  
     this.authService.user$.subscribe((user) => {
       this.user = user;
     });
+
+    console.log('Product details component initialized:', this.product);
   }
 
   private async loadProductDetails(productId: number): Promise<void> {
@@ -72,7 +84,40 @@ export class ProductDetailsComponent implements OnInit {
       text: text || null,
     };
 
-    console.log('Review submitted:', reviewData);
+    if (!this.user) {
+      alert('Usuário não autenticado.');
+      return;
+    }
+
+    const review: Review = {
+      user: this.user,
+      product: this.product,
+      text: reviewData.text || undefined,
+      rating: reviewData.rating,
+      date: new Date(),
+    };
+
+    this.reviewService.addReview(review, this.product.id)
+    .then((response) => {
+      if (response.status === 'success') { 
+        this.reviews.push(review);
+        this.reviewText = '';
+        this.userRating = 0;
+  
+        if (review.rating !== undefined) {
+          this.averageRating =
+            (this.averageRating * (this.reviews.length - 1) + review.rating) / this.reviews.length;
+        }
+      } else {
+        console.error('Failed to add review:', response.message || 'Unknown error');
+        alert('Failed to add review: ' + (response.message || 'Unknown error'));
+      }
+    })
+    .catch((error) => {
+      console.error('Error adding review:', error);
+      alert('An unexpected error occurred while adding the review.');
+    });
+  
   }
 
   async addToCart(): Promise<void> {

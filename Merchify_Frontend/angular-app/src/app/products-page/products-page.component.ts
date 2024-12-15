@@ -75,31 +75,39 @@ export class ProductsPageComponent implements OnInit {
 
 
   applyFilters(filters: any): void {
-    this.filters = filters;
-  
     console.log('Applying filters:', filters);
   
     this.filteredProducts = this.products.filter((product) => {
       console.log('Checking product:', product);
+  
       const matchesType = !filters.type || product.product_type === filters.type;
   
       const matchesPrice =
         (!filters.min_price || product.price >= filters.min_price) &&
         (!filters.max_price || product.price <= filters.max_price);
   
-      // Check genre, color, and size in specific_details
       const matchesGenre =
-        (!filters.genreVinyl || (this.isVinil(product) && product.specific_details?.genre === filters.genreVinyl)) &&
-        (!filters.genreCD || (this.isCD(product) && product.specific_details?.genre === filters.genreCD));
+        (!filters.genreVinyl ||
+          (product.product_type === 'Vinil' && product.specific_details?.genre === filters.genreVinyl)) &&
+        (!filters.genreCD ||
+          (product.product_type === 'CD' && product.specific_details?.genre === filters.genreCD));
   
       const matchesColor =
-        (!filters.colorClothing || (this.isClothing(product) && product.specific_details?.color === filters.colorClothing)) &&
-        (!filters.colorAccessory || (this.isAccessory(product) && product.specific_details?.color === filters.colorAccessory));
+        (!filters.colorClothing ||
+          (product.product_type === 'Clothing' && product.specific_details?.color === filters.colorClothing)) &&
+        (!filters.colorAccessory ||
+          (product.product_type === 'Accessory' && product.specific_details?.color === filters.colorAccessory));
   
       const matchesSize =
         !filters.size ||
-        (this.isAccessory(product) && product.specific_details?.size === filters.size) ||
-        (this.isClothing(product) && product.specific_details?.sizes?.some((size: any) => size === filters.size));
+        (product.product_type === 'Accessory' && product.specific_details?.size === filters.size) ||
+        (product.product_type === 'Clothing' &&
+          product.specific_details?.sizes?.some((size: any) => size === filters.size));
+
+        console.log(product.artist.id);
+        console.log(filters.artist);
+      const matchesArtist =
+        !filters.artist || product.artist.id.toString() === filters.artist; 
   
       // Log matching criteria for debugging
       console.log(`Product: ${product.name}`, {
@@ -108,29 +116,13 @@ export class ProductsPageComponent implements OnInit {
         matchesGenre,
         matchesColor,
         matchesSize,
+        matchesArtist,
       });
   
-      return matchesType && matchesPrice && matchesGenre && matchesColor && matchesSize;
+      return matchesType && matchesPrice && matchesGenre && matchesColor && matchesSize && matchesArtist;
     });
   
     console.log('Filtered products:', this.filteredProducts);
   }
-  
-  
 
-  private isVinil(product: Product): product is Vinil {
-    return product.product_type === 'Vinil';
-  }
-
-  private isCD(product: Product): product is CD {
-    return product.product_type === 'CD';
-  }
-
-  private isClothing(product: Product): product is Clothing {
-    return product.product_type === 'Clothing';
-  }
-
-  private isAccessory(product: Product): product is Accessory {
-    return product.product_type === 'Accessory';
-  }
 }

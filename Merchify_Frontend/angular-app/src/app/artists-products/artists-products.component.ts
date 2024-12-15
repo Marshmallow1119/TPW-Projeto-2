@@ -18,7 +18,7 @@ export class ArtistsProductsComponent implements OnInit {
   filteredProducts: any[] = []; 
   isAuthenticated: boolean = false; 
   user: any = { user_type: '' };
-
+  showArtistFilter: boolean = false;
   genres: string[] = [];
   colors: string[] = []; 
 
