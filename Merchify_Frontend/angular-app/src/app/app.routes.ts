@@ -13,6 +13,7 @@ import { AdminHomeComponent } from './admin-home/admin-home.component';
 import { FavoritesComponent } from './favorites/favorites.component';
 import { CartComponent } from './cart/cart.component';
 import { PaymentPageComponent } from './payment-page/payment-page.component';
+import { ProfileComponent } from './profile/profile.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent }, // Home Route
@@ -29,6 +30,7 @@ export const routes: Routes = [
   { path: 'favorites', component: FavoritesComponent }, 
   { path: 'manage_cart', component: CartComponent },
   { path: 'payment-page', component: PaymentPageComponent },
+  { path: 'profile', component: ProfileComponent },
  
 
   

@@ -131,6 +131,82 @@ def companhias(request):
 
     return Response(companies_data)
 
+
+@api_view(['GET', 'PUT'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def profile(request):
+    user = request.user
+
+    if request.method == 'GET':
+        user_serializer = UserSerializer(user)
+        purchases = Purchase.objects.filter(user=user)
+
+        purchase_serializer = PurchaseSerializer(purchases, many=True)
+
+        return Response({
+            'user': user_serializer.data,
+            'number_of_purchases': purchases.count(),
+            'purchases': purchase_serializer.data
+        })
+
+    elif request.method == 'PUT':
+        data = request.data
+
+        if 'delete_account' in data:
+            # Deleting user account
+            user.delete()
+            return Response({'message': 'Conta eliminada com sucesso.'}, status=status.HTTP_200_OK)
+
+        if 'submit_password' in data:
+            # Handling password change
+            old_password = data.get('old_password')
+            new_password = data.get('new_password')
+            confirm_new_password = data.get('confirm_new_password')
+
+            if not old_password or not new_password or not confirm_new_password:
+                raise ValidationError("Todos os campos de senha são obrigatórios.")
+            
+            if not user.check_password(old_password):
+                raise ValidationError("Senha antiga incorreta.")
+            
+            if new_password != confirm_new_password:
+                raise ValidationError("As novas senhas não coincidem.")
+            
+            try:
+                user.set_password(new_password)
+                user.save()
+                update_session_auth_hash(request, user)  # Atualizar a sessão para evitar logout
+                return Response({'message': 'Senha alterada com sucesso.'}, status=status.HTTP_200_OK)
+            except ValidationError as e:
+                raise ValidationError(e.messages)
+
+        # Atualizar informações do perfil
+        user.first_name = data.get('first_name', user.first_name)
+        user.last_name = data.get('last_name', user.last_name)
+        user.email = data.get('email', user.email)
+        user.username = data.get('username', user.username)
+        user.address = data.get('address', user.address)
+        phone = data.get('phone', user.phone)
+        user.country = data.get('country', user.country)
+
+        if phone and not re.fullmatch(r'\d{9}', phone):
+            raise ValidationError("O número de telefone deve conter exatamente 9 dígitos.")
+        user.phone = phone
+
+        if 'image' in request.FILES:
+            user.image = request.FILES['image']
+
+        user.save()
+
+        # Serialize updated data
+        updated_user_serializer = UserSerializer(user)
+
+        return Response({'message': 'Perfil atualizado com sucesso.', 'user': updated_user_serializer.data})
+
+    return Response({'error': 'Método não suportado.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
 @api_view(['GET'])
 def produtos(request):
     produtos = Product.objects.all()

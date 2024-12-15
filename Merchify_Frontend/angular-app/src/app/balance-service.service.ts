@@ -31,11 +31,6 @@ export class BalanceService {
           Authorization: `Bearer ${token}`,        },
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to fetch balance');
-      }
-
       return await response.json();
     } catch (error: any) {
       console.error('Error fetching balance:', error.message);

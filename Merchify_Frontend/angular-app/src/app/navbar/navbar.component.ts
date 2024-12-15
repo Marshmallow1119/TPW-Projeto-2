@@ -69,7 +69,6 @@ export class NavbarComponent implements OnInit {
       },
       (error) => {
         console.error('Failed to fetch balance:', error);
-        alert('Erro ao carregar o saldo. Por favor, tente novamente mais tarde.');
       }
     );
   }
