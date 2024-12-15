@@ -905,8 +905,8 @@ def apply_discount(request):
 
     return Response({"success": False, "message": "Código de desconto inválido."}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['G'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def process_payment(request):
     user = request.user
@@ -920,28 +920,22 @@ def process_payment(request):
 
         payment_method = request.data.get('payment_method')
         shipping_address = request.data.get('shipping_address')
-        discount_applied = request.data.get('discountApplied')
+        discount_applied = request.data.get('discountApplied', False)
 
         if not payment_method or not shipping_address:
-            return Response(
-                {"error": "Por favor, preencha todos os campos obrigatórios."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise ValidationError("Por favor, preencha todos os campos obrigatórios.")
 
         total = cart.total
-        discount_value = 0
-        if discount_applied:
-            discount_value = request.session.get('discount_value', 0)
-            total -= discount_value
-    
+        discount_value = request.session.get('discount_value', 0) if discount_applied else 0
+        total -= discount_value
 
-        shipping_cost = calculate_shipping_cost(cart)  # Replace with dynamic calculation if needed
+        shipping_cost = calculate_shipping_cost(cart)
         final_total = total + shipping_cost
 
         with transaction.atomic():
             purchase_data = {
                 "user": user.id,
-                "date": now(),
+                "date": now().date(),
                 "paymentMethod": payment_method,
                 "shippingAddress": shipping_address,
                 "total_amount": final_total,
@@ -949,22 +943,12 @@ def process_payment(request):
                 "discount_applied": discount_applied,
                 "discount_value": discount_value,
             }
+
             purchase_serializer = PurchaseSerializer(data=purchase_data)
-            if purchase_serializer.is_valid():
-                purchase = purchase_serializer.save()
-            else:
-                return Response(
-                    {"error": "Erro ao criar a compra.", "details": purchase_serializer.errors},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+            purchase_serializer.is_valid(raise_exception=True)
+            purchase = purchase_serializer.save()
 
             for item in cart_items:
-                if not update_stock(item):
-                    return Response(
-                        {"error": f"Estoque insuficiente para {item.product.name}."},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
                 purchase_product_data = {
                     "purchase": purchase.id,
                     "product": item.product.id,
@@ -972,13 +956,8 @@ def process_payment(request):
                     "total": item.quantity * item.product.price,
                 }
                 purchase_product_serializer = PurchaseProductSerializer(data=purchase_product_data)
-                if purchase_product_serializer.is_valid():
-                    purchase_product_serializer.save()
-                else:
-                    return Response(
-                        {"error": "Erro ao criar o item da compra.", "details": purchase_product_serializer.errors},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
+                purchase_product_serializer.is_valid(raise_exception=True)
+                purchase_product_serializer.save()
 
             cart_items.delete()
 
@@ -989,8 +968,11 @@ def process_payment(request):
 
     except Cart.DoesNotExist:
         return Response({"error": "Carrinho não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+    except ValidationError as e:
+        logger.error(f"Validation error: {e}")
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        print(f"Erro inesperado: {str(e)}")
+        logger.error(f"Erro inesperado: {str(e)}")
         return Response({"error": "Erro interno do servidor."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def calculate_shipping_cost(cart):
@@ -1004,17 +986,6 @@ def calculate_shipping_cost(cart):
             return 7.99
         else:
             return 0
-
-def update_stock(item):
-    product = item.product
-    stock_available = product.get_stock()
-    if stock_available is None or stock_available < item.quantity:
-        return False
-
-    product.reduce_stock(item.quantity)
-    product.save()
-    return True
-
 
 
 @api_view(['GET'])

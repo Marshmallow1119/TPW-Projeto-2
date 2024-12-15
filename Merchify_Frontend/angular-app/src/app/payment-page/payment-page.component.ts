@@ -95,7 +95,6 @@ export class PaymentPageComponent implements OnInit {
           total: item.total
         }));
   
-        // Atualiza o modelo do carrinho
         this.cart = {
           id: response.cart_id, // Ajuste se necessário
           user: this.user as User,
@@ -104,10 +103,6 @@ export class PaymentPageComponent implements OnInit {
           total: this.cartItems.reduce((sum, item) => sum + item.total, 0)
         };
   
-        console.log('Cart:', this.cart);
-        console.log('CartItems:', this.cartItems);
-  
-        // Calcula o total do carrinho
         this.calculateTotal();
       } else {
         console.error('Erro: Resposta do carrinho inválida.', response);
@@ -122,6 +117,7 @@ export class PaymentPageComponent implements OnInit {
       (sum, item) => sum + item.product.price * item.quantity,
       0
     );
+    this.calculateFinalTotal();
   }
 
   calculateFinalTotal() {
@@ -169,29 +165,28 @@ export class PaymentPageComponent implements OnInit {
 
   async submitPayment() {
     if (!this.paymentMethod || !this.shippingAddress) {
-        alert('Por favor, preencha todos os campos obrigatórios.');
-        return;
+      alert('Por favor, preencha todos os campos obrigatórios.');
+      return;
     }
-
+  
     const paymentData = {
-        payment_method: this.paymentMethod,
-        shipping_address: this.shippingAddress,
-        discountApplied: this.discountApplied,
+      payment_method: this.paymentMethod,
+      shipping_address: this.shippingAddress,
+      discountApplied: this.discountApplied,
     };
-
-    // Add loading indicator
+  
     const loader = document.getElementById('loading-indicator');
-    if (loader) loader.style.display = 'block';
-
-    const result = await this.paymentService.submitPayment(paymentData);
-
-    if (loader) loader.style.display = 'none'; 
-
-    if (result.success) {
-        alert(result.message);
-        this.router.navigate(['/']);
-    } else {
-        alert(result.message || 'Erro ao processar o pagamento.');
+    if (loader) loader.style.display = 'block'; // Show the loader
+  
+    try {
+      const result = await this.paymentService.submitPayment(paymentData);
+      this.router.navigate(['/']); 
+    } catch (error: any) {
+      alert('Erro inesperado: não foi possível processar o pagamento.');
+      console.error('Erro inesperado:', error);
+    } finally {
+      if (loader) loader.style.display = 'none'; 
     }
-}
+  }
+  
 }
