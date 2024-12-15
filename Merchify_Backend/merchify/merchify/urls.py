@@ -81,6 +81,7 @@ urlpatterns = [
     path('ws/chat/', views.get_chat, name='get_chat'),
     path('ws/user/', views.get_user_info, name='get_user'),
     path('ws/company/', views.add_company, name='get_company'),
+    path('ws/balance/', views.balance, name='balance'),
 ]   
 
 

@@ -95,7 +95,6 @@ export class PaymentPageComponent implements OnInit {
           total: item.total
         }));
   
-        // Atualiza o modelo do carrinho
         this.cart = {
           id: response.cart_id, // Ajuste se necessário
           user: this.user as User,
@@ -104,10 +103,6 @@ export class PaymentPageComponent implements OnInit {
           total: this.cartItems.reduce((sum, item) => sum + item.total, 0)
         };
   
-        console.log('Cart:', this.cart);
-        console.log('CartItems:', this.cartItems);
-  
-        // Calcula o total do carrinho
         this.calculateTotal();
       } else {
         console.error('Erro: Resposta do carrinho inválida.', response);
@@ -122,6 +117,7 @@ export class PaymentPageComponent implements OnInit {
       (sum, item) => sum + item.product.price * item.quantity,
       0
     );
+    this.calculateFinalTotal();
   }
 
   calculateFinalTotal() {
@@ -133,10 +129,7 @@ export class PaymentPageComponent implements OnInit {
       alert('Por favor, insira um código de desconto.');
       return;
     }
-    console.log("Passo1")
-
     const result = await this.paymentService.applyDiscount(this.discountCode);
-    console.log("Passo3")
 
     if (result.success) {
       this.discountApplied = true;
@@ -149,9 +142,13 @@ export class PaymentPageComponent implements OnInit {
   }
 
   async removeCartItem(itemId: number) {
+    
+    console.log('Cart Item ID being passed:', itemId);
     try {
       await this.cartService.removeCartItem(this.user?.id || 0, itemId);
-      this.cartItems = this.cartItems.filter((item) => item.product.id !== itemId);
+      this.cartItems = this.cartItems.filter((item) => item.cartItemId !== itemId);
+      await this.loadCart(this.user?.id || 0); // Reload the cart
+      console.log('Cart reloaded:', this.cartItems);
       this.calculateTotal();
       this.calculateFinalTotal();
     } catch (error) {
@@ -171,20 +168,30 @@ export class PaymentPageComponent implements OnInit {
       alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
-
+  
     const paymentData = {
       payment_method: this.paymentMethod,
       shipping_address: this.shippingAddress,
-      discount_code: this.discountCode || undefined,
+      discountApplied: this.discountApplied,
     };
-
-    const result = await this.paymentService.submitPayment(paymentData);
-
-    if (result.success) {
+  
+    const loader = document.getElementById('loading-indicator');
+    if (loader) loader.style.display = 'block'; // Show the loader
+  
+    try {
+      const result = await this.paymentService.submitPayment(paymentData);
       alert('Pagamento processado com sucesso!');
-      this.router.navigate(['/thank-you']); // Redirect to thank-you page
-    } else {
-      alert(result.message || 'Erro ao processar o pagamento.');
+      //atualizar o balance utilizando o serviço de balanceService
+      console.log('Novo saldo:', result.new_balance);
+      this.authService.updateUserBalance(result.new_balance);
+
+      this.router.navigate(['/']); 
+    } catch (error: any) {
+      alert('Erro inesperado: não foi possível processar o pagamento.');
+      console.error('Erro inesperado:', error);
+    } finally {
+      if (loader) loader.style.display = 'none'; 
     }
   }
+  
 }

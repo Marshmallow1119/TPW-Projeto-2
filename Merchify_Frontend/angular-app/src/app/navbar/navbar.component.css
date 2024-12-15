@@ -90,3 +90,21 @@
       }
     }
     }
+
+
+    .modal-body p {
+      font-size: 1.1em;
+    }
+    
+    .list-group-item {
+      cursor: pointer;
+    }
+    
+    .list-group-item i {
+      margin-right: 10px;
+    }
+    
+    .list-group-item:hover {
+      background-color: #f8f9fa;
+    }
+    

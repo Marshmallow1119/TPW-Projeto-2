@@ -2,7 +2,7 @@
     <!-- Product Header -->
     <div class="row product-container">
       <div class="col-md-6 d-flex justify-content-center">
-        <img [src]="product.image" [alt]="product.name" class="product-img" />
+        <img [src]="product.image_url" [alt]="product.name" class="product-img" />
       </div>
   
       <div class="col-md-6">
@@ -19,33 +19,33 @@
         <table class="table table-bordered">
           <tbody>
             <tr><th>Categoria</th><td>{{ product.category }}</td></tr>
-            <tr><th>Artista</th><td>{{ product.artist?.name }}</td></tr>
-            <tr><th>Empresa</th><td>{{ product.company?.name }}</td></tr>
+            <tr><th>Artista</th><td>{{ product.artist }}</td></tr>
+            <tr><th>Empresa</th><td>{{ product.company }}</td></tr>
             <tr><th>Data de Adição</th><td>{{ product.addedProduct | date }}</td></tr>
   
             <!-- Specific details for product types -->
             <ng-container *ngIf="product.product_type === 'Vinil'">
-              <tr><th>Gênero</th><td>{{ product.vinil.genre }}</td></tr>
-              <tr><th>Tamanho do LP</th><td>{{ product.vinil.lpSize }}</td></tr>
-              <tr><th>Data de Lançamento</th><td>{{ product.vinil.releaseDate | date }}</td></tr>
-              <tr><th>Stock</th><td>{{ product.vinil.stock }}</td></tr>
+              <tr><th>Gênero</th><td>{{ product.specific_details.genre }}</td></tr>
+              <tr><th>Tamanho do LP</th><td>{{ product.specific_details.lpSize }}</td></tr>
+              <tr><th>Data de Lançamento</th><td>{{ product.addedProduct | date }}</td></tr>
+              <tr><th>Stock</th><td>{{ product.stock }}</td></tr>
             </ng-container>
   
             <ng-container *ngIf="product.product_type === 'CD'">
-              <tr><th>Gênero</th><td>{{ product.cd.genre }}</td></tr>
-              <tr><th>Data de Lançamento</th><td>{{ product.cd.releaseDate | date }}</td></tr>
-              <tr><th>Stock</th><td>{{ product.cd.stock }}</td></tr>
+              <tr><th>Gênero</th><td>{{ product.specific_details.genre }}</td></tr>
+              <tr><th>Data de Lançamento</th><td>{{ product.addedProduct | date}}</td></tr>
+              <tr><th>Stock</th><td>{{ product.stock }}</td></tr>
             </ng-container>
   
             <ng-container *ngIf="product.product_type === 'Clothing'">
-              <tr><th>Cor</th><td>{{ product.clothing.color }}</td></tr>
+              <tr><th>Cor</th><td>{{ product.specific_details.color }}</td></tr>
             </ng-container>
   
             <ng-container *ngIf="product.product_type === 'Accessory'">
-              <tr><th>Material</th><td>{{ product.accessory.material }}</td></tr>
-              <tr><th>Cor</th><td>{{ product.accessory.color }}</td></tr>
-              <tr><th>Tamanho</th><td>{{ product.accessory.size }}</td></tr>
-              <tr><th>Stock</th><td>{{ product.accessory.stock }}</td></tr>
+              <tr><th>Material</th><td>{{ product.specific_details.material }}</td></tr>
+              <tr><th>Cor</th><td>{{ product.specific_details.color }}</td></tr>
+              <tr><th>Tamanho</th><td>{{ product.specific_details.size }}</td></tr>
+              <tr><th>Stock</th><td>{{ product.specific_details.stock }}</td></tr>
             </ng-container>
           </tbody>
         </table>
@@ -61,8 +61,7 @@
               (click)="selectSize(size.id)"
               class="btn btn-dark m-1"
             >
-              {{ size.size }} - {{ size.stock }} Unidades Disponíveis
-            </button>
+            {{ size.size }} - {{ size.stock }} Unidades Disponíveis            </button>
           </div>
         </div>
   

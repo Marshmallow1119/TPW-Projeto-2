@@ -1,3 +1,4 @@
+from decimal import Decimal
 import json
 import logging
 import re
@@ -22,6 +23,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 import jwt
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.utils.timezone import now
+
 
 # Django Forms and Validation
 from .forms import (
@@ -43,7 +46,7 @@ from rest_framework import status
 from rest_framework.decorators import (
     api_view, authentication_classes, permission_classes
 )
-from app.serializers import CartItemSerializer, ChatSerializer, FavoriteArtistSerializer, FavoriteCompanySerializer, FavoriteSerializer, LoginSerializer, PurchaseSerializer, RegisterSerializer, ReviewSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
+from app.serializers import BalanceSerializer, CartItemSerializer, ChatSerializer, FavoriteArtistSerializer, FavoriteCompanySerializer, FavoriteSerializer, LoginSerializer, PurchaseProductSerializer, PurchaseSerializer, RegisterSerializer, ReviewSerializer, ReviewSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
 
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -69,6 +72,47 @@ def home(request):
     except Exception as e:
         logger.error(f"Error in home view: {e}")
         return Response({'error': str(e)}, status=500)
+
+@api_view(['GET', 'POST', 'PUT'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def balance(request):
+    user = request.user
+    print(user)
+
+    if request.method == 'GET':
+        return Response({'user': user.username, 'balance': str(user.balance)})
+
+    elif request.method in ['POST', 'PUT']:
+        print(request.data)
+        serializer = BalanceSerializer(data=request.data)
+        if serializer.is_valid():
+            amount = serializer.validated_data['amount']
+
+            if request.method == 'POST':
+                user.balance += Decimal(amount)
+                user.save()
+                return Response({
+                    'message': 'Balance added successfully!',
+                    'user': user.username,
+                    'new_balance': str(user.balance)
+                })
+
+            elif request.method == 'PUT':
+                if user.balance < Decimal(amount):
+                    return Response({'error': 'Insufficient balance.'}, status=status.HTTP_400_BAD_REQUEST)
+
+                user.balance -= Decimal(amount)
+                user.save()
+                return Response({
+                    'message': 'Balance deducted successfully!',
+                    'user': user.username,
+                    'new_balance': str(user.balance)
+                })
+
+        return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({'error': 'Invalid request method.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 @api_view(['GET'])
 def companhias(request):
@@ -207,70 +251,22 @@ def productDetails(request, identifier):
         product.save()
         company_data = CompanySerializer(product.company).data if product.company else None
 
-        product_data = {
-            'id': product.id,
-            'name': product.name,
-            'description': product.description,
-            'price': product.price,
-            'image': product.image.url if product.image else None,
-            'artist': {'name': product.artist.name} if product.artist else None,
-            'company': company_data,
-            'category': product.category,
-            'addedProduct': product.addedProduct.strftime('%Y-%m-%d') if product.addedProduct else None,
-            'count': product.count,
-            'average_rating': product.get_average_rating(),
-            'product_type': product.get_product_type(),
-            'stock': product.get_stock(),
-        }
+        product_serializer = ProductSerializer(product, context={'request': request})
+        
+        reviews = product.reviews.all()
+        review_serializer = ReviewSerializer(reviews, many=True)
 
-        if hasattr(product, 'clothing'):
-            product_data['sizes'] = [
-                {'id': size.id, 'size': size.size, 'stock': size.stock}
-                for size in product.clothing.sizes.all()
-            ]
+        product_data = product_serializer.data
+        product_data['reviews'] = review_serializer.data
 
-        if hasattr(product, 'vinil'):
-            product_data['vinil'] = {
-                'genre': product.vinil.genre,
-                'lpSize': product.vinil.lpSize,
-                'releaseDate': product.vinil.releaseDate.strftime('%Y-%m-%d') if product.vinil.releaseDate else None,
-                'stock': product.vinil.stock,
-            }
+        return Response(product_data)
 
-        if hasattr(product, 'cd'):
-            product_data['cd'] = {
-                'genre': product.cd.genre,
-                'releaseDate': product.cd.releaseDate.strftime('%Y-%m-%d') if product.cd.releaseDate else None,
-                'stock': product.cd.stock,
-            }
-
-        if hasattr(product, 'accessory'):
-            product_data['accessory'] = {
-                'material': product.accessory.material,
-                'color': product.accessory.color,
-                'size': product.accessory.size,
-                'stock': product.accessory.stock,
-            }
-
-        product_data['reviews'] = [
-            {
-                'user': {'username': review.user.username},
-                'rating': review.rating,
-                'text': review.text,
-                'date': review.date.strftime('%Y-%m-%d') if review.date else None,
-            }
-            for review in product.reviews.all()
-        ]
-
-        return JsonResponse(product_data, safe=False)
     elif request.method == 'DELETE':
         if not (request.user.user_type == 'admin' or request.user.user_type == 'company'):
-            print("User is not admin or company")
             raise PermissionDenied
         product = get_object_or_404(Product, id=identifier)
         product.delete()
-        return JsonResponse({'message': 'Produto excluído com sucesso!'})
-
+        return Response({'message': 'Produto excluído com sucesso!'})
 
 
 
@@ -456,14 +452,11 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
     - DELETE: Remove an item from the cart.
     """
 
-    # Check if user_id matches the authenticated user
     if not user_id or user_id != request.user.id:
         return Response({"error": "Acesso não autorizado."}, status=status.HTTP_403_FORBIDDEN)
 
-    # Ensure the user has a cart, create if not exists
     cart, created = Cart.objects.get_or_create(user=request.user)
 
-    # GET: Retrieve cart items
     if request.method == 'GET':
         try:
             cart_items = CartItem.objects.filter(cart=cart)
@@ -472,7 +465,6 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    # POST: Add an item to the cart
     elif request.method == 'POST':
         if product_id:
             try:
@@ -489,7 +481,6 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
                 else:
                     stock_available = product.get_stock()
     
-                # Fetch or create cart item
                 cart_item, item_created = CartItem.objects.get_or_create(
                     cart=cart,
                     product=product,
@@ -596,10 +587,9 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
     elif request.method == 'DELETE':
         if item_id:
             try:
-                cart_item = get_object_or_404(CartItem, id=item_id)
+                cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
                 product = cart_item.product
     
-                # Verifica o tipo de produto e ajusta o estoque
                 if product.get_product_type() == 'Clothing' and cart_item.size:
                     cart_item.size.stock += cart_item.quantity
                     cart_item.size.save()
@@ -615,7 +605,6 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
                 else:
                     raise ValueError("Tipo de produto desconhecido ou inválido.")
     
-                # Remove o item do carrinho
                 cart_item.delete()
     
                 return Response({"message": "Item removido com sucesso!"}, status=status.HTTP_200_OK)
@@ -625,7 +614,6 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
     
         return Response({"error": "Parâmetro item_id é obrigatório para remover itens."}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Unsupported method
     return Response({"error": "Método não permitido."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 @api_view(['GET', 'DELETE', 'PUT'])
@@ -922,7 +910,7 @@ def apply_discount(request):
     return Response({"success": False, "message": "Código de desconto inválido."}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def process_payment(request):
     user = request.user
@@ -934,38 +922,36 @@ def process_payment(request):
         if not cart_items.exists():
             return Response({"error": "O carrinho está vazio."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Extract payment data
         payment_method = request.data.get('payment_method')
         shipping_address = request.data.get('shipping_address')
-        discount_code = request.data.get('discount_code')
+        discount_applied = request.data.get('discountApplied', False)
 
         if not payment_method or not shipping_address:
-            return Response({"error": "Por favor, preencha todos os campos obrigatórios."}, status=status.HTTP_400_BAD_REQUEST)
+            raise ValidationError("Por favor, preencha todos os campos obrigatórios.")
 
         total = cart.total
-        discount_value = 0
-        discount_applied = False
+        discount_value = request.session.get('discount_value', 0) if discount_applied else 0
+        total -= discount_value
 
-        # Apply discount logic
-        if discount_code and discount_code.lower() == 'primeiracompra':
-            if not Purchase.objects.filter(user=user).exists():
-                discount_value = total * 0.10
-                total -= discount_value
-                discount_applied = True
-            else:
-                return Response(
-                    {"error": "O código de desconto só é válido para a primeira compra."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-        shipping_cost = 5.0  # Assume a flat shipping cost; adjust as needed
+        shipping_cost = calculate_shipping_cost(cart)
         final_total = total + shipping_cost
 
+
         with transaction.atomic():
-            # Create Purchase
+
+            print("User balance before purchase:", user.balance)
+            print("Final total:", final_total)
+
+            user.balance -= Decimal(final_total)
+            user.number_of_purchases += 1
+            user.save()
+
+            print("User balance after purchase:", user.balance)
+
+
             purchase_data = {
                 "user": user.id,
-                "date": now(),
+                "date": now().date(),
                 "paymentMethod": payment_method,
                 "shippingAddress": shipping_address,
                 "total_amount": final_total,
@@ -973,77 +959,49 @@ def process_payment(request):
                 "discount_applied": discount_applied,
                 "discount_value": discount_value,
             }
+
             purchase_serializer = PurchaseSerializer(data=purchase_data)
-            if purchase_serializer.is_valid():
-                purchase = purchase_serializer.save()
-            else:
-                return Response(
-                    {"error": "Erro ao criar a compra.", "details": purchase_serializer.errors},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+            purchase_serializer.is_valid(raise_exception=True)
+            purchase = purchase_serializer.save()
 
-            # Deduct stock and create PurchaseProduct
             for item in cart_items:
-                product = item.product
-                product_type = product.get_product_type()
-                stock_available = product.get_stock()
-
-                if stock_available is not None and stock_available >= item.quantity:
-                    if product_type == 'Vinil':
-                        product.vinil.stock -= item.quantity
-                        product.vinil.save()
-
-                    elif product_type == 'CD':
-                        product.cd.stock -= item.quantity
-                        product.cd.save()
-
-                    elif product_type == 'Accessory':
-                        product.accessory.stock -= item.quantity
-                        product.accessory.save()
-
-                    elif product_type == 'Clothing' and item.size:
-                        size = item.size
-                        size.stock -= item.quantity
-                        size.save()
-                else:
-                    return Response(
-                        {"error": f"Estoque insuficiente para {product.name}. Disponível: {stock_available}"},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
                 purchase_product_data = {
                     "purchase": purchase.id,
-                    "product": product.id,
+                    "product": item.product.id,
                     "quantity": item.quantity,
-                    "total": item.quantity * product.price,
+                    "total": item.quantity * item.product.price,
                 }
                 purchase_product_serializer = PurchaseProductSerializer(data=purchase_product_data)
-                if purchase_product_serializer.is_valid():
-                    purchase_product_serializer.save()
-                else:
-                    return Response(
-                        {
-                            "error": "Erro ao criar o item da compra.",
-                            "details": purchase_product_serializer.errors,
-                        },
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
+                purchase_product_serializer.is_valid(raise_exception=True)
+                purchase_product_serializer.save()
 
-            # Clear cart
             cart_items.delete()
 
         return Response(
-            {"message": "Pagamento processado com sucesso!", "purchase": purchase_serializer.data},
+            {"message": "Pagamento processado com sucesso!", "purchase": purchase_serializer.data, "new_balance": user.balance},
             status=status.HTTP_201_CREATED,
         )
 
     except Cart.DoesNotExist:
         return Response({"error": "Carrinho não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+    except ValidationError as e:
+        logger.error(f"Validation error: {e}")
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        # Log the error for debugging
-        print(f"Erro inesperado: {str(e)}")
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.error(f"Erro inesperado: {str(e)}")
+        return Response({"error": "Erro interno do servidor."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+def calculate_shipping_cost(cart):
+    if cart.user.country == 'Portugal':
+        if cart.total < 100:
+            return 5
+        else:
+            return 0
+    else:
+        if cart.total < 100:
+            return 7.99
+        else:
+            return 0
 
 
 @api_view(['GET'])
@@ -1097,7 +1055,7 @@ def company_products(request, company_id):
         'products': products_data,
     }
 
-    print(f"Returning response: {response}")  # Debugging: Log the response
+    print(f"Returning response: {response}") 
     return Response(response)
 
 
@@ -1106,12 +1064,11 @@ def company_product_detail(request, company_id, product_id):
     company = get_object_or_404(Company, id=company_id)
     product = get_object_or_404(Product, id=product_id, company=company)
 
-    # Contar favoritos e obter reviews
     product.favorites_count = product.favorites.count()
     reviews = product.reviews.all()
 
 
-    if hasattr(product, 'clothing'):  # Check if it's a clothing product (with sizes)
+    if hasattr(product, 'clothing'):  
         sizes = product.clothing.sizes.all()
         product.size_stock = {
             'XS': sizes.filter(size='XS').first().stock if sizes.filter(size='XS').exists() else 0,

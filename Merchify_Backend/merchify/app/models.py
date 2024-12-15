@@ -45,6 +45,8 @@ class User(AbstractUser):
     image = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     company = models.ForeignKey(Company, on_delete=models.SET_NULL, blank=True, null=True)
     banned = models.BooleanField(default=False)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  
+
 
     def __str__(self):
         return self.username

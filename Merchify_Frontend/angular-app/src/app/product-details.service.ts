@@ -1,7 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Router } from '@angular/router';
-import { base64toBlob } from './utils';
 import { CONFIG } from './config';
 
 @Injectable({
@@ -10,16 +7,27 @@ import { CONFIG } from './config';
 export class ProductDetailsService {
   private baseUrl: string = CONFIG.baseUrl;
 
-   constructor(private router:Router) { }
+  constructor() {}
 
-  async getProductDetails(productId: number): Promise<Observable<any>> {
+  async getProductDetails(productId: number): Promise<any> {
     const url = `${this.baseUrl}/product/${productId}/`;
-    const data: Response = await fetch(url);
-    const product: any = await data.json() ?? [];
-    if (product.image) {
-      product.image = `http://localhost:8000${product.image}`;
+
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch product details: ${response.statusText}`);
+      }
+
+      const product = await response.json();
+      if (product.image) {
+        product.image = `${this.baseUrl}${product.image}`;
+      }
+
+      return product;
+    } catch (error) {
+      console.error('Error fetching product details:', error);
+      throw new Error('Unable to load product details. Please try again later.');
     }
-    return product;
   }
-  
 }

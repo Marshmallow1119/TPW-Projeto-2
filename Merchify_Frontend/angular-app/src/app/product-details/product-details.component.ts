@@ -50,17 +50,47 @@ export class ProductDetailsComponent implements OnInit {
     this.authService.user$.subscribe((user) => {
       this.user = user;
     });
-
-    console.log('Product details component initialized:', this.product);
+    this.loadProductDetails(productId);
   }
 
   private async loadProductDetails(productId: number): Promise<void> {
     this.loading = true;
+    this.errorMessage = '';
     try {
-      this.product = await this.productDetailsService.getProductDetails(productId);
-      this.sizes = this.product.sizes || [];
-      this.averageRating = this.product.average_rating || 0;
-      console.log('Product details loaded:', this.product);
+      const response = await this.productDetailsService.getProductDetails(productId);
+  
+      console.log('Raw Product details:', response);
+  
+      // Map the response to the `Product` interface
+      this.product = {
+        id: response.id,
+        name: response.name,
+        description: response.description || 'Descrição não disponível.',
+        price: response.price,
+        image_url: response.image_url,
+        artist: response.artist.name, // If `artist` is just an ID, handle accordingly
+        company: response.company.name, // If `company` is just an ID, handle accordingly
+        category: response.category,
+        addedProduct: new Date(response.addedProduct), // Convert to Date object
+        count: response.count,
+        average_rating: response.average_rating || 0,
+        product_type: response.product_type,
+        stock: response.stock || 0,
+        specific_details: response.specific_details || null,
+      };
+  
+      if (this.product.product_type === 'Clothing') {
+        this.sizes = this.product.specific_details.sizes || [];
+      } else {
+        this.sizes = [];
+      }
+
+  
+      console.log('Processed Product:', this.product);
+      console.log('stock:', this.product.stock);
+      console.log('product_type:', this.product.product_type);
+
+      console.log('Sizes:', this.sizes);
     } catch (error) {
       console.error('Error loading product details:', error);
       this.errorMessage = 'Erro ao carregar os detalhes do produto. Tente novamente mais tarde.';
@@ -68,6 +98,7 @@ export class ProductDetailsComponent implements OnInit {
       this.loading = false;
     }
   }
+  
 
   selectSize(sizeId: number): void {
     this.selectedSize = sizeId;
