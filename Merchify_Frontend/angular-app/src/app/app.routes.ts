@@ -34,8 +34,6 @@ export const routes: Routes = [
   { path: 'manage_cart', component: CartComponent },
   { path: 'payment-page', component: PaymentPageComponent },
   { path: 'chat/:id', component: ChatComponent },
-  { path: 'admin/add/company', component: AddCompanyComponent },
-
   { path: 'my-company-products/:company_id', component: MyCompanyProductsComponent },
   { path: 'companies/:company_id/products/:product_id/edit', component: EditProductComponent },
 
