@@ -1454,7 +1454,7 @@ def add_company(request):
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-def get_chats(request):
+def get_chat(request):
     if request.user.user_type == 'individual':
         chats = Chat.objects.filter(user=request.user)
     elif request.user.user_type == 'company':
