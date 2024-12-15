@@ -456,14 +456,11 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
     - DELETE: Remove an item from the cart.
     """
 
-    # Check if user_id matches the authenticated user
     if not user_id or user_id != request.user.id:
         return Response({"error": "Acesso não autorizado."}, status=status.HTTP_403_FORBIDDEN)
 
-    # Ensure the user has a cart, create if not exists
     cart, created = Cart.objects.get_or_create(user=request.user)
 
-    # GET: Retrieve cart items
     if request.method == 'GET':
         try:
             cart_items = CartItem.objects.filter(cart=cart)
@@ -472,7 +469,6 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    # POST: Add an item to the cart
     elif request.method == 'POST':
         if product_id:
             try:
@@ -489,7 +485,6 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
                 else:
                     stock_available = product.get_stock()
     
-                # Fetch or create cart item
                 cart_item, item_created = CartItem.objects.get_or_create(
                     cart=cart,
                     product=product,
@@ -623,7 +618,6 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
     
         return Response({"error": "Parâmetro item_id é obrigatório para remover itens."}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Unsupported method
     return Response({"error": "Método não permitido."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 @api_view(['GET', 'DELETE'])
@@ -918,14 +912,12 @@ def process_payment(request):
     user = request.user
 
     try:
-        # Validate cart existence
         cart = Cart.objects.get(user=user)
         cart_items = CartItem.objects.filter(cart=cart)
 
         if not cart_items.exists():
             return Response({"error": "O carrinho está vazio."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Extract payment data
         payment_method = request.data.get('payment_method')
         shipping_address = request.data.get('shipping_address')
         discount_applied = request.data.get('discountApplied')
@@ -966,7 +958,6 @@ def process_payment(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            # Deduct stock and create PurchaseProduct
             for item in cart_items:
                 if not update_stock(item):
                     return Response(
@@ -989,7 +980,6 @@ def process_payment(request):
                         status=status.HTTP_400_BAD_REQUEST,
                     )
 
-            # Clear cart
             cart_items.delete()
 
         return Response(
@@ -1015,7 +1005,6 @@ def calculate_shipping_cost(cart):
         else:
             return 0
 
-# Utility to update stock
 def update_stock(item):
     product = item.product
     stock_available = product.get_stock()
@@ -1078,7 +1067,7 @@ def company_products(request, company_id):
         'products': products_data,
     }
 
-    print(f"Returning response: {response}")  # Debugging: Log the response
+    print(f"Returning response: {response}") 
     return Response(response)
 
 
@@ -1087,12 +1076,11 @@ def company_product_detail(request, company_id, product_id):
     company = get_object_or_404(Company, id=company_id)
     product = get_object_or_404(Product, id=product_id, company=company)
 
-    # Contar favoritos e obter reviews
     product.favorites_count = product.favorites.count()
     reviews = product.reviews.all()
 
 
-    if hasattr(product, 'clothing'):  # Check if it's a clothing product (with sizes)
+    if hasattr(product, 'clothing'):  
         sizes = product.clothing.sizes.all()
         product.size_stock = {
             'XS': sizes.filter(size='XS').first().stock if sizes.filter(size='XS').exists() else 0,
