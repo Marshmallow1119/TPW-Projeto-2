@@ -440,45 +440,36 @@ def add_to_cart(request, product_id):
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
+
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def manage_cart(request, user_id=None, product_id=None, item_id=None):
     """
-    View Geral para Gerenciamento de Carrinho:
-    - GET: Obter todos os itens do carrinho do usuário
-    - POST: Adicionar item ao carrinho
-    - PUT: Atualizar quantidade de um item no carrinho
-    - DELETE: Remover um item do carrinho
+    View for managing the shopping cart:
+    - GET: Retrieve all cart items for the user.
+    - POST: Add an item to the cart.
+    - PUT: Update the quantity of an item in the cart.
+    - DELETE: Remove an item from the cart.
     """
 
-    """
-    quero verificar se o user nao tiver carrinho quero criar um para ele
-
-    """
-
+    # Check if user_id matches the authenticated user
     if not user_id or user_id != request.user.id:
         return Response({"error": "Acesso não autorizado."}, status=status.HTTP_403_FORBIDDEN)
 
-    """
-    quero verificar se o user nao tiver carrinho quero criar um para ele
-    """
-    if not Cart.objects.filter(user=request.user).exists():
-        Cart.objects.create(user=request.user)
+    # Ensure the user has a cart, create if not exists
+    cart, created = Cart.objects.get_or_create(user=request.user)
 
-
-
+    # GET: Retrieve cart items
     if request.method == 'GET':
         try:
-            cart = Cart.objects.get(user=request.user)
             cart_items = CartItem.objects.filter(cart=cart)
-            print(cart_items)
             serializer = CartItemSerializer(cart_items, many=True)
-            print(serializer.data)
             return Response({"cart_items": serializer.data}, status=status.HTTP_200_OK)
-        except Cart.DoesNotExist:
-            return Response({"error": "Carrinho não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+    # POST: Add an item to the cart
     elif request.method == 'POST':
         if product_id:
             try:
@@ -486,39 +477,110 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
                 quantity = int(data.get("quantity", 1))
                 size_id = data.get("size")
                 product = get_object_or_404(Product, id=product_id)
-
+    
+                stock_available = None
                 size = None
                 if product.get_product_type() == 'Clothing' and size_id:
                     size = get_object_or_404(Size, id=size_id)
-
-                cart, created = Cart.objects.get_or_create(user_id=user_id)
+                    stock_available = size.stock
+                else:
+                    stock_available = product.get_stock()
+    
+                # Fetch or create cart item
                 cart_item, item_created = CartItem.objects.get_or_create(
                     cart=cart,
                     product=product,
-                    size=size,
+                    size=size if product.get_product_type() == 'Clothing' else None,
                     defaults={"quantity": quantity}
                 )
-
+    
+                combined_quantity = quantity if item_created else cart_item.quantity + quantity
+    
+                if stock_available is not None and combined_quantity > stock_available:
+                    return Response(
+                        {
+                            "error": f"Quantidade total excede o estoque. Disponível: {stock_available}, quantidade solicitada: {quantity}"
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                
+    
                 if not item_created:
-                    cart_item.quantity += quantity
+                    cart_item.quantity = combined_quantity
                     cart_item.save()
 
-                
+                if product.get_product_type() == 'Vinil':
+                    product.vinil.stock -= quantity
+                    product.vinil.stock = max(0, product.vinil.stock)
+                    product.vinil.save()
+                elif product.get_product_type() == 'CD':
+                    product.cd.stock -= quantity
+                    product.cd.stock = max(0, product.cd.stock)
+                    product.cd.save()
+                elif product.get_product_type() == 'Clothing':
+                    size.stock -= quantity
+                    size.stock = max(0, size.stock)
+                    size.save()
+                elif product.get_product_type() == 'Accessory':
+                    product.accessory.stock -= quantity
+                    product.accessory.stock = max(0, product.accessory.stock)
+                    product.accessory.save
+    
                 return Response({"message": "Produto adicionado ao carrinho!"}, status=status.HTTP_201_CREATED)
-
+    
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+    
         return Response({"error": "Parâmetro product_id é obrigatório para adicionar itens."}, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'PUT':
         if item_id:
             try:
                 data = json.loads(request.body)
+                print(data)
                 quantity = int(data.get("quantity", 1))
+                print(quantity)
                 cart_item = get_object_or_404(CartItem, id=item_id)
+                product = cart_item.product
 
-                cart_item.quantity = max(1, quantity)
+                stock_available = None
+                if cart_item.product.get_product_type() == 'Clothing' and cart_item.size:
+                    stock_available = cart_item.size.stock + cart_item.quantity
+
+                    if quantity > stock_available:
+                        return Response(
+                            {"error": f"Estoque insuficiente. Disponível: {stock_available}"},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+
+                    cart_item.size.stock = stock_available - quantity
+                    if product.get_product_type() == 'Clothing' and cart_item.size:
+                        cart_item.size.stock = cart_item.product.stock
+                        cart_item.size.save()
+                    cart_item.size.save()
+
+                else:
+                    stock_available = cart_item.product.get_stock() + cart_item.quantity
+
+                    if quantity > stock_available:
+                        return Response(
+                            {"error": f"Estoque insuficiente. Disponível: {stock_available}"},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+
+                    cart_item.product.stock = stock_available - quantity
+                    if product.get_product_type() == 'Vinil':
+                        product.vinil.stock = cart_item.product.stock
+                        product.vinil.save()
+                    elif product.get_product_type() == 'CD':
+                        product.cd.stock = cart_item.product.stock
+                        product.cd.save()
+                    elif product.get_product_type() == 'Accessory':
+                        product.accessory.stock = cart_item.product.stock
+                        product.accessory.save()
+                    cart_item.product.save()
+
+                cart_item.quantity = max(1, quantity) 
                 cart_item.save()
 
                 return Response({"message": "Quantidade atualizada com sucesso!"}, status=status.HTTP_200_OK)
@@ -532,15 +594,35 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
         if item_id:
             try:
                 cart_item = get_object_or_404(CartItem, id=item_id)
+                product = cart_item.product
+    
+                # Verifica o tipo de produto e ajusta o estoque
+                if product.get_product_type() == 'Clothing' and cart_item.size:
+                    cart_item.size.stock += cart_item.quantity
+                    cart_item.size.save()
+                elif product.get_product_type() == 'Vinil':
+                    product.vinil.stock += cart_item.quantity
+                    product.vinil.save()
+                elif product.get_product_type() == 'CD':
+                    product.cd.stock += cart_item.quantity
+                    product.cd.save()
+                elif product.get_product_type() == 'Accessory':
+                    product.accessory.stock += cart_item.quantity
+                    product.accessory.save()
+                else:
+                    raise ValueError("Tipo de produto desconhecido ou inválido.")
+    
+                # Remove o item do carrinho
                 cart_item.delete()
-
+    
                 return Response({"message": "Item removido com sucesso!"}, status=status.HTTP_200_OK)
-
+    
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+    
         return Response({"error": "Parâmetro item_id é obrigatório para remover itens."}, status=status.HTTP_400_BAD_REQUEST)
 
+    # Unsupported method
     return Response({"error": "Método não permitido."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 @api_view(['GET', 'DELETE'])

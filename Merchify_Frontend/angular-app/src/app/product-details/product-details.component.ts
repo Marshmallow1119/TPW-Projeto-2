@@ -15,7 +15,7 @@ import { User } from '../models/user';
   styleUrls: ['./product-details.component.css'],
 })
 export class ProductDetailsComponent implements OnInit {
-  product: any;
+  product: any = null;
   sizes: any[] = [];
   selectedSize: number | null = null;
   averageRating: number = 0;
@@ -32,11 +32,10 @@ export class ProductDetailsComponent implements OnInit {
     private cartService: CartService,
     private router: Router,
     private authService: AuthService
-  
   ) {}
 
   ngOnInit(): void {
-    const productId = this.route.snapshot.params['identifier'];
+    const productId = Number(this.route.snapshot.paramMap.get('identifier'));
     this.loadProductDetails(productId);
     this.authService.user$.subscribe((user) => {
       this.user = user;
@@ -67,12 +66,12 @@ export class ProductDetailsComponent implements OnInit {
       alert('Por favor, selecione uma avaliação.');
       return;
     }
-  
+
     const reviewData = {
       rating,
       text: text || null,
     };
-  
+
     console.log('Review submitted:', reviewData);
   }
 
@@ -81,40 +80,42 @@ export class ProductDetailsComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-  
+
     if (this.product.product_type === 'Clothing' && !this.selectedSize) {
       alert('Por favor, selecione um tamanho.');
       return;
     }
-  
+
     if (!this.quantity || this.quantity < 1) {
       alert('A quantidade deve ser no mínimo 1.');
       return;
     }
-  
+
     const data = {
       quantity: this.quantity,
       size: this.selectedSize,
     };
-  
+
     try {
       const userId = this.authService.getUserId();
       if (!userId) {
         throw new Error('Usuário não autenticado.');
       }
-  
+
       const productId = this.product.id;
       console.log('Adicionando ao carrinho:', { userId, productId, data });
-  
-      const response = await this.cartService.addToCart(Number(userId), productId, data);
+
+      const response = await this.cartService.addToCart(userId, productId, data);
       console.log('Produto adicionado ao carrinho:', response);
+
       alert('Produto adicionado ao carrinho com sucesso!');
+      await this.loadProductDetails(productId); // Reload product details to update stock
+      this.router.navigate(['/manage_cart']);
     } catch (error) {
       console.error('Erro ao adicionar ao carrinho:', error);
       alert('Erro ao adicionar o produto ao carrinho. Tente novamente.');
     }
   }
-  
 
   isNumeric(value: any): boolean {
     return !isNaN(parseFloat(value)) && isFinite(value);

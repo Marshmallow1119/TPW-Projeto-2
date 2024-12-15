@@ -79,12 +79,11 @@ export class CartComponent implements OnInit {
           total: item.total
         }));
   
-        // Atualiza o modelo do carrinho
         this.cart = {
-          id: response.cart_id, // Ajuste se necessário
+          id: response.cart_id, 
           user: this.user as User,
-          date: new Date(), // Ajuste conforme necessário
-          items: this.cartItems, // Lista de itens já mapeada
+          date: new Date(), 
+          items: this.cartItems, 
           total: this.cartItems.reduce((sum, item) => sum + item.total, 0)
         };
   
