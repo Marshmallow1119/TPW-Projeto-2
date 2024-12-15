@@ -40,7 +40,7 @@
           <!-- Login Section -->
           <ng-template #loginSection>
             <div class="login-button-container">
-              <a routerLink="/login" class="btn btn-outline-dark"><i class="fa fa-user"></i> Login</a>
+              <a class="btn btn-outline-dark"(click)="handleLogin()"><i class="fa fa-user"></i> Login</a>
             </div>
             <form class="d-flex align-items-center" (submit)="onSearch()">
               <input
@@ -63,7 +63,7 @@
             <!-- User-specific options -->
             <div *ngIf="user" class="ms-auto d-flex align-items-center">
               <div class="navbar-text me-3 fw-bold fs-5">
-                Bem-Vindo(a), {{ user.user_type | titlecase }} {{ user.username }}
+                Bem-Vindo(a), {{ user.username }}
               </div>
               <form class="d-flex align-items-center" style="margin-right: 10px;" (submit)="onSearch()">
                 <input
@@ -181,6 +181,10 @@
                 <a *ngSwitchCase="'individual'" routerLink="/favorites" routerLinkActive="active" class="btn btn-outline-dark me-2">
                   <i class="fa fa-heart text-danger"></i>
                 </a>
+
+                <a *ngSwitchCase="'individual'" routerLink="/chat" class="btn btn-outline-dark me-2">
+                  <i class="fa fa-message"></i>
+                </a>
       
                 <a *ngSwitchCase="'admin'" routerLink="/profile" class="btn btn-outline-dark me-2">
                   <i class="fa fa-user"></i>
@@ -189,11 +193,14 @@
                   <i class="fa fa-plus"></i> Adicionar Empresa
                 </a>
       
-                <a *ngSwitchCase="'company'" [routerLink]="'/company-products'" class="btn btn-outline-dark me-2">
+                <a *ngSwitchCase="'company'" [routerLink]="'/my-company-products/' + user.company?.id" class="btn btn-outline-dark me-2">
                   <i class="bi bi-archive-fill"></i> Ver os meus produtos
                 </a>
                 <a *ngSwitchCase="'company'" routerLink="/profile" class="btn btn-outline-dark me-2">
                   <i class="fa fa-user"></i>
+                </a>
+                <a *ngSwitchCase="'company'" routerLink="/chat" class="btn btn-outline-dark me-2">
+                  <i class="fa fa-message"></i>
                 </a>
               </ng-container>
               <a (click)="logout()" class="btn btn-outline-dark"><i class="fas fa-sign-out-alt"></i></a>

@@ -237,3 +237,33 @@ class PurchaseProduct(models.Model):
     @property
     def total(self):
         return self.quantity * self.product.price
+    
+
+
+class Chat(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chats')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='chats')  
+    created_at = models.DateTimeField(auto_now_add=True) 
+
+    def clean(self):
+        if self.user.user_type != 'individual':
+            raise ValidationError("Only individual users can initiate chats.")
+    
+    class Meta:
+        unique_together = ('user', 'company') 
+
+    def __str__(self):
+        return f"Chat between {self.user.username} and {self.company.name}"
+    
+class Message(models.Model):
+    id = models.AutoField(primary_key=True)
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages') 
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='messages')  
+    is_from_company = models.BooleanField(default=False)  
+    text = models.TextField() 
+    date = models.DateTimeField(auto_now_add=True) 
+    
+    def __str__(self):
+        sender_role = 'Company' if self.is_from_company else 'User'
+        return f"{sender_role} ({self.sender.username}): {self.text[:20]}..."

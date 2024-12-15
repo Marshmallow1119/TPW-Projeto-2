@@ -6,30 +6,36 @@
 ></app-ban-user-modal>
 
 <div *ngIf="users?.length; else noUsers">
-  <table class="table">
-    <thead>
+  <table class="table table-bordered table-hover">
+    <thead class="thead-light">
       <tr>
-        <th scope="col">Image</th>
+        <th scope="col">Imagem</th>
         <th scope="col">Username</th>
         <th scope="col">Email</th>
-        <th scope="col">Actions</th>
+        <th scope="col" class="text-center">Ações</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let user of users">
-        <td><img [src]="user.image" [alt]="user.username" class="user-image" /></td>
+      <tr *ngFor="let user of users" id="user-row-{{ user.id }}">
+        <td class="text-center">
+          <img
+            [src]="user.image || '/assets/default-user.png'"
+            [alt]="user.username"
+            class="user-image rounded-circle"
+          />
+        </td>
         <td>{{ user.username }}</td>
         <td>{{ user.email }}</td>
-        <td>
+        <td class="text-center">
           <button class="btn btn-danger btn-sm" (click)="openBanUserModal(user.id)">
-            <i class="fas fa-trash-alt"></i> 
-            Ban User
+            <i class="fas fa-ban"></i> Banir Utilizador
           </button>
         </td>
       </tr>
     </tbody>
   </table>
 </div>
+
 <ng-template #noUsers>
-  <p class="text-muted">No users found.</p>
+  <p class="text-muted text-center">Nenhum utilizador encontrado.</p>
 </ng-template>

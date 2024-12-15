@@ -4,7 +4,7 @@ import { CompaniesService } from '../companhia.service';
 import { Company } from '../models/company';
 import { CommonModule } from '@angular/common';
 import { BanCompanyModalComponent } from '../ban-company-modal/ban-company-modal.component';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-admin-company-table',
@@ -16,7 +16,7 @@ export class AdminCompanyTableComponent implements OnInit {
   companies: Company[] = [];
   selectedCompanyId: number | null = null;
 
-  constructor (private companyService: CompaniesService) {}
+  constructor (private companyService: CompaniesService, private router: Router) {}
 
   async ngOnInit(): Promise<void> {
     this.companies = await this.companyService.getCompanies();
@@ -42,6 +42,10 @@ export class AdminCompanyTableComponent implements OnInit {
     } finally {
       this.closeBanCompanyModal();
     }
+  }
+
+  async onAddNewCompany(): Promise<void> {
+    this.router.navigate(['/admin/add/company']);
   }
 
 }

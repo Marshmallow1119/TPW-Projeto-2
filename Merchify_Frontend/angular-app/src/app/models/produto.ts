@@ -19,6 +19,8 @@ export interface Product {
   product_type?: string; 
   stock?: number; 
   specific_details?: any;
+  favorites_count: number;
+  reviews_count: number;
 }
 
 export interface Vinil extends Product {

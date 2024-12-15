@@ -1,0 +1,66 @@
+<div class="container mt-4">
+    <h2>Adicionar nova empresa</h2>
+    
+    <!-- Form -->
+    <form [formGroup]="addCompanyForm" (ngSubmit)="onSubmit()" novalidate>
+      <!-- Messages -->
+      <div *ngIf="messages?.length" class="mt-3">
+        <div *ngFor="let message of messages" class="alert" [ngClass]="'alert-' + message.type">
+          {{ message.text }}
+        </div>
+      </div>
+    
+      <div class="card p-4">
+        <h4>Detalhes da Empresa</h4>
+    
+        <!-- Company Details -->
+        <div class="row">
+          <!-- Company Form Fields -->
+          <div *ngFor="let control of companyControls" class="col-md-6">
+            <div class="form-group mb-3">
+              <label [for]="control.key">{{ control.label }}</label>
+              <input
+                [type]="control.type || 'text'"
+                [id]="control.key"
+                class="form-control"
+                [formControlName]="control.key"
+                [ngClass]="{ 'is-invalid': isInvalid(control.key) }"
+              />
+              <div *ngIf="isInvalid(control.key)" class="text-danger small">
+                {{ getError(control.key) }}
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <h4>Detalhes do usuário da empresa</h4>
+        <div class="row">
+          <div *ngFor="let control of userControls" class="col-md-6">
+            <div class="form-group mb-3">
+              <label [for]="control.key">{{ control.label }}</label>
+              <input
+                [type]="control.type || 'text'"
+                [id]="control.key"
+                class="form-control"
+                [formControlName]="control.key"
+                [ngClass]="{ 'is-invalid': isInvalid(control.key) }"
+              />
+              <div *ngIf="isInvalid(control.key)" class="text-danger small">
+                {{ getError(control.key) }}
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <!-- Submit Button -->
+        <div class="row">
+          <div class="col-12 text-center">
+            <button type="submit" class="btn btn-success mt-3" [disabled]="addCompanyForm.invalid">
+              Submeter
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  

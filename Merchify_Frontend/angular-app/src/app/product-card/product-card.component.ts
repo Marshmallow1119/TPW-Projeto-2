@@ -1,8 +1,9 @@
 import { Component, Input } from '@angular/core';
 import { Product } from '../models/produto';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FavoritesService } from '../favorites.service';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-product-card',
@@ -15,7 +16,7 @@ export class ProductCardComponent {
   @Input() user: any; 
   
 
-  constructor(private favoritesService: FavoritesService) {}
+  constructor(private favoritesService: FavoritesService, private authService: AuthService, private router: Router) {}
   
   addToCart(product: Product): void {
     console.log('Add to cart:', product);
@@ -24,6 +25,10 @@ export class ProductCardComponent {
   toggleFavorite(event: Event, productId: number): void {
     event.preventDefault();
     event.stopPropagation(); 
+    if (!this.authService.isAuthenticated) {
+      this.router.navigate(['/login']);
+      return;
+    }
     if (this.product.is_favorited) {
       this.favoritesService.removeFavorite(productId);
       this.product.is_favorited = false;

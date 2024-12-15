@@ -248,6 +248,30 @@ export class AuthService {
       this.userSubject.next(currentUser); // Emite a atualização para os componentes
     }
   }
+
+  getUserInfo(): Observable<User> {
+    const url = `${this.baseUrl}/user/`; // Endpoint URL
+    const accessToken = localStorage.getItem('accessToken');
   
+    if (!accessToken) {
+      console.error('No access token found');
+      return throwError(() => new Error('No access token found'));
+    }
+  
+    const headers = { Authorization: `Bearer ${accessToken}` };
+  
+    return this.http.get<User>(url, { headers }).pipe(
+      tap((user) => {
+        console.log('User info:', user);
+        this.userSubject.next(user);
+      }),
+      catchError((error) => {
+        console.error('Error fetching user info:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+  
+
 
 }

@@ -1,5 +1,36 @@
 <div class="sidebar-filter bg-light p-3 rounded mb-3">
     <form #filterForm="ngForm">
+      <div *ngIf="showArtistFilter">
+        <h5>Artista</h5>
+        <div class="form-group custom-dropdown">
+          <div class="dropdown">
+            <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="artistDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              {{ selectedArtistName || 'Todos' }}
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="artistDropdown">
+              <li
+                *ngFor="let artist of artists"
+                class="dropdown-item"
+                (click)="selectArtist(artist)"
+              >
+                <img
+                  [src]="artist.image_url"
+                  alt="{{ artist.name }}"
+                  class="artist-image"
+                />
+                {{ artist.name }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+  
       <h5>Tipo de Produto</h5>
       <div class="form-group">
         <div *ngFor="let type of productTypes">

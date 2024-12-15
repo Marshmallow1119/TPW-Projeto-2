@@ -27,12 +27,19 @@ export class LoginComponent {
         localStorage.setItem('accessToken', response.access);
         localStorage.setItem('refreshToken', response.refresh);
         console.log('User type:', response.user_type);
+        if ((localStorage.getItem('redirectUrl')) && (response.user_type === 'individual')) {
+          const redirectUrl = localStorage.getItem('redirectUrl');
+          localStorage.removeItem('redirectUrl');
+          this.router.navigate([redirectUrl]);
+          return;
+        }
         switch (response.user_type) {
           case 'individual':
             this.router.navigate(['/']);
             break;
           case 'company':
-            this.router.navigate(['/company-products']);
+            console.log(response)
+            this.router.navigate(['/my-company-products/' + response.user.company.id]);
             break;
           case 'admin':
             this.router.navigate(['/admin-home']);

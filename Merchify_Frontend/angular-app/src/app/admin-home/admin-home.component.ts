@@ -17,5 +17,10 @@ import { AdminCompanyTableComponent } from '../admin-company-table/admin-company
 export class AdminHomeComponent  {
 
   constructor() {}
+  activeSection: string = 'users-section';
+
+  showSection(sectionId: string): void {
+    this.activeSection = sectionId;
+  }
 
 }

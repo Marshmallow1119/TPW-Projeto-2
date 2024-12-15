@@ -36,8 +36,8 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth import password_validation
 
 from app.models import (
-    Product, Company, Cart, CartItem, Purchase, User, Vinil, CD, Clothing, Accessory,
-    Size, Favorite, FavoriteArtist, FavoriteCompany, Artist, Review, PurchaseProduct
+    Chat, Product, Company, Cart, CartItem, Purchase, User, Vinil, CD, Clothing, Accessory,
+    Size, Favorite, FavoriteArtist, FavoriteCompany, Artist, Review, PurchaseProduct, Message
 )
 
 logger = logging.getLogger(__name__)
@@ -46,7 +46,7 @@ from rest_framework import status
 from rest_framework.decorators import (
     api_view, authentication_classes, permission_classes
 )
-from app.serializers import BalanceSerializer, CartItemSerializer, FavoriteArtistSerializer, FavoriteCompanySerializer, FavoriteSerializer, LoginSerializer, PurchaseProductSerializer, PurchaseSerializer, RegisterSerializer, ReviewSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
+from app.serializers import BalanceSerializer, CartItemSerializer, ChatSerializer, FavoriteArtistSerializer, FavoriteCompanySerializer, FavoriteSerializer, LoginSerializer, PurchaseProductSerializer, PurchaseSerializer, RegisterSerializer, ReviewSerializer, ReviewSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
 
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -54,6 +54,7 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.authtoken.models import Token
 
+from json import loads
 
 @api_view(['GET'])
 def home(request):
@@ -324,6 +325,7 @@ def productDetails(request, identifier):
         product = get_object_or_404(Product, id=identifier)
         product.count += 1
         product.save()
+        company_data = CompanySerializer(product.company).data if product.company else None
 
         product_serializer = ProductSerializer(product, context={'request': request})
         
@@ -424,6 +426,7 @@ def login(request):
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
         user = authenticate(username=username, password=password)
+        user_data = UserSerializer(user).data
         if user:
             refresh = RefreshToken.for_user(user)
             return Response({
@@ -432,6 +435,7 @@ def login(request):
                 'username': user.username,
                 'id': user.id,
                 'user_type': user.user_type,
+                'user': user_data
             }, status=status.HTTP_200_OK)
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -690,7 +694,7 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
 
     return Response({"error": "Método não permitido."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-@api_view(['GET', 'DELETE'])
+@api_view(['GET', 'DELETE', 'PUT'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def company(request, company_id):
@@ -702,6 +706,14 @@ def company(request, company_id):
         if not (request.user.user_type == 'admin' or request.user.user_type == 'company'):
             raise PermissionDenied
         company = get_object_or_404(Company, id=company_id)
+        company.delete()
+        return JsonResponse({'message': 'Company deleted successfully!'})
+    elif request.method == 'PUT':
+        if not (request.user.user_type == 'admin'):
+            raise PermissionDenied
+        company = get_object_or_404(Company, id=company_id)
+        user = get_object_or_404(User, company=company)
+        user.banned = True
         company.delete()
         return JsonResponse({'message': 'Company deleted successfully!'})
 
@@ -1098,10 +1110,11 @@ def company_products(request, company_id):
             }
         else:
             size_stock = product.get_stock()
-
+        artist_data = ArtistSerializer(product.artist, context={'request': request}).data if product.artist else None
         products_data.append({
             'id': product.id,
             'name': product.name,
+            'artist': artist_data,
             'description': product.description,
             'price': product.price,
             'image': product.image.url if product.image else None,
@@ -1333,3 +1346,200 @@ def get_filters(request):
             'status': 'error',
             'message': str(e),
         }, status=500)
+
+
+@api_view(['GET', 'POST', 'DELETE'])
+def reviews(request, product_id):
+    if request.method == 'GET':
+        product = get_object_or_404(Product, id=product_id)
+        reviews = product.reviews.all()
+        serialized_reviews = ReviewSerializer(reviews, many=True)
+        return Response(serialized_reviews.data)
+    
+    elif request.method == 'POST':
+        product = get_object_or_404(Product, id=product_id)
+
+        if not request.user.is_authenticated:
+            return Response({"status": "error", "message": "Authentication required"}, status=401)
+
+        user = request.user
+        print(f"User: {user}")
+
+        review_form = ReviewForm(request.data)
+        if review_form.is_valid():
+            Review.objects.create(
+                date=request.data.get('date'),
+                text=request.data.get('text'),
+                rating=request.data.get('rating'),
+                product=product, 
+                user=user         
+            )
+            return Response({"status": "success", "message": "Review added successfully"})
+        
+        print(f"Review form errors: {review_form.errors}")
+        return Response({"status": "error", "message": review_form.errors}, status=400)
+    
+    elif request.method == 'DELETE':
+        if not request.user.is_authenticated:
+            return Response({"status": "error", "message": "Authentication required"}, status=401)
+
+        # Retrieve and delete the review
+        review_id = request.data.get('review_id')
+        if not review_id:
+            return Response({"status": "error", "message": "Review ID is required"}, status=400)
+
+        review = get_object_or_404(Review, id=review_id, user=request.user)  # Ensure user owns the review
+        review.delete()
+        return Response({"status": "success"})
+
+    return Response({"status": "error", "message": "Method not allowed"}, status=405)
+
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def get_chat_messages(request, company_id):
+    if request.user.user_type != 'individual':
+        return JsonResponse({'error': 'Only individual users can access chat messages.'}, status=403)
+
+    company = get_object_or_404(Company, id=company_id)
+
+    # Fetch or create the chat
+    chat = Chat.objects.filter(user=request.user, company=company).first()
+    if not chat:
+        chat = Chat.objects.create(user=request.user, company=company)
+
+    messages = chat.messages.order_by('date').values(
+        'id',
+        'text',
+        'date',
+        'is_from_company',
+        'sender__username'
+    )
+
+    return JsonResponse({'messages': list(messages)}, status=200)
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def send_message(request, company_id=None, user_id=None):
+
+
+    if request.user.user_type not in ['individual', 'company']:
+        return JsonResponse({'error': 'Unauthorized user type.'}, status=403)
+
+    data = loads(request.body.decode('utf-8'))
+    message_text = data.get('text')
+
+    if not message_text or not message_text.strip():
+        return JsonResponse({'error': 'Message text cannot be empty.'}, status=400)
+
+    if company_id and not user_id:
+        if request.user.user_type != 'individual':
+            return JsonResponse({'error': 'Only individual users can send messages to a company.'}, status=403)
+
+        company = get_object_or_404(Company, id=company_id)
+
+        chat, created = Chat.objects.get_or_create(user=request.user, company=company)
+        is_from_company = False
+
+    elif user_id and not company_id:
+        if request.user.user_type != 'company':
+            return JsonResponse({'error': 'Only company users can send messages to a user.'}, status=403)
+
+        company = request.user.company
+        if not company:
+            return JsonResponse({'error': 'You are not associated with a company.'}, status=403)
+
+        user = get_object_or_404(User, id=user_id, user_type='individual')
+
+        chat = Chat.objects.filter(user=user, company=company).first()
+        if not chat:
+            return JsonResponse({'error': 'Chat not found for this user and company.'}, status=404)
+
+        is_from_company = True
+
+    else:
+        return JsonResponse({'error': 'Invalid request. Provide either a company_id or user_id.'}, status=400)
+
+    message = Message.objects.create(
+        chat=chat,
+        sender=request.user,
+        is_from_company=is_from_company,
+        text=message_text.strip()
+    )
+
+    return JsonResponse({
+        'message': {
+            'id': message.id,
+            'text': message.text,
+            'date': message.date,
+            'is_from_company': message.is_from_company,
+            'sender': message.sender.username,
+        }
+    }, status=201)
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def get_user_info(request):
+    user = request.user
+    user_data = UserSerializer(user).data
+    return JsonResponse(user_data)
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def add_company(request):
+    company_form = CompanyForm(request.data, request.FILES)
+    user_form = UserForm(request.data)
+
+    if company_form.is_valid() and user_form.is_valid():
+        try:
+            with transaction.atomic():
+                company = company_form.save()
+
+                user = user_form.save(commit=False)
+                user.user_type = 'company'
+                user.firstname = 'Company'
+                user.lastname = company.name
+                user.email = company.email
+                user.phone = company.phone
+                user.address = company.address
+                user.company = company
+                user.set_password(user_form.cleaned_data['password'])
+                user.save()
+
+                group = Group.objects.get(name='company')
+                user.groups.add(group)
+
+            return Response(
+                {"message": "Company and associated user have been created successfully."},
+                status=status.HTTP_201_CREATED,
+            )
+        except Exception as e:
+            return Response(
+                {"error": "An error occurred while creating the company and user.", "details": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    else:
+        errors = {
+            "company_errors": company_form.errors,
+            "user_errors": user_form.errors,
+        }
+        return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def get_chat(request):
+    if request.user.user_type == 'individual':
+        chats = Chat.objects.filter(user=request.user)
+    elif request.user.user_type == 'company':
+        company = request.user.company
+        chats = Chat.objects.filter(company=company)
+    else:
+        return Response({"error": "Unauthorized user type."}, status=status.HTTP_403_FORBIDDEN)
+
+    serialized_chats = ChatSerializer(chats, many=True)
+    return Response(serialized_chats.data)
