@@ -18,7 +18,7 @@ export class ProdutosCompanhiaService {
    */
 
   async getCompanhiaProdutos(company_id: number): Promise<any> {
-    console.log(company_id); 
+    console.log("company_id:  " + company_id); 
     if (!company_id) {
       console.error('ID da companhia está vazio ou inválido');
       return null;
@@ -49,6 +49,21 @@ export class ProdutosCompanhiaService {
     } catch (error) {
       console.error('Erro ao buscar produtos:', error); 
       return null;
+    }
+  }
+
+  async deleteProduct(productId: number): Promise<void> {
+    try {
+      await fetch(`${this.baseUrl}/product/${productId}/delete/`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });      
+    }
+    catch (error) {
+      console.error('Error deleting product:', error);
     }
   }
 

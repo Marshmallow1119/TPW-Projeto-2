@@ -13,6 +13,8 @@ import { AdminHomeComponent } from './admin-home/admin-home.component';
 import { FavoritesComponent } from './favorites/favorites.component';
 import { CartComponent } from './cart/cart.component';
 import { PaymentPageComponent } from './payment-page/payment-page.component';
+import { MyCompanyProductsComponent } from './my-company-products/my-company-products.component';
+import { EditProductComponent } from './edit-product/edit-product.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent }, // Home Route
@@ -29,7 +31,8 @@ export const routes: Routes = [
   { path: 'favorites', component: FavoritesComponent }, 
   { path: 'manage_cart', component: CartComponent },
   { path: 'payment-page', component: PaymentPageComponent },
- 
+  { path: 'my-company-products/:company_id', component: MyCompanyProductsComponent },
+  { path: 'companies/:company_id/products/:product_id/edit', component: EditProductComponent },
 
   
 ];

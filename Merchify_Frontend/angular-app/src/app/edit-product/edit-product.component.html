@@ -1,0 +1,66 @@
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Editar Produto</h2>
+  
+    <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label for="name" class="form-label">Nome do Produto</label>
+        <input
+          id="name"
+          type="text"
+          class="form-control"
+          formControlName="name"
+        />
+      </div>
+  
+      <div class="mb-3">
+        <label for="description" class="form-label">Descrição</label>
+        <textarea
+          id="description"
+          class="form-control"
+          formControlName="description"
+        ></textarea>
+      </div>
+  
+      <div class="mb-3">
+        <label for="price" class="form-label">Preço (€)</label>
+        <input
+          id="price"
+          type="number"
+          class="form-control"
+          formControlName="price"
+        />
+      </div>
+  
+      <div class="mb-3">
+        <label for="product_type" class="form-label">Tipo de Produto</label>
+        <select
+          id="product_type"
+          class="form-select"
+          formControlName="product_type"
+        >
+          <option value="vinil">Vinil</option>
+          <option value="cd">CD</option>
+          <option value="clothing">Roupa</option>
+          <option value="accessory">Outros</option>
+        </select>
+      </div>
+  
+      <div class="mb-3">
+        <label for="image" class="form-label">Imagem do Produto</label>
+        <input
+          id="image"
+          type="file"
+          class="form-control"
+          (change)="onFileSelected($event)"
+        />
+      </div>
+      
+      <div class="d-flex justify-content-between">
+        <button type="submit" class="btn btn-success">Salvar Alterações</button>
+        <button type="button" class="btn btn-secondary" (click)="onCancel()">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+  

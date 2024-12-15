@@ -86,5 +86,24 @@ export class ProductsService {
       };
     }
   }
+
+  async addProduct(product: Product, imageFile: File): Promise<void> {
+    try {
+      const formData = new FormData();
+      formData.append('product', JSON.stringify(product));
+      formData.append('image', imageFile);
+      const response = await fetch(`${this.baseUrl}/produtos/`, {
+        method: 'POST',
+        body: formData,
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to add product: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('Error adding product:', error);
+    }
+  }
+  
+  
   
 }
