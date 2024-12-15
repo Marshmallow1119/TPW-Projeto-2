@@ -1,0 +1,104 @@
+.info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%; /* Garante que todos os cards tenham a mesma altura */
+  }
+  
+  .card-body {
+    flex: 1; /* Preenche o espaço disponível, garantindo que o botão fique na base */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .card-body .info-grid {
+    margin-bottom: 20px; /* Espaço entre informações e botão */
+  }
+  
+  .card-body .text-center {
+    margin-top: auto; /* Empurra o botão para o final do card */
+  }
+  
+  .card-body .btn {
+    width: 100%; /* Opcional: Faz o botão ocupar toda a largura */
+  }
+  
+  
+  .card-header {
+    font-weight: bold;
+  }
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-overlay.show {
+    display: flex;
+  }
+  
+  .modal-container {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .modal-body {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+  
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  
+  .product-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .product-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 10px;
+  }
+  
