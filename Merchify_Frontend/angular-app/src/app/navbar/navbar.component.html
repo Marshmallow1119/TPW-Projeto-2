@@ -181,6 +181,10 @@
                 <a *ngSwitchCase="'individual'" routerLink="/favorites" routerLinkActive="active" class="btn btn-outline-dark me-2">
                   <i class="fa fa-heart text-danger"></i>
                 </a>
+
+                <a *ngSwitchCase="'individual'" routerLink="/chat" class="btn btn-outline-dark me-2">
+                  <i class="fa fa-message"></i>
+                </a>
       
                 <a *ngSwitchCase="'admin'" routerLink="/profile" class="btn btn-outline-dark me-2">
                   <i class="fa fa-user"></i>
@@ -194,6 +198,9 @@
                 </a>
                 <a *ngSwitchCase="'company'" routerLink="/profile" class="btn btn-outline-dark me-2">
                   <i class="fa fa-user"></i>
+                </a>
+                <a *ngSwitchCase="'company'" routerLink="/chat" class="btn btn-outline-dark me-2">
+                  <i class="fa fa-message"></i>
                 </a>
               </ng-container>
               <a (click)="logout()" class="btn btn-outline-dark"><i class="fas fa-sign-out-alt"></i></a>

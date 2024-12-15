@@ -1,1 +1,29 @@
-<p>list-chats works!</p>
+<div class="container mt-4">
+    <h2>Chats com Empresas</h2>
+    <div *ngIf="chats.length > 0; else noChats">
+      <div class="list-group">
+        <a
+          *ngFor="let chat of chats"
+          class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+          [routerLink]="['/chat', chat.company.id]"
+        >
+          <div class="d-flex align-items-center">
+            <img
+              *ngIf="chat.company.logo_base64"
+              [src]="chat.company.logo_base64"
+              alt="{{ chat.company.name }}"
+              class="company-logo mr-3"
+            />
+            <div>
+              <h5 class="mb-0">{{ chat.company.name }}</h5>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  
+    <ng-template #noChats>
+      <p class="text-muted mt-3">Você não possui chats ativos no momento.</p>
+    </ng-template>
+  </div>
+  

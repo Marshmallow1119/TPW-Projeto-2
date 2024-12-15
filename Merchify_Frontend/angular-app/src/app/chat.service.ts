@@ -84,7 +84,7 @@ export class ChatService {
     );
   }
 
-  private getChats(): Observable<any> {
+  getChats(): Observable<any> {
     const url = `${this.baseUrl}/chat/`;
     const headers = this.getAuthHeaders();
     return this.http.get(url, { headers }).pipe(
