@@ -76,7 +76,7 @@ urlpatterns = [
     path('ws/filters/', views.get_filters, name='filters'),
     path('ws/process_payment/', views.process_payment, name='process_payment'),
     path('ws/apply_discount/', views.apply_discount, name='apply_discount'),
-
+    path('ws/balance/', views.balance, name='balance'),
 ]   
 
 

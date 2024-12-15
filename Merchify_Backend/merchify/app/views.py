@@ -1,3 +1,4 @@
+from decimal import Decimal
 import json
 import logging
 import re
@@ -45,7 +46,7 @@ from rest_framework import status
 from rest_framework.decorators import (
     api_view, authentication_classes, permission_classes
 )
-from app.serializers import CartItemSerializer, FavoriteArtistSerializer, FavoriteCompanySerializer, FavoriteSerializer, LoginSerializer, PurchaseProductSerializer, PurchaseSerializer, RegisterSerializer, ReviewSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
+from app.serializers import BalanceSerializer, CartItemSerializer, FavoriteArtistSerializer, FavoriteCompanySerializer, FavoriteSerializer, LoginSerializer, PurchaseProductSerializer, PurchaseSerializer, RegisterSerializer, ReviewSerializer, UserSerializer, ProductSerializer, CompanySerializer, ArtistSerializer
 
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -70,6 +71,48 @@ def home(request):
     except Exception as e:
         logger.error(f"Error in home view: {e}")
         return Response({'error': str(e)}, status=500)
+
+@api_view(['GET', 'POST', 'PUT'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def balance(request):
+    user = request.user
+    print(user)
+
+    if request.method == 'GET':
+        return Response({'user': user.username, 'balance': str(user.balance)})
+
+    elif request.method in ['POST', 'PUT']:
+        print(request.data)
+        serializer = BalanceSerializer(data=request.data)
+        if serializer.is_valid():
+            amount = serializer.validated_data['amount']
+
+            if request.method == 'POST':
+                user.balance += Decimal(amount)
+                user.save()
+                return Response({
+                    'message': 'Balance added successfully!',
+                    'user': user.username,
+                    'new_balance': str(user.balance)
+                })
+
+            elif request.method == 'PUT':
+                # Deduct funds from the user's balance
+                if user.balance < Decimal(amount):
+                    return Response({'error': 'Insufficient balance.'}, status=status.HTTP_400_BAD_REQUEST)
+
+                user.balance -= Decimal(amount)
+                user.save()
+                return Response({
+                    'message': 'Balance deducted successfully!',
+                    'user': user.username,
+                    'new_balance': str(user.balance)
+                })
+
+        return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({'error': 'Invalid request method.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 @api_view(['GET'])
 def companhias(request):

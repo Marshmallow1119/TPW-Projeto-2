@@ -54,6 +54,7 @@ export class AuthService {
           phone: response.phone,
           country: response.country,
           number_of_purchases: response.number_of_purchases || 0,
+          balance: response.balance || 0,
         };
 
         this.userSubject.next(user);
@@ -121,6 +122,7 @@ export class AuthService {
           email: response.email,
           phone: response.phone,
           country: response.country,
+          balance: response.balance || 0,
         };
 
         this.userSubject.next(user);
@@ -182,7 +184,7 @@ export class AuthService {
             email: response.email,
             phone: response.phone,
             country: response.country,
-
+            balance: 0 // Set the balance to 0 for new users
           };
   
           this.userSubject.next(user); 
@@ -228,4 +230,16 @@ export class AuthService {
       return null;
     }
   }
+
+  updateUser(updatedUser: Partial<User>): void {
+    const currentUser = this.userSubject.value; // Obtem o usuário atual
+    if (!currentUser) return; // Se o usuário não estiver autenticado, não faz nada
+  
+    // Atualiza apenas os campos modificados
+    const newUser: User = { ...currentUser, ...updatedUser };
+  
+    this.userSubject.next(newUser); // Notifica os observadores sobre a atualização
+  }
+  
+
 }

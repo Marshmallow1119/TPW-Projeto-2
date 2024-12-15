@@ -26,6 +26,14 @@ class CompanySerializer(serializers.ModelSerializer):
     def get_logo_base64(self, obj):
         return encode_image_to_base64(obj.logo) if obj.logo else None
 
+class BalanceSerializer(serializers.Serializer):
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    def validate_amount(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("The amount must be greater than zero.")
+        return value
+
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
@@ -34,11 +42,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'firstname', 'lastname', 'user_type',
-            'email', 'phone', 'country', 'image'
+            'email', 'phone', 'country', 'image', 'balance'
         ]
 
     def get_image(self, obj):
         return encode_image_to_base64(obj.image) if obj.image else None
+
 
 # Artist Serializer
 class ArtistSerializer(serializers.ModelSerializer):

@@ -5,3 +5,10 @@
 *venv/
 *app/db.sqlite3
 *app/templatetags/__pycache__
+*app/staticfiles/
+*app/staticfiles/__pycache__
+
+
+
+
+
