@@ -13,6 +13,8 @@ import { AdminHomeComponent } from './admin-home/admin-home.component';
 import { FavoritesComponent } from './favorites/favorites.component';
 import { CartComponent } from './cart/cart.component';
 import { PaymentPageComponent } from './payment-page/payment-page.component';
+import { MyCompanyProductsComponent } from './my-company-products/my-company-products.component';
+import { EditProductComponent } from './edit-product/edit-product.component';
 import { ChatComponent } from './chat/chat.component';
 import { AddCompanyComponent } from './add-company/add-company.component';
 
@@ -34,7 +36,8 @@ export const routes: Routes = [
   { path: 'chat/:id', component: ChatComponent },
   { path: 'admin/add/company', component: AddCompanyComponent },
 
- 
+  { path: 'my-company-products/:company_id', component: MyCompanyProductsComponent },
+  { path: 'companies/:company_id/products/:product_id/edit', component: EditProductComponent },
 
   
 ];
