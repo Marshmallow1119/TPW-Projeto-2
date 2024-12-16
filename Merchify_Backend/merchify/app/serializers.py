@@ -195,14 +195,20 @@ class FavoriteCompanySerializer(serializers.ModelSerializer):
 # Purchase Serializer
 class PurchaseSerializer(serializers.ModelSerializer):
     total = serializers.ReadOnlyField()
+    products= serializers.SerializerMethodField()
 
     class Meta:
         model = Purchase
         fields = [
             'id', 'user', 'date', 'paymentMethod', 'shippingAddress',
-            'status', 'total_amount', 'discount_applied', 'discount_value', 'total'
+            'status', 'total_amount', 'discount_applied', 'discount_value', 'total','products'
         ]
-   
+    def get_products(self, obj):
+        # Usa o serializer de produtos associados
+        purchase_products = PurchaseProduct.objects.filter(purchase=obj)
+
+        return PurchaseProductSerializer(purchase_products, many=True).data
+
 # Review Serializer
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -214,11 +220,12 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 # PurchaseProduct Serializer
 class PurchaseProductSerializer(serializers.ModelSerializer):
+    product_details = ProductSerializer(source='product', read_only=True)
     total = serializers.ReadOnlyField()
 
     class Meta:
         model = PurchaseProduct
-        fields = ['id', 'purchase', 'product', 'quantity', 'total']
+        fields = ['id', 'purchase', 'product','product_details', 'quantity', 'total']
 
 # Login Serializer
 class LoginSerializer(serializers.Serializer):

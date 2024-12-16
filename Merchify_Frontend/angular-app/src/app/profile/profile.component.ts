@@ -40,16 +40,11 @@ export class ProfileComponent implements OnInit {
 
   async loadProfile(): Promise<void> {
     try {
-      console.log('Carregando perfil...');
       const data = await this.profileService.getProfile();
-      console.log('Perfil carregado:', this.user);
 
       this.user = data.user;
       this.purchases = data.purchases;
       this.numberOfPurchases = data.number_of_purchases;
-
-      console.log('Dados de compras:', this.purchases);
-
 
     } catch (error) {
       console.error('Erro ao carregar perfil:', error);

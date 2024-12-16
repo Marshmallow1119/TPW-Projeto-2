@@ -3,6 +3,7 @@ import { Company } from './company';
 import { Size } from './size';
 
 export interface Product {
+  quantity: any;
   featured: any;
   id: number;
   name: string;
