@@ -12,14 +12,16 @@ import { SizeStockModalComponent } from '../size-stock-modal/size-stock-modal.co
   standalone: true,
   templateUrl: './admin-products-table.component.html',
   styleUrls: ['./admin-products-table.component.css'],
-  imports: [CommonModule, RouterModule, DeleteProductModalComponent, SizeStockModalComponent],
+  imports: [CommonModule, RouterModule, DeleteProductModalComponent, SizeStockModalComponent,FormsModule],
 })
 export class AdminProductsTableComponent implements OnInit {
   products: Product[] = [];
   errorMessage: string | null = null;
   selectedProduct: Product | null = null;
+  selectedProductForPromotion: any = null; // Produto selecionado para promoção
+  newPromotionPrice: number | null = null; // Novo preço inserido no modal
   isStockModalOpen: boolean = false; // Track modal state
-
+  
   constructor(private productService: ProductsService) {}
 
   async ngOnInit(): Promise<void> {
@@ -104,4 +106,40 @@ export class AdminProductsTableComponent implements OnInit {
       this.errorMessage = 'Error updating stock';
     }
   }
+
+
+    // Abre o modal de promoção
+openPromotionModal(product: any): void {
+  this.selectedProductForPromotion = { ...product }; // Clona o produto para preservar o estado original
+  this.newPromotionPrice = product.price; // Preenche o preço atual
+}
+
+// Fecha o modal de promoção
+closePromotionModal(): void {
+  this.selectedProductForPromotion = null;
+  this.newPromotionPrice = null;
+}
+
+async applyPromotion(): Promise<void> {
+  if (this.newPromotionPrice === null || this.newPromotionPrice <= 0) {
+    alert('Por favor, insira um novo preço válido.');
+    return;
+  }
+
+  if (this.selectedProductForPromotion) {
+    try {
+      const product = this.selectedProductForPromotion;
+
+      // Chama o serviço para aplicar a promoção
+      await this.productService.addPromotion(product, this.newPromotionPrice);
+
+      alert('Promoção aplicada com sucesso!');
+      this.closePromotionModal();
+      this.fetchProducts(); 
+    } catch (error) {
+      console.error('Erro ao aplicar promoção:', error);
+      alert('Erro ao aplicar promoção.');
+    }
+  }
+}
 }

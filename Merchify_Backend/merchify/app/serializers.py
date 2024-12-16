@@ -109,8 +109,8 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id', 'name', 'description', 'price', 'image_url', 'artist', 'company',
-            'category', 'addedProduct', 'count', 'average_rating', 'stock_size',
-            'product_type', 'stock', 'specific_details'
+            'category', 'addedProduct', 'count', 'average_rating',
+            'product_type', 'stock', 'specific_details','old_price','is_on_promotion'
         ]
 
     def get_specific_details(self, obj):

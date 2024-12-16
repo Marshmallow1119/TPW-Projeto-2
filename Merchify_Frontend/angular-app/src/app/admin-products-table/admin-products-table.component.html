@@ -27,7 +27,19 @@
             />
           </td>
           <td>{{ product.name }}</td>
-          <td>{{ product.price | number: '1.2-2' }}€</td>
+          <td>
+            <div>
+              <!-- Preço -->
+              <span [ngClass]="{ 'promotion-price': product.is_on_promotion }">
+                {{ product.price | number: '1.2-2' }}€
+              </span>
+              <!-- Rótulo 'Em Promoção' -->
+              <div *ngIf="product.is_on_promotion" class="text-danger small">
+                (em promoção)
+              </div>
+            </div>
+          </td>
+          
           <td>{{ product.category }}</td>
           <td>
             <div *ngIf="isVinil(product)">
@@ -59,13 +71,13 @@
             <button class="btn btn-secondary btn-sm">
               <i class="fas fa-edit"></i> Editar
             </button>
-            <button
-              class="btn btn-danger btn-sm"
-              (click)="openDeleteModal(product)"
-            >
+            <button class="btn btn-danger btn-sm me-2" (click)="openDeleteModal(product)">
               <i class="fas fa-trash-alt"></i> Apagar
             </button>
-          </td>
+            <button class="btn btn-warning btn-sm" (click)="openPromotionModal(product)">
+              <i class="fas fa-percent"></i> Promoção
+            </button>
+          </td>          
         </tr>
       </tbody>
     </table>
@@ -92,4 +104,39 @@
     (saveChangesEvent)="onSaveStockChanges($event)"
   ></app-size-stock-modal>
 
+</div>
+
+
+<!--Modal de promoção-->
+<div
+  class="modal fade show"
+  *ngIf="selectedProductForPromotion"
+  tabindex="-1"
+  role="dialog"
+  style="display: block; background-color: rgba(0, 0, 0, 0.5);"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Promoção - {{ selectedProductForPromotion.name }}</h5>
+        <button type="button" class="btn-close" (click)="closePromotionModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Preço Atual:</strong> {{ selectedProductForPromotion.price | number: '1.2-2' }}€</p>
+        <div class="form-group">
+          <label for="newPrice">Novo Preço:</label>
+          <input
+            type="number"
+            id="newPrice"
+            [(ngModel)]="newPromotionPrice"
+            class="form-control"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closePromotionModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="applyPromotion()">Salvar</button>
+      </div>
+    </div>
+  </div>
 </div>

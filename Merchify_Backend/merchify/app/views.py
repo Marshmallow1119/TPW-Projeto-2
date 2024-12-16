@@ -272,6 +272,46 @@ def produtos(request):
     serializer = ProductSerializer(produtos, many=True, context={'request': request})
     return Response(serializer.data)
 
+
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def add_promotion(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    data = request.data
+
+    new_price = data.get('new_price')
+    if not new_price:
+        return Response({'error': 'New price is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    product.old_price = product.price
+    product.price = new_price
+    product.save()
+
+
+    return Response({'message': 'Promoção aplicada com sucesso!'})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @api_view(['GET'])
 def artistas(request):
     artists = Artist.objects.all()
@@ -340,7 +380,7 @@ def productDetails(request, identifier):
         
         reviews = product.reviews.all()
         review_serializer = ReviewSerializer(reviews, many=True)
-
+r generalizações a partir de observações específicas
         product_data = product_serializer.data
         product_data['reviews'] = review_serializer.data
 
@@ -1085,17 +1125,13 @@ def calculate_shipping_cost(cart):
 @api_view(['GET'])
 def company_home(request):
     company_id = request.user.company.id if request.user.user_type == 'company' else None
-    print("Company ID:", company_id)
     return render(request, 'company_home.html', {'company_id': company_id})
 
 @api_view(['GET'])
 def company_products(request, company_id):
-    print(f"Received company_id: {company_id}")  # Debugging: Log the company_id
     company = get_object_or_404(Company, id=company_id)
-    print(f"Found company: {company.name}")  # Debugging: Log the company name
 
     products = Product.objects.filter(company=company)
-    print(f"Number of products found: {products.count()}")  # Debugging: Log the product count
 
     products_data = ProductSerializer(products, many=True, context={'request': request}).data
 
