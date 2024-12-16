@@ -41,7 +41,8 @@ export class FiltroComponent implements OnInit {
     size: '',
     min_price: null,
     max_price: null,
-    artist: '', // Added artist filter
+    artist: '', 
+    onSale: false,
   };
 
 
@@ -89,6 +90,7 @@ export class FiltroComponent implements OnInit {
       min_price: null,
       max_price: null,
       artist: '', // Reset artist filter
+      onSale: false,
     };
     this.selectedType = '';
     this.selectedArtist = ''; // Reset selected artist
