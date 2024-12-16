@@ -12,6 +12,7 @@ import { BalanceService } from '../balance-service.service';
 })
 @Component({
   selector: 'app-navbar',
+  standalone: true,
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
   imports: [ThemeButtonComponent, RouterModule, CommonModule, FormsModule],
@@ -126,12 +127,12 @@ export class NavbarComponent implements OnInit {
 
   changeTheme(theme: string): void {
     console.log('Changing theme to:', theme);
-   //this.isLoading = true; // Inicia o carregamento
-   //setTimeout(() => {
-   //  // Altera o tema aplicando uma classe no body
-   //  document.body.className = ''; // Remove classes anteriores
-   //  document.body.classList.add(`theme-${theme}`);
-   //  this.isLoading = false; // Finaliza o carregamento
-   //}, 1000); // Simula o tempo de carregamento (1 segundo)
+    this.isLoading = true; // Inicia o carregamento
+    setTimeout(() => {
+     document.body.className = ''; // Remove classes anteriores
+     document.body.classList.add(`theme-${theme}`);
+     this.isLoading = false; // Finaliza o carregamento
+   }, 1000); // Simula o tempo de carregamento (1 segundo)
   }
+  
 }
