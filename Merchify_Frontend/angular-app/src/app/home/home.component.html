@@ -1,10 +1,21 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Agu+Display&display=swap" rel="stylesheet">
+
 <div style="margin: 0; padding: 0;">
-  <!-- Info Bars -->
-  <div *ngIf="showPromotion" class="info-bar bg-warning text-dark py-2 text-center w-100" style="margin: 0; padding: 0;">
-    <p class="mb-0" style="color:black !important">
-      <i class="bi bi-truck"></i> Envio grátis para todo Portugal Continental em compras acima de 100 euros
-    </p>
-  </div>
+  <div 
+  *ngIf="showPromotion" 
+  class="info-bar py-2 text-center w-100"
+  [ngClass]="{ 
+    'bg-warning text-dark': theme !== 'christmas', 
+    'bg-white text-black': theme === 'christmas' 
+  }"
+>
+  <p class="mb-0">
+    <i class="bi bi-truck"></i> <strong> Envio grátis para todo Portugal Continental em compras acima de 100 euros</strong>
+  </p>
+</div>
+
 
   <div *ngIf="isAuthenticaded && numberOfPurchases === 0 && userType === 'individual'  " class="info-bar bg-dark text-white py-2 text-center w-100">
     <p class="mb-0">
@@ -20,8 +31,7 @@
   </div>
   
 
-  <!-- Carousel -->
-  <div id="carouselExampleIndicators" class="carousel slide w-100" data-bs-ride="carousel" style="margin: 0; padding: 0;">
+  <div *ngIf="theme === 'default'" id="carouselExampleIndicators" class="carousel slide w-100" data-bs-ride="carousel" style="margin: 0; padding: 0;">
     <div class="carousel-inner w-100">
       <div *ngFor="let slide of slides; let i = index" class="carousel-item" [class.active]="i === 0">
         <a [routerLink]="['/artistsProducts', slide.name]">
@@ -38,23 +48,41 @@
       <span class="visually-hidden">Next</span>
     </button>
   </div>
+
+  <div *ngIf="theme === 'christmas'" class="christmas-theme">
+    <!-- Imagem de fundo -->
+    <img src="assets/back3.jpg" alt="Fundo de Natal" class="background-image" />
+  
+    <!-- Conteúdo -->
+    <h1 class="title">🎄 Merry Christmas! 🎅</h1>
+    <div class="countdown-container">
+      <countdown [config]="{ leftTime: getTimeUntilChristmas(), format: 'd:HH:mm:ss' }"></countdown>
+    </div>
+
+  </div>
   
 
-  <!-- Artists List -->
-  <app-artists-list
-    title="Artistas"
-    [artists]="artists"
-    [showButton]="true"
-    buttonLabel="Ver todos os artistas"
-    buttonLink="/artists-page"
-  ></app-artists-list>
+
+
+  <div class="section-background">
+    <app-artists-list
+      title="Artistas"
+      [artists]="artists"
+      [showButton]="true"
+      buttonLabel="Ver todos os artistas"
+      buttonLink="/artists-page"
+    ></app-artists-list>
+  </div>
+  
   <!-- Products List -->
-  <app-products-list
-    title="Produtos recentemente adicionados"
-    [products]="recentProducts"
-    [showButton]="true"
-    buttonLabel="Ver todos os produtos"
-    buttonLink="/products"
-  ></app-products-list>
+  <div class="section-background">
+    <app-products-list
+      title="Produtos recentemente adicionados"
+      [products]="recentProducts"
+      [showButton]="true"
+      buttonLabel="Ver todos os produtos"
+      buttonLink="/products"
+    ></app-products-list>
+  </div>
 
 </div>

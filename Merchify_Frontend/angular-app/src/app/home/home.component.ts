@@ -10,11 +10,13 @@ import { ArtistsListComponent } from '../artists-list/artists-list.component';
 import { User } from '../models/user';
 import { AuthService } from '../auth.service';
 import { ProfileService } from '../profile.service';
+import { ThemeService } from '../theme.service';
+import { CountdownModule } from 'ngx-countdown';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, RouterModule,ProductsListComponent,ArtistsListComponent],  
+  imports: [CommonModule, FormsModule, RouterLink, RouterModule,ProductsListComponent,ArtistsListComponent, CountdownModule],  
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
@@ -28,6 +30,7 @@ export class HomeComponent {
   purchases: any[] = [];
   numberOfPurchases: number = 0;
   userType: string = ''; 
+  theme: string = 'default'; 
   
 
 
@@ -51,8 +54,13 @@ export class HomeComponent {
 
   constructor(
     private authService: AuthService,
-    private profileService: ProfileService
+    private profileService: ProfileService,
+    private themeService: ThemeService
   ) {
+    this.themeService.theme$.subscribe((theme) => {
+      console.log('NavbarComponent received theme:', theme);
+      this.theme = theme;
+    });
     this.authService.user$.subscribe((user) => {
       this.user = user;
       if (this.authService.isAuthenticated()) {
@@ -88,6 +96,17 @@ export class HomeComponent {
     } catch (error) {
       console.error('Erro ao carregar perfil:', error);
     }
+  }
+  getTimeUntilChristmas(): number {
+    const now = new Date();
+    const christmas = new Date(now.getFullYear(), 11, 25); // 25 de Dezembro
+
+    // Se já passou o Natal deste ano, conte até o próximo ano
+    if (now > christmas) {
+      christmas.setFullYear(now.getFullYear() + 1);
+    }
+
+    return Math.floor((christmas.getTime() - now.getTime()) / 1000); // Retorna o tempo em segundos
   }
 }
 
