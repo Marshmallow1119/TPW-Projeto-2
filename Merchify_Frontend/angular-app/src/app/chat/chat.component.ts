@@ -27,13 +27,11 @@ export class ChatComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Fetch the logged-in user's information
     this.authService.getUserInfo().subscribe(
       (user: User) => {
         this.userType = user.user_type as 'individual' | 'company' | 'admin'; // Explicitly cast
         console.log('User type:', this.userType);
   
-        // Proceed with fetching messages once userType is known
         this.recipientId = +this.route.snapshot.paramMap.get('id')!;
         this.fetchMessages();
       },
@@ -41,13 +39,6 @@ export class ChatComponent implements OnInit {
         console.error('Failed to fetch user info:', error);
       }
     );
-  
-    // Optionally poll messages for real-time updates
-    setInterval(() => {
-      if (this.recipientId && this.userType) {
-        this.fetchMessages();
-      }
-    }, 5000);
   }
 
   fetchMessages(): void {

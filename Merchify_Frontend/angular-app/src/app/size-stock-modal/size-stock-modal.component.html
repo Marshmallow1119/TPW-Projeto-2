@@ -1,0 +1,36 @@
+<div
+  class="modal fade"
+  id="sizeStockModal"
+  tabindex="-1"
+  aria-labelledby="sizeStockModalLabel"
+  [ngClass]="{ show: isModalOpen }"
+  [style.display]="isModalOpen ? 'block' : 'none'"
+  [attr.aria-hidden]="!isModalOpen"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="sizeStockModalLabel">Adicionar Stock</h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="productStockSize">
+          <div *ngFor="let stockItem of productStockSize" class="d-flex mb-3">
+            <label class="me-2" [for]="'size_' + stockItem.size" style="min-width: 70px;">{{ stockItem.size }}:</label>
+            <input
+              type="number"
+              [(ngModel)]="stockItem.stock"
+              [id]="'size_' + stockItem.size"
+              class="form-control"
+              min="0"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="saveChanges()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>

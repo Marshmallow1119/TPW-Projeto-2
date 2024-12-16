@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Product } from './models/produto';
 import { base64toBlob } from './utils';
 import { CONFIG } from './config';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -104,6 +105,28 @@ export class ProductsService {
     }
   }
   
-  
+
+  async updateProductStock(productId: number, body: any): Promise<any> {
+    const token = localStorage.getItem('accessToken'); 
+    if (!token) {
+      throw new Error('Access token not found');
+    }
+    try {
+      const response = await fetch(`${this.baseUrl}/products/${productId}/stock/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update product stock');
+      }
+      return await response.json();
+    } catch (error) {
+
+  }
+}
   
 }

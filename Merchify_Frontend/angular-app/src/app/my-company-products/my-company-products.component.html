@@ -61,14 +61,6 @@
           <div class="d-flex justify-content-center">
             <!-- Botão de adicionar estoque -->
             <button
-              *ngIf="product.product_type === 'Clothing'"
-              class="btn btn-sm btn-success me-2"
-              (click)="openClothingStockModal(product)"
-            >
-              <i class="fas fa-plus me-1" style="color: black;"></i> Stock
-            </button>
-            <button
-              *ngIf="product.product_type !== 'Clothing'"
               class="btn btn-sm btn-success me-2"
               (click)="openStockModal(product)"
             >
@@ -96,3 +88,10 @@
     </div>
   </div>
   
+  <app-size-stock-modal
+  [isModalOpen]="isStockModalOpen"
+  [productStockSize]="selectedProduct?.stock_size || null"
+  (closeModalEvent)="closeStockModal()"
+  (saveChangesEvent)="onSaveStockChanges($event)"
+></app-size-stock-modal>
+

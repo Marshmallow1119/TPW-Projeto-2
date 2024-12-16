@@ -78,13 +78,11 @@ def home(request):
 @permission_classes([IsAuthenticated])
 def balance(request):
     user = request.user
-    print(user)
 
     if request.method == 'GET':
         return Response({'user': user.username, 'balance': str(user.balance)})
 
     elif request.method in ['POST', 'PUT']:
-        print(request.data)
         serializer = BalanceSerializer(data=request.data)
         if serializer.is_valid():
             amount = serializer.validated_data['amount']
@@ -403,16 +401,12 @@ def register_view(request):
            'username': user.username,
            'id': user.id,
        }, status=status.HTTP_201_CREATED)
-   print(serializer.errors)
    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def ban_user(request, user_id):
-    print(request.headers.get('Authorization'))  
-    print(request.user)  
-
     user = get_object_or_404(User, id=user_id)
     user.is_banned = True
     user.save()
@@ -609,9 +603,7 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
         if item_id:
             try:
                 data = json.loads(request.body)
-                print(data)
                 quantity = int(data.get("quantity", 1))
-                print(quantity)
                 cart_item = get_object_or_404(CartItem, id=item_id)
                 product = cart_item.product
 
@@ -966,7 +958,6 @@ def remove_from_favorites_company(request, company_id):
 @permission_classes([IsAuthenticated])
 def apply_discount(request):
     discount_code = request.query_params.get('discount_code', '').strip().lower()
-    print("Received discount code:", discount_code)
 
     user = request.user
 
@@ -1017,14 +1008,12 @@ def process_payment(request):
 
         with transaction.atomic():
 
-            print("User balance before purchase:", user.balance)
-            print("Final total:", final_total)
+
 
             user.balance -= Decimal(final_total)
             user.number_of_purchases += 1
             user.save()
 
-            print("User balance after purchase:", user.balance)
 
 
             purchase_data = {
@@ -1097,32 +1086,7 @@ def company_products(request, company_id):
     products = Product.objects.filter(company=company)
     print(f"Number of products found: {products.count()}")  # Debugging: Log the product count
 
-    products_data = []
-    for product in products:
-        if hasattr(product, 'clothing'):
-            sizes = product.clothing.sizes.all()
-            size_stock = {
-                'XS': sizes.filter(size='XS').first().stock if sizes.filter(size='XS').exists() else 0,
-                'S': sizes.filter(size='S').first().stock if sizes.filter(size='S').exists() else 0,
-                'M': sizes.filter(size='M').first().stock if sizes.filter(size='M').exists() else 0,
-                'L': sizes.filter(size='L').first().stock if sizes.filter(size='L').exists() else 0,
-                'XL': sizes.filter(size='XL').first().stock if sizes.filter(size='XL').exists() else 0,
-            }
-        else:
-            size_stock = product.get_stock()
-        artist_data = ArtistSerializer(product.artist, context={'request': request}).data if product.artist else None
-        products_data.append({
-            'id': product.id,
-            'name': product.name,
-            'artist': artist_data,
-            'description': product.description,
-            'price': product.price,
-            'image': product.image.url if product.image else None,
-            'favorites_count': product.favorites.count(),
-            'reviews_count': product.reviews.count(),
-            'size_stock': size_stock,
-            'product_type': product.get_product_type(),
-        })
+    products_data = ProductSerializer(products, many=True, context={'request': request}).data
 
     response = {
         'company': {
@@ -1133,7 +1097,6 @@ def company_products(request, company_id):
         'products': products_data,
     }
 
-    print(f"Returning response: {response}") 
     return Response(response)
 
 
@@ -1235,7 +1198,6 @@ def edit_product(request, product_id):
 def get_users(request):
     users = User.objects.all()
     serialized_users = UserSerializer(users, many=True)
-    print(serialized_users.data)
     return Response(serialized_users.data)
 
 @api_view(['DELETE'])
@@ -1363,7 +1325,6 @@ def reviews(request, product_id):
             return Response({"status": "error", "message": "Authentication required"}, status=401)
 
         user = request.user
-        print(f"User: {user}")
 
         review_form = ReviewForm(request.data)
         if review_form.is_valid():
@@ -1543,3 +1504,87 @@ def get_chat(request):
 
     serialized_chats = ChatSerializer(chats, many=True)
     return Response(serialized_chats.data)
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def fetch_product_stock(request, product_id):
+    """
+    Fetch stock for a specific product by ID.
+    """
+    product = get_object_or_404(Product, id=product_id)
+
+    stock = None
+    if product.get_product_type() == 'Vinil':
+        stock = product.vinil.stock
+    elif product.get_product_type() == 'CD':
+        stock = product.cd.stock
+    elif product.get_product_type() == 'Clothing':
+        sizes = product.clothing.sizes.all().values("size", "stock")
+        stock = {"total_stock": sum(size["stock"] for size in sizes), "sizes": list(sizes)}
+    elif product.get_product_type() == 'Accessory':
+        stock = product.accessory.stock
+
+    return Response({"stock": stock})
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_product_stock(request, product_id):
+    """Update stock or sizes for a product."""
+    try:
+        product = Product.objects.get(id=product_id)
+        product_type = product.get_product_type()
+        print("Request Data:", request.data)
+
+        # Ensure request data is properly structured
+        if not isinstance(request.data, list):
+            return Response({'error': 'Request data must be a list'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if product_type == 'Clothing':
+            # Validate and update sizes for Clothing
+            for size_data in request.data:
+                if 'size' not in size_data or 'stock' not in size_data:
+                    return Response({'error': 'Each size entry must include "size" and "stock"'}, status=status.HTTP_400_BAD_REQUEST)
+
+                size_instance = product.clothing.sizes.filter(size=size_data['size']).first()
+                if not size_instance:
+                    return Response({'error': f"Size '{size_data['size']}' not found for the product"}, status=status.HTTP_404_NOT_FOUND)
+
+                size_instance.stock = size_data['stock']
+                size_instance.save()
+
+            return Response({'message': 'Sizes updated successfully'}, status=status.HTTP_200_OK)
+
+        else:
+            # Update stock for specific product types
+            if len(request.data) != 1 or 'stock' not in request.data[0]:
+                return Response({'error': 'Request must contain a single object with "stock" for non-Clothing products'}, status=status.HTTP_400_BAD_REQUEST)
+
+            stock_value = request.data[0]['stock']
+
+            # Handle stock update based on product type
+            if product_type == 'Vinil':
+                vinil = product.vinil
+                vinil.stock = stock_value
+                vinil.save()
+            elif product_type == 'CD':
+                cd = product.cd
+                cd.stock = stock_value
+                cd.save()
+            elif product_type == 'Accessory':
+                accessory = product.accessory
+                accessory.stock = stock_value
+                accessory.save()
+            else:
+                # If stock is a direct field of the Product model
+                product.stock = stock_value
+                product.save()
+
+            print("Updated Product Stock:", stock_value)
+            return Response({'message': 'Stock updated successfully'}, status=status.HTTP_200_OK)
+
+    except Product.DoesNotExist:
+        return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        print("Error:", str(e))
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

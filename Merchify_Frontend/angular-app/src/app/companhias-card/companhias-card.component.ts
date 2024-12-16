@@ -17,6 +17,7 @@ export class CompanhiasCardComponent {
   @Input() company!: Company;
   @Input() isAuthenticated!: boolean;
   @Input() userType!: string;
+  
 
   toggleFavorite(event: Event): void {
     event.preventDefault(); 

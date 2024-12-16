@@ -83,6 +83,7 @@ urlpatterns = [
     path('ws/user/', views.get_user_info, name='get_user'),
     path('ws/company/', views.add_company, name='get_company'),
     path('ws/balance/', views.balance, name='balance'),
+    path('ws/products/<int:product_id>/stock/', views.update_product_stock, name='stock'),
 ]   
 
 

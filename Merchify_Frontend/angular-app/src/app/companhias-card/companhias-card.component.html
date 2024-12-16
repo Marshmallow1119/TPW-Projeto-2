@@ -20,7 +20,7 @@
     <div class="card-body text-center d-flex flex-column">
       <h5 class="card-title">{{ company.name }}</h5>
       <p class="card-text">{{ company.product_count }} produtos</p>
-      <p class="card-text">Avaliação Média: {{ company.average_rating }}</p>
+      <p class="card-text">Avaliação Média: {{ company.average_rating | number:'1.2-2' }}</p>
     </div>
   </a>
   <i

@@ -17,7 +17,8 @@ export interface Product {
   is_favorited?: boolean; 
   average_rating?: string | number; 
   product_type?: string; 
-  stock?: number; 
+  stock: number;
+  stock_size: any[]; 
   specific_details?: any;
   favorites_count: number;
   reviews_count: number;
