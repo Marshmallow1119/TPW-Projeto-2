@@ -66,7 +66,6 @@ def home(request):
 
         artists_data = ArtistSerializer(artists, many=True, context={'request': request}).data
         recent_products_data = ProductSerializer(recent_products, many=True, context={'request': request}).data
-
         return Response({
             'artists': artists_data,
             'recent_products': recent_products_data,
@@ -278,11 +277,8 @@ def produtos(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def add_promotion(request, product_id):
-    print('add_promotion')
     product = get_object_or_404(Product, id=product_id)
     data = request.data
-
-    print(data)
 
     new_price = data.get('new_price')
 
@@ -298,7 +294,6 @@ def add_promotion(request, product_id):
     product.is_on_promotion = True
     product.save()
 
-    # Retorna os três valores no JSON
     return Response({
         'message': 'Promoção aplicada com sucesso!',
         'old_price': old_price,
@@ -324,23 +319,6 @@ def cancel_promotion(request, product_id):
     product.save()
 
     return Response({'message': 'Promoção cancelada com sucesso!'})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 @api_view(['GET'])
@@ -1615,7 +1593,6 @@ def update_product_stock(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
         product_type = product.get_product_type()
-        print("Request Data:", request.data)
 
         # Ensure request data is properly structured
         if not isinstance(request.data, list):
@@ -1661,7 +1638,6 @@ def update_product_stock(request, product_id):
                 product.stock = stock_value
                 product.save()
 
-            print("Updated Product Stock:", stock_value)
             return Response({'message': 'Stock updated successfully'}, status=status.HTTP_200_OK)
 
     except Product.DoesNotExist:

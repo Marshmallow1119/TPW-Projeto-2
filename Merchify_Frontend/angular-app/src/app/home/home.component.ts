@@ -7,6 +7,9 @@ import { ProductsService } from '../products.service';
 import { Product } from '../models/produto';
 import { HomeService } from '../home.service';
 import { ArtistsListComponent } from '../artists-list/artists-list.component';
+import { User } from '../models/user';
+import { AuthService } from '../auth.service';
+import { ProfileService } from '../profile.service';
 
 @Component({
   selector: 'app-home',
@@ -20,11 +23,13 @@ export class HomeComponent {
   homeService: HomeService = inject(HomeService);
   recentProducts: Product[] = [];
   artists: any[] = [];
+  user: User | null = null;
+  isAuthenticaded: boolean = false;
+  purchases: any[] = [];
+  numberOfPurchases: number = 0;
+  userType: string = ''; 
+  
 
-
-  user = {
-    isAuthenticated: false,
-  };
 
   slides = [
     {
@@ -44,7 +49,17 @@ export class HomeComponent {
     }
   ];
 
-  constructor() {
+  constructor(
+    private authService: AuthService,
+    private profileService: ProfileService
+  ) {
+    this.authService.user$.subscribe((user) => {
+      this.user = user;
+      if (this.authService.isAuthenticated()) {
+        this.isAuthenticaded = true;
+        this.userType = user?.user_type || '';
+      }
+    });
     this.loadHomeData();
   }
 
@@ -58,5 +73,21 @@ export class HomeComponent {
     }
   }
 
+  async loadProfile(): Promise<void> {
+    try {
+      const data = await this.profileService.getProfile();
+
+      this.user = data.user;
+
+      console.log("user", this.user)
+      this.purchases = data.purchases;
+      this.numberOfPurchases = data.number_of_purchases;
+      console.log(this.numberOfPurchases)
+
+
+    } catch (error) {
+      console.error('Erro ao carregar perfil:', error);
+    }
+  }
 }
 

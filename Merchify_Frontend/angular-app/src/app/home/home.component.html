@@ -5,18 +5,20 @@
       <i class="bi bi-truck"></i> Envio grátis para todo Portugal Continental em compras acima de 100 euros
     </p>
   </div>
-  <div *ngIf="user.isAuthenticated" class="info-bar bg-dark text-white py-2 text-center w-100" style="margin: 0; padding: 0;">
+
+  <div *ngIf="isAuthenticaded && numberOfPurchases === 0 && userType === 'individual'  " class="info-bar bg-dark text-white py-2 text-center w-100">
     <p class="mb-0">
       <i class="bi bi-gift"></i> Promoção de 10% na sua primeira compra! Use o código <strong>PRIMEIRACOMPRA</strong>
     </p>
   </div>
-  <div *ngIf="!user.isAuthenticated" class="info-bar bg-dark text-white py-2 text-center w-100" style="margin: 0; padding: 0;">
+  <div *ngIf="!isAuthenticaded" class="info-bar bg-dark text-white py-2 text-center w-100">
     <a routerLink="/login" class="text-white text-decoration-none">
       <p class="mb-0">
         <i class="bi bi-gift"></i> Promoção de 10% na sua primeira compra! Faça login e use o código <strong>PRIMEIRACOMPRA</strong>
       </p>
     </a>
   </div>
+  
 
   <!-- Carousel -->
   <div id="carouselExampleIndicators" class="carousel slide w-100" data-bs-ride="carousel" style="margin: 0; padding: 0;">
@@ -36,6 +38,7 @@
       <span class="visually-hidden">Next</span>
     </button>
   </div>
+  
 
   <!-- Artists List -->
   <app-artists-list
@@ -51,7 +54,7 @@
     [products]="recentProducts"
     [showButton]="true"
     buttonLabel="Ver todos os produtos"
-    buttonLink="/products-page"
+    buttonLink="/products"
   ></app-products-list>
 
 </div>
