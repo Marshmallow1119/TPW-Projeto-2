@@ -132,6 +132,7 @@ async applyPromotion(): Promise<void> {
       await this.productService.addPromotion(product, this.newPromotionPrice);
 
       alert('Promoção aplicada com sucesso!');
+      console.log('is_on_sale:', product.is_on_promotion);
       this.closePromotionModal();
       this.fetchProducts(); 
     } catch (error) {
@@ -147,11 +148,10 @@ async cancelPromotion(product: Product): Promise<void> {
   if (!confirmation) return;
 
   try {
-    // Chamada ao serviço para cancelar a promoção
     await this.productService.cancelPromotion(product);
 
     alert('Promoção cancelada com sucesso!');
-    this.fetchProducts(); // Atualiza os produtos na tabela
+    this.fetchProducts(); 
   } catch (error) {
     console.error('Erro ao cancelar promoção:', error);
     alert('Erro ao cancelar promoção.');

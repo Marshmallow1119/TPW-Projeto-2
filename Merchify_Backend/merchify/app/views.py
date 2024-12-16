@@ -295,6 +295,7 @@ def add_promotion(request, product_id):
     # Atualiza o preço e salva o produto
     product.old_price = old_price
     product.price = new_price
+    product.is_on_promotion = True
     product.save()
 
     # Retorna os três valores no JSON
@@ -302,7 +303,8 @@ def add_promotion(request, product_id):
         'message': 'Promoção aplicada com sucesso!',
         'old_price': old_price,
         'new_price': new_price,
-        'current_price': product.price  # Pode ser igual a new_price
+        'current_price': product.price,  
+        'is_on_promotion': product.is_on_promotion
     }, status=status.HTTP_200_OK)
 
 

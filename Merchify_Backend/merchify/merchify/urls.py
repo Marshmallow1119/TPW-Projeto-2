@@ -83,10 +83,9 @@ urlpatterns = [
     path('ws/user/', views.get_user_info, name='get_user'),
     path('ws/company/', views.add_company, name='get_company'),
     path('ws/balance/', views.balance, name='balance'),
-    #const response = await fetch(`${this.baseUrl}/product/${product.id}/add-promotion/`, {
     path('ws/product/<int:product_id>/add-promotion/', views.add_promotion, name='add_promotion'),
     path('ws/products/<int:product_id>/stock/', views.update_product_stock, name='stock'),
-        path('product/<int:product_id>/cancel-promotion/', views.cancel_promotion, name='cancel_promotion'),
+    path('ws/product/<int:product_id>/cancel-promotion/', views.cancel_promotion, name='cancel_promotion'),
 ]   
 
 
