@@ -50,10 +50,8 @@
   </div>
 
   <div *ngIf="theme === 'christmas'" class="christmas-theme">
-    <!-- Imagem de fundo -->
     <img src="assets/back3.jpg" alt="Fundo de Natal" class="background-image" />
   
-    <!-- Conteúdo -->
     <h1 class="title">🎄 Merry Christmas! 🎅</h1>
     <div class="countdown-container">
       <countdown [config]="{ leftTime: getTimeUntilChristmas(), format: 'd:HH:mm:ss' }"></countdown>

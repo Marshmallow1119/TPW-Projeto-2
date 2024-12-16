@@ -100,12 +100,18 @@ style="padding: 0.25rem 0; min-height: 50px;">
                 </button>
               </form>
               <ng-container [ngSwitch]="user.user_type">
-                <a *ngSwitchCase="'individual'" routerLink="/profile" class="btn btn-outline-dark me-2"  >
+                <a *ngSwitchCase="'individual'" routerLink="/profile" class="btn btn-outline-dark me-2" [ngClass]="{ 
+                  'btn-outline-dark': theme !== 'christmas', 
+                  'btn-outline-light text-white': theme === 'christmas' 
+                }" >
                   <i class="fa fa-user"></i>
                 </a>
                 <div class="d-flex align-items-center">
                   <!-- Display User Balance -->
-                  <span *ngSwitchCase="'individual'" class="btn btn-outline-dark me-2">
+                  <span *ngSwitchCase="'individual'" class="btn btn-outline-dark me-2"[ngClass]="{ 
+                    'btn-outline-dark': theme !== 'christmas', 
+                    'btn-outline-light text-white': theme === 'christmas' 
+                  }">
                     Saldo: {{ user.balance | currency: 'EUR' }}
                   </span>
                 
@@ -115,6 +121,10 @@ style="padding: 0.25rem 0; min-height: 50px;">
                     class="btn btn-outline-success me-2" 
                     data-bs-toggle="modal" 
                     data-bs-target="#addFundsModal"
+                    [ngClass]="{ 
+                      'btn-outline-dark': theme !== 'christmas', 
+                      'btn-outline-light text-white': theme === 'christmas' 
+                    }"
                   >
                     <i class="fa fa-plus"></i>
                   </button>
