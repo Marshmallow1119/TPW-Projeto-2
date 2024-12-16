@@ -9,8 +9,8 @@
         >
           <div class="d-flex align-items-center">
             <img
-              *ngIf="chat.company.logo_base64"
-              [src]="'data:image/png;base64,' + chat.company.logo_base64"
+              *ngIf="chat.company.image_url"
+              [src]="chat.company.image_url"
               alt="{{ chat.company.name }}"
               class="company-logo mr-3"
             />

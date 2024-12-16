@@ -246,7 +246,9 @@ class Chat(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chats')
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='chats')  
-    created_at = models.DateTimeField(auto_now_add=True) 
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_user_timestamp = models.DateTimeField(auto_now_add=True)
+    last_company_timestamp = models.DateTimeField(auto_now_add=True)
 
     def clean(self):
         if self.user.user_type != 'individual':

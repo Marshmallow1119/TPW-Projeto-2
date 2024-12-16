@@ -5,13 +5,13 @@
   <a [routerLink]="['/company', company.id]" class="card-link" style="text-decoration: none;">
     <div class="card-img-wrapper">
       <img
-        *ngIf="company.logo_base64"
-        [src]="'data:image/png;base64,' + company.logo_base64"
+        *ngIf="company.image_url"
+        [src]="company.image_url"
         class="card-img-top"
         [alt]="company.name"
       />
       <img
-        *ngIf="!company.logo_base64"
+        *ngIf="!company.image_url"
         src="/assets/logo.png"
         class="card-img-top"
         alt="Default Logo"

@@ -123,7 +123,7 @@ def companhias(request):
     else:
         favorited_company_ids = []
 
-    serializer = CompanySerializer(companies, many=True)
+    serializer = CompanySerializer(companies, many=True, context={'request': request})
     companies_data = serializer.data
 
     for company in companies_data:
@@ -742,7 +742,7 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
 def company(request, company_id):
     if request.method == 'GET':
         company = get_object_or_404(Company, id=company_id)
-        serializer = CompanySerializer(company)
+        serializer = CompanySerializer(company, context={'request': request})
         return Response(serializer.data)
     elif request.method == 'DELETE':
         if not (request.user.user_type == 'admin' or request.user.user_type == 'company'):
@@ -1448,6 +1448,8 @@ def send_message(request, company_id=None, user_id=None):
         company = get_object_or_404(Company, id=company_id)
 
         chat, created = Chat.objects.get_or_create(user=request.user, company=company)
+        chat.unread_messages_company += 1
+
         is_from_company = False
 
     elif user_id and not company_id:
@@ -1461,6 +1463,7 @@ def send_message(request, company_id=None, user_id=None):
         user = get_object_or_404(User, id=user_id, user_type='individual')
 
         chat = Chat.objects.filter(user=user, company=company).first()
+        chat.unread_messages_user += 1
         if not chat:
             return JsonResponse({'error': 'Chat not found for this user and company.'}, status=404)
 
@@ -1475,6 +1478,7 @@ def send_message(request, company_id=None, user_id=None):
         is_from_company=is_from_company,
         text=message_text.strip()
     )
+    
 
     return JsonResponse({
         'message': {
@@ -1634,3 +1638,31 @@ def update_product_stock(request, product_id):
     except Exception as e:
         print("Error:", str(e))
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def get_all_unread_messages(request):
+    if not request.user.is_authenticated:
+        raise PermissionDenied
+
+    total_unread_messages = 0
+
+    if hasattr(request.user, 'company') and request.user.company:
+        chats = Chat.objects.filter(company=request.user.company)
+
+        for chat in chats:
+            unread_messages = chat.messages.filter(
+                date__gt=chat.last_company_timestamp,
+                is_from_company=False
+            ).count()
+            total_unread_messages += unread_messages
+
+    elif request.user.user_type == 'individual':
+        chats = Chat.objects.filter(user=request.user)
+
+        for chat in chats:
+            unread_messages = chat.messages.filter(
+                date__gt=chat.last_user_timestamp,
+                is_from_company=True
+            ).count()
+            total_unread_messages += unread_messages
+    return JsonResponse({'total_unread_messages': total_unread_messages})

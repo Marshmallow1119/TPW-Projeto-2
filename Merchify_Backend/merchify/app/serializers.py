@@ -13,19 +13,21 @@ def encode_image_to_base64(image_field):
 
 # Company Serializer
 class CompanySerializer(serializers.ModelSerializer):
-    logo_base64 = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
     product_count = serializers.IntegerField(source='getNumberOfProducts', read_only=True)
     average_rating = serializers.FloatField(source='get_average_rating', read_only=True)
 
     class Meta:
         model = Company
         fields = [
-            'id', 'name', 'address', 'email', 'phone', 'logo_base64',
+            'id', 'name', 'address', 'email', 'phone', 'image_url',
             'product_count', 'average_rating'
         ]
 
-    def get_logo_base64(self, obj):
-        return encode_image_to_base64(obj.logo) if obj.logo else None
+    def get_image_url(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.logo.url) if obj.logo and request else None
+    
 
 class BalanceSerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=10, decimal_places=2)
@@ -306,10 +308,12 @@ class ChatSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     company = CompanySerializer(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
+    last_user_timestamp = serializers.DateTimeField(read_only=True)
+    last_company_timestamp = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = Chat
-        fields = ['id', 'user', 'company', 'created_at']
+        fields = ['id', 'user', 'company', 'created_at', 'last_user_timestamp', 'last_company_timestamp']
 
 
 class MessageSerializer(serializers.ModelSerializer):

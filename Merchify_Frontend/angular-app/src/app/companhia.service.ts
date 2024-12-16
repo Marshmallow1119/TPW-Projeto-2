@@ -91,4 +91,23 @@ export class CompaniesService {
     }
   }
 
+  async getCompany(companyId: number): Promise<Company> {
+    const token = localStorage.getItem('accessToken');
+    const url = `${this.baseUrl}/company/${companyId}/`;
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch company');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching company:', error);
+      throw error;
+    }
+  }
+
 }

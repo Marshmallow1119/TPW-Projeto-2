@@ -5,7 +5,7 @@
     address?: string;
     email: string;
     phone: string;
-    logo_base64?: string; 
+    image_url?: string; 
     product_count: number; 
     average_rating: number | string; 
     is_favorited: boolean; 

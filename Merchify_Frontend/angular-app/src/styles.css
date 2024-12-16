@@ -230,3 +230,8 @@
   body.dark-theme .btn-close {
     filter: brightness(0) invert(1) !important;
   }
+
+  body.dark-theme .chat-header {
+    background-color: #343a40 !important;
+    color: #ffffff !important;
+  }

@@ -100,6 +100,7 @@ export class AdminProductsTableComponent implements OnInit {
     try {
       await this.productService.updateProductStock(this.selectedProduct.id, updatedStockSize);
       await this.fetchProducts();
+      alert('Stock updated successfully!');
       this.closeStockModal();
     } catch (error) {
       console.error('Error updating stock:', error);
@@ -108,13 +109,11 @@ export class AdminProductsTableComponent implements OnInit {
   }
 
 
-    // Abre o modal de promoção
 openPromotionModal(product: any): void {
-  this.selectedProductForPromotion = { ...product }; // Clona o produto para preservar o estado original
-  this.newPromotionPrice = product.price; // Preenche o preço atual
+  this.selectedProductForPromotion = { ...product }; 
+  this.newPromotionPrice = product.price; 
 }
 
-// Fecha o modal de promoção
 closePromotionModal(): void {
   this.selectedProductForPromotion = null;
   this.newPromotionPrice = null;
