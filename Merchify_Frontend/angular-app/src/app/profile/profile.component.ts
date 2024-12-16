@@ -47,28 +47,11 @@ export class ProfileComponent implements OnInit {
       this.numberOfPurchases = data.number_of_purchases;
 
 
-      console.log('image_url:', this.user?.image);
     } catch (error) {
       console.error('Erro ao carregar perfil:', error);
     }
   }
 
-  async saveProfile(): Promise<void> {
-    const updatedData = {
-      first_name: this.user?.firstname,
-      last_name: this.user?.lastname,
-      email: this.user?.email,
-    };
-
-    try {
-      const response = await this.profileService.updateProfile(updatedData);
-      console.log('Perfil atualizado com sucesso:', response);
-      alert('Perfil atualizado com sucesso!');
-    } catch (error) {
-      console.error('Erro ao atualizar perfil:', error);
-      alert('Erro ao atualizar perfil.');
-    }
-  }
 
   toggleEdit(): void {
     this.editing = !this.editing;
@@ -82,6 +65,9 @@ export class ProfileComponent implements OnInit {
       lastname: this.user.lastname,
       email: this.user.email,
       username: this.user.username,
+      phone: this.user.phone,
+      address: this.user.address,
+      country: this.user.country,
     };
 
     try {
@@ -98,7 +84,7 @@ export class ProfileComponent implements OnInit {
     if (confirm('Tem certeza que deseja deletar sua conta?')) {
       try {
         await this.profileService.deleteAccount();
-        this.authService.logout(); // Redireciona para login
+        this.authService.logout(); 
       } catch (error) {
         console.error('Erro ao deletar conta:', error);
         alert('Erro ao deletar conta.');

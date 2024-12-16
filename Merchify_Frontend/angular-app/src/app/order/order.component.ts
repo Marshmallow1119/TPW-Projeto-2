@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ProfileService } from '../profile.service';
 import { User } from '../models/user';
 import { Product } from '../models/produto';
 
@@ -13,7 +12,7 @@ import { Product } from '../models/produto';
   templateUrl: './order.component.html',
   styleUrl: './order.component.css'
 })
-export class OrderComponent implements OnInit {
+export class OrderComponent {
   @Input() order: any;
   isModalOpen = false;
   selectedOrder: any | null = null;
@@ -22,26 +21,7 @@ export class OrderComponent implements OnInit {
   numberOfPurchases: number = 0;
   products: Product[] = [];
   products_details: any[] = [];
-  constructor(private profileService: ProfileService) {}
-  ngOnInit(): void {
-    this.loadProfile();
-  }
-
-  async loadProfile(): Promise<void> {
-    try {
-      const data = await this.profileService.getProfile();
-
-      this.user = data.user;
-      this.purchases = data.purchases;
-      this.products = this.purchases.flatMap(purchase => purchase.products);
-      this.numberOfPurchases = data.number_of_purchases;
-
-      
-
-    } catch (error) {
-      console.error('Erro ao carregar perfil:', error);
-    }
-  }
+  constructor() {}
 
   viewDetails(): void {
     this.selectedOrder = this.order;

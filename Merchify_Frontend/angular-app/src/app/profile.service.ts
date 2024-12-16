@@ -32,6 +32,7 @@ export class ProfileService {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Erro ao carregar o perfil.');
       }
+      
       return await response.json();
     } catch (error) {
       console.error('Erro em getProfile:', error);
@@ -45,7 +46,7 @@ export class ProfileService {
       if (!token) {
         throw new Error('Token de autenticação não encontrado.');
       }
-
+      console.log("entrou no update")
       const response = await fetch(`${this.baseUrl}/account/profile`, {
         method: 'PUT',
         headers: {
@@ -108,6 +109,5 @@ export class ProfileService {
       throw error;
     }
   }
-
 
 }
