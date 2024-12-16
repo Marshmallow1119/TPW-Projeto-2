@@ -278,21 +278,50 @@ def produtos(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def add_promotion(request, product_id):
+    print('add_promotion')
     product = get_object_or_404(Product, id=product_id)
     data = request.data
 
+    print(data)
+
     new_price = data.get('new_price')
+
     if not new_price:
         return Response({'error': 'New price is required.'}, status=status.HTTP_400_BAD_REQUEST)
     
-    product.old_price = product.price
+    # Salva o preço antigo antes de alterar
+    old_price = product.price
+    
+    # Atualiza o preço e salva o produto
+    product.old_price = old_price
     product.price = new_price
     product.save()
 
+    # Retorna os três valores no JSON
+    return Response({
+        'message': 'Promoção aplicada com sucesso!',
+        'old_price': old_price,
+        'new_price': new_price,
+        'current_price': product.price  # Pode ser igual a new_price
+    }, status=status.HTTP_200_OK)
 
-    return Response({'message': 'Promoção aplicada com sucesso!'})
 
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def cancel_promotion(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
 
+    if not product.is_on_promotion:
+        return Response({'error': 'O produto não está em promoção.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Reverter o preço antigo
+    product.price = product.old_price
+    product.old_price = None
+    product.is_on_promotion = False
+    product.save()
+
+    return Response({'message': 'Promoção cancelada com sucesso!'})
 
 
 

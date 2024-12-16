@@ -33,9 +33,9 @@
               <span [ngClass]="{ 'promotion-price': product.is_on_promotion }">
                 {{ product.price | number: '1.2-2' }}€
               </span>
-              <!-- Rótulo 'Em Promoção' -->
-              <div *ngIf="product.is_on_promotion" class="text-danger small">
-                (em promoção)
+              <!-- Rótulo 'PROMOÇÃO' -->
+              <div *ngIf="product.is_on_promotion" class="text-warning small fw-bold">
+                PROMOÇÃO
               </div>
             </div>
           </td>
@@ -74,8 +74,19 @@
             <button class="btn btn-danger btn-sm me-2" (click)="openDeleteModal(product)">
               <i class="fas fa-trash-alt"></i> Apagar
             </button>
-            <button class="btn btn-warning btn-sm" (click)="openPromotionModal(product)">
+            <button
+              *ngIf="!product.is_on_promotion"
+              class="btn btn-warning btn-sm"
+              (click)="openPromotionModal(product)"
+            >
               <i class="fas fa-percent"></i> Promoção
+            </button>
+            <button
+              *ngIf="product.is_on_promotion"
+              class="btn btn-danger btn-sm"
+              (click)="confirmCancelPromotion(product)"
+            >
+              <i class="fas fa-times-circle"></i> Cancelar Promoção
             </button>
           </td>          
         </tr>

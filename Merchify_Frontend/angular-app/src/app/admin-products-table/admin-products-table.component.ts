@@ -108,10 +108,9 @@ export class AdminProductsTableComponent implements OnInit {
   }
 
 
-    // Abre o modal de promoção
 openPromotionModal(product: any): void {
-  this.selectedProductForPromotion = { ...product }; // Clona o produto para preservar o estado original
-  this.newPromotionPrice = product.price; // Preenche o preço atual
+  this.selectedProductForPromotion = product;
+  this.newPromotionPrice = null;
 }
 
 // Fecha o modal de promoção
@@ -130,7 +129,6 @@ async applyPromotion(): Promise<void> {
     try {
       const product = this.selectedProductForPromotion;
 
-      // Chama o serviço para aplicar a promoção
       await this.productService.addPromotion(product, this.newPromotionPrice);
 
       alert('Promoção aplicada com sucesso!');
@@ -142,4 +140,26 @@ async applyPromotion(): Promise<void> {
     }
   }
 }
+
+
+async cancelPromotion(product: Product): Promise<void> {
+  const confirmation = confirm('Tem a certeza que deseja retirar a promoção?');
+  if (!confirmation) return;
+
+  try {
+    // Chamada ao serviço para cancelar a promoção
+    await this.productService.cancelPromotion(product);
+
+    alert('Promoção cancelada com sucesso!');
+    this.fetchProducts(); // Atualiza os produtos na tabela
+  } catch (error) {
+    console.error('Erro ao cancelar promoção:', error);
+    alert('Erro ao cancelar promoção.');
+  }
+}
+
+confirmCancelPromotion(product: Product): void {
+  this.cancelPromotion(product);
+}
+
 }
