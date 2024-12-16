@@ -24,6 +24,8 @@ from django.views.decorators.http import require_POST
 import jwt
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils.timezone import now
+from django.contrib.auth import update_session_auth_hash
+
 
 
 # Django Forms and Validation
@@ -131,13 +133,14 @@ def companhias(request):
     return Response(companies_data)
 
 
-@api_view(['GET', 'PUT'])
+@api_view(['GET', 'PUT','DELETE'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def profile(request):
     user = request.user
 
     if request.method == 'GET':
+
         user_serializer = UserSerializer(user)
         purchases = Purchase.objects.filter(user=user)
 
@@ -150,12 +153,8 @@ def profile(request):
         })
 
     elif request.method == 'PUT':
-        data = request.data
 
-        if 'delete_account' in data:
-            # Deleting user account
-            user.delete()
-            return Response({'message': 'Conta eliminada com sucesso.'}, status=status.HTTP_200_OK)
+        data = request.data
 
         if 'submit_password' in data:
             # Handling password change
@@ -175,35 +174,47 @@ def profile(request):
             try:
                 user.set_password(new_password)
                 user.save()
-                update_session_auth_hash(request, user)  # Atualizar a sessão para evitar logout
+                update_session_auth_hash(request, user) 
                 return Response({'message': 'Senha alterada com sucesso.'}, status=status.HTTP_200_OK)
             except ValidationError as e:
                 raise ValidationError(e.messages)
+        
+        else:
 
-        # Atualizar informações do perfil
-        user.first_name = data.get('first_name', user.first_name)
-        user.last_name = data.get('last_name', user.last_name)
-        user.email = data.get('email', user.email)
-        user.username = data.get('username', user.username)
-        user.address = data.get('address', user.address)
-        phone = data.get('phone', user.phone)
-        user.country = data.get('country', user.country)
+            if 'firstname' in data:
+                user.firstname = data.get('firstname')
+            if 'lastname' in data:
+                user.lastname = data.get('lastname')
+            if 'email' in data:
+                user.email = data.get('email')
+            if 'address' in data:
+                user.address = data.get('address')
+            if 'country' in data:
+                user.country = data.get('country')
+            
 
-        if phone and not re.fullmatch(r'\d{9}', phone):
-            raise ValidationError("O número de telefone deve conter exatamente 9 dígitos.")
-        user.phone = phone
+            if 'image' in request.FILES:
+                user.image = request.FILES['image']
 
-        if 'image' in request.FILES:
-            user.image = request.FILES['image']
+            phone = data.get('phone')
+            if phone and not re.fullmatch(r'\d{9}', phone):
+                raise ValidationError("O número de telefone deve conter exatamente 9 dígitos.")
+            if 'phone' in data:
+                user.phone = phone
 
-        user.save()
 
-        # Serialize updated data
-        updated_user_serializer = UserSerializer(user)
+            user.save()
 
-        return Response({'message': 'Perfil atualizado com sucesso.', 'user': updated_user_serializer.data})
 
-    return Response({'error': 'Método não suportado.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+            updated_user_serializer = UserSerializer(user)
+            return Response({'message': 'Perfil atualizado com sucesso.', 'user': updated_user_serializer.data})
+
+    elif request.method == 'DELETE':
+        user.delete()
+        return Response({'message': 'Conta eliminada com sucesso.'}, status=status.HTTP_200_OK)
+        
+    else:
+        return Response({'error': 'Método não suportado.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['GET'])

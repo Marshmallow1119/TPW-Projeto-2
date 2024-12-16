@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Product } from './models/produto';
-import { base64toBlob } from './utils';
 import { CONFIG } from './config';
 import { HttpHeaders } from '@angular/common/http';
 
@@ -14,19 +13,24 @@ export class ProductsService {
   constructor(private router:Router) { }
 
   //getProduct
-  async getProduct(id:number):Promise<Product>{
-    const url = this.baseUrl + '/produtos/' + id;
-    const data: Response =  await fetch(url);
-    const product: Product = await data.json() ?? [];
-    return product;
-
+  async getProduct(id: number): Promise<Product> {
+    try {
+      const response = await fetch(`${this.baseUrl}/product/${id}`);
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar produto: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Erro ao buscar produto:', error);
+      throw error;
+    }
   }
 
 
   //getProducts
   async getProducts(): Promise<Product[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/produtos/`);
+      const response = await fetch(`${this.baseUrl}/products/`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -57,7 +61,7 @@ export class ProductsService {
 
   async editProduct(product: Product): Promise<void> {
     try {
-      await fetch(`${this.baseUrl}/products/${product.id}/`, {
+      await fetch(`${this.baseUrl}/product/${product.id}/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +97,7 @@ export class ProductsService {
       const formData = new FormData();
       formData.append('product', JSON.stringify(product));
       formData.append('image', imageFile);
-      const response = await fetch(`${this.baseUrl}/produtos/`, {
+      const response = await fetch(`${this.baseUrl}/products/`, {
         method: 'POST',
         body: formData,
       });

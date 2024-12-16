@@ -115,7 +115,7 @@ export class MyCompanyProductsComponent {
         formData.append('image', product.image_url);
       }
   
-      const response = await fetch(`${this.baseUrl}/produtos/${product.id}/`, {
+      const response = await fetch(`${this.baseUrl}/products/${product.id}/`, {
         method: 'PUT',
         body: formData,
       });

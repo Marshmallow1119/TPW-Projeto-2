@@ -20,7 +20,7 @@ export class ProfileComponent implements OnInit {
   editing = false;
   numberOfPurchases: number = 0;
   changingPassword = false;
-  showPasswordFields: boolean = false; // Controla a exibição dos campos de senha
+  showPasswordFields: boolean = false; 
   passwords = {
     old_password: '',
     new_password: '',
@@ -40,15 +40,14 @@ export class ProfileComponent implements OnInit {
 
   async loadProfile(): Promise<void> {
     try {
-      console.log('Carregando perfil...');
       const data = await this.profileService.getProfile();
-      console.log('Perfil carregado:', this.user);
 
       this.user = data.user;
+
+      console.log("user", this.user)
       this.purchases = data.purchases;
       this.numberOfPurchases = data.number_of_purchases;
-
-      console.log('Dados de compras:', this.purchases);
+      console.log(this.numberOfPurchases)
 
 
     } catch (error) {
@@ -56,22 +55,6 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  async saveProfile(): Promise<void> {
-    const updatedData = {
-      first_name: this.user?.firstname,
-      last_name: this.user?.lastname,
-      email: this.user?.email,
-    };
-
-    try {
-      const response = await this.profileService.updateProfile(updatedData);
-      console.log('Perfil atualizado com sucesso:', response);
-      alert('Perfil atualizado com sucesso!');
-    } catch (error) {
-      console.error('Erro ao atualizar perfil:', error);
-      alert('Erro ao atualizar perfil.');
-    }
-  }
 
   toggleEdit(): void {
     this.editing = !this.editing;
@@ -85,13 +68,21 @@ export class ProfileComponent implements OnInit {
       lastname: this.user.lastname,
       email: this.user.email,
       username: this.user.username,
+      phone: this.user.phone,
+      address: this.user.address,
+      country: this.user.country,
     };
+
 
     try {
       await this.profileService.updateProfile(updateData);
       alert('Perfil atualizado com sucesso!');
+      console.log('Problema aqui');
+      await this.loadProfile();
+
       this.editing = false;
     } catch (error) {
+      await this.loadProfile();
       console.error('Erro ao atualizar perfil:', error);
       alert('Erro ao atualizar perfil.');
     }
@@ -101,7 +92,7 @@ export class ProfileComponent implements OnInit {
     if (confirm('Tem certeza que deseja deletar sua conta?')) {
       try {
         await this.profileService.deleteAccount();
-        this.authService.logout(); // Redireciona para login
+        this.authService.logout(); 
       } catch (error) {
         console.error('Erro ao deletar conta:', error);
         alert('Erro ao deletar conta.');
@@ -110,7 +101,7 @@ export class ProfileComponent implements OnInit {
   }
 
   togglePasswordChange(): void {
-    alert('Alteração de senha ainda não implementada.');
+    this.showPasswordFields = true; 
   }
 
   async showOrderDetails(orderId: number): Promise<void> {
@@ -141,14 +132,24 @@ export class ProfileComponent implements OnInit {
     }
 
     try {
-      await this.profileService.changePassword(this.passwords.old_password, this.passwords.new_password);
+      await this.profileService.changePassword(this.passwords);
       alert('Senha alterada com sucesso!');
-      this.togglePasswordChange();
+      this.cancelPasswordChange();
     } catch (error) {
       console.error('Erro ao alterar senha:', error);
       alert('Erro ao alterar senha.');
     }
   }
+
+  cancelPasswordChange(): void {
+    this.showPasswordFields = false;
+    this.passwords = {
+      old_password: '',
+      new_password: '',
+      confirm_new_password: '',
+    };
+  }
+
 
   
 

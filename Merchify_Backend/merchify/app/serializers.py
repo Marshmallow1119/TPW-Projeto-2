@@ -3,6 +3,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User as AuthUser
 from django.conf import settings
 from app.models import *
+from django.core.files.base import ContentFile
 
 # Helper function for encoding images in Base64
 def encode_image_to_base64(image_field):
@@ -34,20 +35,46 @@ class BalanceSerializer(serializers.Serializer):
             raise serializers.ValidationError("The amount must be greater than zero.")
         return value
 
-# User Serializer
 class UserSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-    company = CompanySerializer(read_only=True)
+    image = serializers.SerializerMethodField()  # Para leitura
+    company = CompanySerializer(read_only=True)  # Apenas leitura
 
     class Meta:
         model = User
         fields = [
             'id', 'username', 'firstname', 'lastname', 'user_type',
-            'email', 'phone', 'country', 'image', 'balance', 'company'
+            'email', 'phone', 'country', 'image', 'balance', 'company', 'address'
         ]
 
     def get_image(self, obj):
         return encode_image_to_base64(obj.image) if obj.image else None
+
+    def update(self, instance, validated_data):
+        # Verificar se a imagem é um Base64
+        image_base64 = self.initial_data.get('image')
+        if image_base64:
+            try:
+                # Remover prefixo "data:image/*;base64,"
+                format, imgstr = image_base64.split(';base64,')
+                ext = format.split('/')[-1]
+                instance.image.save(
+                    f"{instance.username}.{ext}",
+                    ContentFile(base64.b64decode(imgstr)),
+                    save=False
+                )
+            except Exception as e:
+                raise serializers.ValidationError(f"Erro ao processar imagem: {e}")
+        
+        # Atualizar outros campos normalmente
+        instance.firstname = validated_data.get('firstname', instance.firstname)
+        instance.lastname = validated_data.get('lastname', instance.lastname)
+        instance.email = validated_data.get('email', instance.email)
+        instance.phone = validated_data.get('phone', instance.phone)
+        instance.country = validated_data.get('country', instance.country)
+        instance.address = validated_data.get('address', instance.address)
+        
+        instance.save()
+        return instance
 
 
 # Artist Serializer
@@ -209,14 +236,20 @@ class FavoriteCompanySerializer(serializers.ModelSerializer):
 # Purchase Serializer
 class PurchaseSerializer(serializers.ModelSerializer):
     total = serializers.ReadOnlyField()
+    products= serializers.SerializerMethodField()
 
     class Meta:
         model = Purchase
         fields = [
             'id', 'user', 'date', 'paymentMethod', 'shippingAddress',
-            'status', 'total_amount', 'discount_applied', 'discount_value', 'total'
+            'status', 'total_amount', 'discount_applied', 'discount_value', 'total','products'
         ]
-   
+    def get_products(self, obj):
+        # Usa o serializer de produtos associados
+        purchase_products = PurchaseProduct.objects.filter(purchase=obj)
+
+        return PurchaseProductSerializer(purchase_products, many=True).data
+
 # Review Serializer
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -228,11 +261,12 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 # PurchaseProduct Serializer
 class PurchaseProductSerializer(serializers.ModelSerializer):
+    product_details = ProductSerializer(source='product', read_only=True)
     total = serializers.ReadOnlyField()
 
     class Meta:
         model = PurchaseProduct
-        fields = ['id', 'purchase', 'product', 'quantity', 'total']
+        fields = ['id', 'purchase', 'product','product_details', 'quantity', 'total']
 
 # Login Serializer
 class LoginSerializer(serializers.Serializer):

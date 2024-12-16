@@ -3,29 +3,19 @@
       <!-- Coluna do Perfil -->
       <div class="col-md-4 border-right">
           <div class="d-flex flex-column align-items-center text-center p-3 py-5">
-              <img
-                  *ngIf="user?.image"
-                  [src]="user?.image"
-                  class="profile-picture rounded-circle mt-5"
-                  width="200"
-                  height="200"
-                  alt="Profile Picture"
-              />
-              <img
-                  *ngIf="!user?.image"
-                  src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"
-                  class="profile-picture rounded-circle mt-5"
-                  width="200"
-                  height="200"
-                  alt="Default Profile Picture"
-              />
+            <img
+            *ngIf="user?.image"
+            [src]="'data:image/png;base64,' + user?.image"
+            alt="User Profile Image"
+            class="profile-image"
+          />
               <div *ngIf="editing" class="mt-3">
                   <button class="btn btn-outline-primary" (click)="uploadProfilePicture()">Alterar Foto</button>
                   <input type="file" id="profileImage" (change)="onImageSelected($event)" hidden />
               </div>
               <h4 class="font-weight-bold mt-3">{{ user?.username }}</h4>
               <p class="text-black-50">{{ user?.email }}</p>
-              <p *ngIf="user?.user_type === 'individual'">Número de Compras: {{ user?.number_of_purchases }}</p>
+              <p *ngIf="user?.user_type === 'individual'">Número de Compras: {{ numberOfPurchases }}</p>
           </div>
       </div>
 
@@ -74,35 +64,62 @@
                       </div>
 
                       <!-- Botões de Ação -->
-                      <div class="mt-5 text-end">
-                          <button type="button" class="btn btn-primary me-3" (click)="toggleEdit()">
-                              {{ editing ? 'Cancelar' : 'Editar' }}
-                          </button>
-                          <button *ngIf="editing" type="button" class="btn btn-success me-3" (click)="saveChanges()">Salvar</button>
-                          <button type="button" class="btn btn-danger me-3" (click)="deleteAccount()">Deletar Conta</button>
-                          <button type="button" class="btn btn-secondary" (click)="togglePasswordChange()">Alterar Senha</button>
-                      </div>
+<div class="mt-5 text-end">
+    <!-- Exibe os botões normais apenas se os campos de senha não estiverem visíveis -->
+    <ng-container *ngIf="!showPasswordFields; else passwordActions">
+        <button type="button" class="btn btn-primary me-3" (click)="toggleEdit()">
+            {{ editing ? 'Cancelar' : 'Editar' }}
+        </button>
+        <button *ngIf="editing" type="button" class="btn btn-success me-3" (click)="saveChanges()">Salvar</button>
+        <button type="button" class="btn btn-danger me-3" (click)="deleteAccount()">Deletar Conta</button>
+        <button type="button" class="btn btn-secondary" (click)="togglePasswordChange()">Alterar Senha</button>
+    </ng-container>
 
-                      <!-- Campos para Alteração de Senha -->
-                      <div *ngIf="showPasswordFields" class="mt-4">
-                          <div class="row">
-                              <div class="col-md-12">
-                                  <label class="labels">Senha Atual</label>
-                                  <input type="password" class="form-control" [(ngModel)]="passwords.old_password" />
-                              </div>
-                              <div class="col-md-12 mt-3">
-                                  <label class="labels">Nova Senha</label>
-                                  <input type="password" class="form-control" [(ngModel)]="passwords.new_password" />
-                              </div>
-                              <div class="col-md-12 mt-3">
-                                  <label class="labels">Confirmar Nova Senha</label>
-                                  <input type="password" class="form-control" [(ngModel)]="passwords.confirm_new_password" />
-                              </div>
-                          </div>
-                          <div class="mt-3 text-end">
-                              <button type="button" class="btn btn-primary" (click)="changePassword()">Salvar Nova Senha</button>
-                          </div>
-                      </div>
+    <!-- Botões para alteração de senha -->
+    <ng-template #passwordActions>
+        <button type="button" class="btn btn-primary me-3" (click)="changePassword()">Salvar Nova Senha</button>
+        <button type="button" class="btn btn-secondary" (click)="cancelPasswordChange()">Cancelar</button>
+    </ng-template>
+</div>
+
+<!-- Campos para Alteração de Senha -->
+<!-- Campos para Alteração de Senha -->
+<div *ngIf="showPasswordFields" class="mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <label class="labels">Senha Atual</label>
+            <input
+                type="password"
+                class="form-control"
+                [(ngModel)]="passwords.old_password"
+                [ngModelOptions]="{standalone: true}"
+                name="oldPassword"
+            />
+        </div>
+        <div class="col-md-12 mt-3">
+            <label class="labels">Nova Senha</label>
+            <input
+                type="password"
+                class="form-control"
+                [(ngModel)]="passwords.new_password"
+                [ngModelOptions]="{standalone: true}"
+                name="newPassword"
+            />
+        </div>
+        <div class="col-md-12 mt-3">
+            <label class="labels">Confirmar Nova Senha</label>
+            <input
+                type="password"
+                class="form-control"
+                [(ngModel)]="passwords.confirm_new_password"
+                [ngModelOptions]="{standalone: true}"
+                name="confirmNewPassword"
+            />
+        </div>
+    </div>
+</div>
+
+
                   </div>
               </form>
           </div>

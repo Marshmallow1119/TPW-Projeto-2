@@ -1,0 +1,1 @@
+from app.models import User  # Substitua 'app' pelo nome do seu app

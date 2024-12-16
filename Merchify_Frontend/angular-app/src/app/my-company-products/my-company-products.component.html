@@ -1,7 +1,7 @@
 <div class="container my-5">
     <h1 class="my-4 text-center">Produtos de {{ company?.name }}</h1>
   
-    <!-- Mensagem para quando não houver produtos -->
+    <!-- Mensagem quando não houver produtos -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <a></a>
       <p *ngIf="!products.length" class="text-muted mb-0">
@@ -9,12 +9,8 @@
       </p>
     </div>
   
-    <!-- Botão para adicionar produtos -->
-    <button
-      class="btn btn-dark mb-4"
-      style="width: 100%;"
-      (click)="onAddProduct()"
-    >
+    <!-- Botão Adicionar Produto -->
+    <button class="btn btn-dark mb-4 w-100" (click)="onAddProduct()">
       Adicionar Produto
     </button>
   
@@ -25,10 +21,10 @@
         *ngFor="let product of products"
       >
         <div class="product-card">
+          <!-- Link para detalhes do produto -->
           <a
-            [routerLink]="['/companies', company?.id, 'products', product.id]"
-            class="d-block"
-            style="text-decoration: none; color: inherit;"
+            [routerLink]="['/product', product.id]"
+            class="d-block text-decoration-none text-dark"
           >
             <img
               [src]="product.image_url"
@@ -41,25 +37,11 @@
               <p class="product-description">
                 {{ product.description | slice: 0:50 }}...
               </p>
-              <div
-                class="d-flex justify-content-center align-items-center"
-                style="margin-bottom: 40px"
-              >
-                <div class="me-3">
-                  <i class="fa fa-heart text-danger"></i>
-                  {{ product.favorites_count }}
-                </div>
-                <div>
-                  <i class="fa fa-comment text-info"></i>
-                  {{ product.reviews_count }}
-                </div>
-              </div>
             </div>
           </a>
   
-          <!-- Botões de ações -->
-          <div class="d-flex justify-content-center">
-            <!-- Botão de adicionar estoque -->
+          <!-- Botões de Ações -->
+          <div class="d-flex justify-content-center mt-2">
             <button
               class="btn btn-sm btn-success me-2"
               (click)="openStockModal(product)"
@@ -67,15 +49,13 @@
               <i class="fas fa-plus me-1" style="color: black;"></i> Stock
             </button>
   
-            <!-- Botão de editar -->
             <a
-                [routerLink]="['/companies', company?.id, 'products', product.id, 'edit']"
-            class="btn btn-sm btn-warning me-2"
+              [routerLink]="['/companies', company?.id, 'products', product.id, 'edit']"
+              class="btn btn-sm btn-warning me-2"
             >
               <i class="fas fa-edit me-1" style="color: black;"></i>Editar
             </a>
   
-            <!-- Botão de excluir -->
             <button
               class="btn btn-sm btn-danger"
               (click)="onDeleteProduct(product.id)"
