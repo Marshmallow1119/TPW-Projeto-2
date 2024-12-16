@@ -86,7 +86,6 @@ export class ProductDetailsComponent implements OnInit {
       }
 
   
-      console.log('Processed Product:', this.product);
       console.log('stock:', this.product.stock);
       console.log('product_type:', this.product.product_type);
 

@@ -45,7 +45,7 @@
             [id]="type.value"
             (change)="onFilterChange()"
             />
-          <label [for]="type.value">{{ type.label }}</label><br />
+          <label style="margin-left:5px" [for]="type.value">{{ type.label }}</label><br />
         </div>
       </div>
       <div *ngIf="selectedType === 'Vinil'" id="vinil-filters">
@@ -126,7 +126,7 @@
       </div>
   
       <div class="form-group d-flex justify-content-between mt-3">
-        <button type="button" class="btn btn-secondary" style="width: 48%" (click)="resetFilters()">
+        <button type="button" class="btn btn-secondary" style="width: 100%" (click)="resetFilters()">
           Reiniciar Filtros
         </button>
       </div>

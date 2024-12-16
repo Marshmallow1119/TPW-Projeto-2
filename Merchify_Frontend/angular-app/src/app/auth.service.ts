@@ -84,6 +84,10 @@ export class AuthService {
       catchError((error) => {
         console.error('Token refresh failed:', error);
         this.logout();
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('redirectUrl');
+        this.router.navigate(['/']);
         return throwError(() => error);
       })
     );
