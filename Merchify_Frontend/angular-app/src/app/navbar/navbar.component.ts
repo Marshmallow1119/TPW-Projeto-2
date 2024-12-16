@@ -6,6 +6,7 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BalanceService } from '../balance-service.service';
+import { ThemeService } from '../theme.service';
 
 @Injectable({
   providedIn: 'root',
@@ -24,15 +25,21 @@ export class NavbarComponent implements OnInit {
   amount: number | null = null;
   balance: number = 0;
   isLoading: boolean | undefined;
+  theme: string = 'default';
 
   constructor(
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private balanceService: BalanceService
+    private balanceService: BalanceService,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
+    this.themeService.theme$.subscribe((theme) => {
+      console.log('NavbarComponent received theme:', theme);
+      this.theme = theme;
+    });
     this.authService.user$.subscribe((user) => {
       console.log('NavbarComponent received user:', user);
       this.user = user;
@@ -126,13 +133,9 @@ export class NavbarComponent implements OnInit {
 
 
   changeTheme(theme: string): void {
-    console.log('Changing theme to:', theme);
-    this.isLoading = true; // Inicia o carregamento
-    setTimeout(() => {
-     document.body.className = ''; // Remove classes anteriores
-     document.body.classList.add(`theme-${theme}`);
-     this.isLoading = false; // Finaliza o carregamento
-   }, 1000); // Simula o tempo de carregamento (1 segundo)
+    this.themeService.changeTheme(theme);
+    window.location.reload(); // Optional: Reload the page if theme affects global styles
   }
-  
+
+
 }
