@@ -22,6 +22,7 @@ export class NavbarComponent implements OnInit {
   selectedPaymentMethod: string | null = null;
   amount: number | null = null;
   balance: number = 0;
+  isLoading: boolean | undefined;
 
   constructor(
     private authService: AuthService,
@@ -120,5 +121,17 @@ export class NavbarComponent implements OnInit {
   handleLogin(): void {
     localStorage.setItem('redirectUrl', this.router.url);
     this.router.navigate(['/login']);
+  }
+
+
+  changeTheme(theme: string): void {
+    console.log('Changing theme to:', theme);
+   //this.isLoading = true; // Inicia o carregamento
+   //setTimeout(() => {
+   //  // Altera o tema aplicando uma classe no body
+   //  document.body.className = ''; // Remove classes anteriores
+   //  document.body.classList.add(`theme-${theme}`);
+   //  this.isLoading = false; // Finaliza o carregamento
+   //}, 1000); // Simula o tempo de carregamento (1 segundo)
   }
 }

@@ -69,3 +69,15 @@
   .btn{
     margin: 5px;
   }
+
+  .promotion-price {
+    font-weight: bold;
+    color: red;
+  }
+  
+  .text-warning.small {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: #7c5d00; /* Amarelo */
+  }
+  

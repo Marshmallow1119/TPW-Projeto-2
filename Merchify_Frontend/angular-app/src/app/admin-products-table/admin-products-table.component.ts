@@ -110,8 +110,8 @@ export class AdminProductsTableComponent implements OnInit {
 
 
 openPromotionModal(product: any): void {
-  this.selectedProductForPromotion = { ...product }; 
-  this.newPromotionPrice = product.price; 
+  this.selectedProductForPromotion = product;
+  this.newPromotionPrice = null;
 }
 
 closePromotionModal(): void {
@@ -129,10 +129,10 @@ async applyPromotion(): Promise<void> {
     try {
       const product = this.selectedProductForPromotion;
 
-      // Chama o serviço para aplicar a promoção
       await this.productService.addPromotion(product, this.newPromotionPrice);
 
       alert('Promoção aplicada com sucesso!');
+      console.log('is_on_sale:', product.is_on_promotion);
       this.closePromotionModal();
       this.fetchProducts(); 
     } catch (error) {
@@ -141,4 +141,25 @@ async applyPromotion(): Promise<void> {
     }
   }
 }
+
+
+async cancelPromotion(product: Product): Promise<void> {
+  const confirmation = confirm('Tem a certeza que deseja retirar a promoção?');
+  if (!confirmation) return;
+
+  try {
+    await this.productService.cancelPromotion(product);
+
+    alert('Promoção cancelada com sucesso!');
+    this.fetchProducts(); 
+  } catch (error) {
+    console.error('Erro ao cancelar promoção:', error);
+    alert('Erro ao cancelar promoção.');
+  }
+}
+
+confirmCancelPromotion(product: Product): void {
+  this.cancelPromotion(product);
+}
+
 }

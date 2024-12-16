@@ -17,7 +17,7 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link" [routerLink]="'/'" routerLinkActive="active">Home</a>
+          <a class="nav-link" [routerLink]="'/'" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" [routerLink]="'/products-page'" routerLinkActive="active">Produtos</a>
@@ -27,6 +27,10 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" [routerLink]="'/companhias-page'" routerLinkActive="active">Empresas</a>
+        </li>
+        <!--Se for admin tem uma opcao dashboard-->
+        <li *ngIf="user?.user_type === 'admin'" class="nav-item">
+          <a class="nav-link" [routerLink]="'/admin-home'" routerLinkActive="active">Dashboard</a>
         </li>
       </ul>
 
@@ -65,7 +69,7 @@
               <div class="navbar-text me-3 fw-bold fs-5">
                 Bem-Vindo(a), {{ user.username }}
               </div>
-              <form class="d-flex align-items-center" style="margin-right: 10px;" (submit)="onSearch()">
+              <form class="d-flex align-items-center me-3" style="margin-right: 10px;" (submit)="onSearch()">
                 <input
                   class="form-control search-input"
                   type="text"
@@ -189,6 +193,7 @@
                 <a *ngSwitchCase="'admin'" routerLink="/profile" class="btn btn-outline-dark me-2">
                   <i class="fa fa-user"></i>
                 </a>
+
                 <a *ngSwitchCase="'admin'" routerLink="/admin/add/company" class="btn btn-outline-dark me-2">
                   <i class="fa fa-plus"></i> Adicionar Empresa
                 </a>
@@ -196,17 +201,53 @@
                 <a *ngSwitchCase="'company'" [routerLink]="'/my-company-products/' + user.company?.id" class="btn btn-outline-dark me-2">
                   <i class="bi bi-archive-fill"></i> Ver os meus produtos
                 </a>
+
                 <a *ngSwitchCase="'company'" routerLink="/profile" class="btn btn-outline-dark me-2">
                   <i class="fa fa-user"></i>
                 </a>
+
                 <a *ngSwitchCase="'company'" routerLink="/chat" class="btn btn-outline-dark me-2">
                   <i class="fa fa-message"></i>
                 </a>
+
+                <li class="nav-item dropdown" style="list-style-type: none; margin: 0; padding: 0;">
+                  <a
+                    class="nav-link dropdown-toggle d-flex align-items-center justify-content-center rounded-circle bg-light"
+                    href="#"
+                    id="themeDropdown"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    style="
+                      width: 50px; 
+                      height: 50px; 
+                      border: 1px solid #ccc; 
+                      padding: 0;
+                      margin-right: 10px;"
+                  >
+                    <i class="fa fa-paint-brush" style="font-size: 20px;"></i>
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end shadow-sm rounded" aria-labelledby="themeDropdown">
+                    <li>
+                      <a class="dropdown-item d-flex align-items-center" (click)="changeTheme('default')">
+                        <i class="fa fa-circle text-primary me-2"></i>
+                        <span>Padrão</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item d-flex align-items-center" (click)="changeTheme('christmas')">
+                        <i class="fa fa-tree text-success me-2"></i>
+                        <span>Natal</span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                
               </ng-container>
+
               <a (click)="logout()" class="btn btn-outline-dark"><i class="fas fa-sign-out-alt"></i></a>
             </div>
-
-              <!-- Theme Button -->
+              
               <app-theme-button></app-theme-button>
 
       <!-- Display Login Section If User Is Not Logged In -->
@@ -215,3 +256,9 @@
     </div>
   </div>
 </nav>
+
+<div *ngIf="isLoading" class="loading-overlay">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Carregando...</span>
+  </div>
+</div>
