@@ -46,6 +46,8 @@ export class ProfileComponent implements OnInit {
       this.purchases = data.purchases;
       this.numberOfPurchases = data.number_of_purchases;
 
+
+      console.log('image_url:', this.user?.image);
     } catch (error) {
       console.error('Erro ao carregar perfil:', error);
     }
