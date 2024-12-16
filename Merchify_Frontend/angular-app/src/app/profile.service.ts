@@ -46,7 +46,7 @@ export class ProfileService {
       if (!token) {
         throw new Error('Token de autenticação não encontrado.');
       }
-      console.log("entrou no update")
+      console.log(data)
       const response = await fetch(`${this.baseUrl}/account/profile`, {
         method: 'PUT',
         headers: {
@@ -82,32 +82,31 @@ export class ProfileService {
     });
   }
 
-  async changePassword(data: any, new_password: string): Promise<any> {
-    try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        throw new Error('Token de autenticação não encontrado.');
-      }
-
-      const response = await fetch(`${this.baseUrl}/account/change-password`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao atualizar a senha.');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Erro em changePassword:', error);
-      throw error;
+  async changePassword(passwords: { old_password: string; new_password: string; confirm_new_password: string }): Promise<void> {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('Token de autenticação não encontrado.');
+    }
+  
+    const response = await fetch(`${this.baseUrl}/account/profile`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        submit_password: true,
+        old_password: passwords.old_password,
+        new_password: passwords.new_password,
+        confirm_new_password: passwords.confirm_new_password,
+      }),
+    });
+  
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erro ao alterar senha.');
     }
   }
+  
 
 }

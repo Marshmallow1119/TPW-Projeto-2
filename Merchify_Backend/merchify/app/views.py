@@ -24,6 +24,8 @@ from django.views.decorators.http import require_POST
 import jwt
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils.timezone import now
+from django.contrib.auth import update_session_auth_hash
+
 
 
 # Django Forms and Validation
@@ -138,8 +140,7 @@ def companhias(request):
 @permission_classes([IsAuthenticated])
 def profile(request):
     user = request.user
-    print(user)
-    print(user.first_name)
+
     if request.method == 'GET':
 
         user_serializer = UserSerializer(user)
@@ -157,8 +158,6 @@ def profile(request):
 
         data = request.data
 
-
-        print(data)
         if 'submit_password' in data:
             # Handling password change
             old_password = data.get('old_password')
@@ -184,30 +183,30 @@ def profile(request):
         
         else:
 
-            user.first_name = data.get('first_name', user.first_name)
-            print("Antes de salvar:", user.first_name)
-            user.last_name = data.get('last_name', user.last_name)
-            print("Antes de salvar:", user.last_name)
-            user.email = data.get('email', user.email)
-            print("Antes de salvar:", user.email)
-            user.username = data.get('username', user.username)
-            print("Antes de salvar:", user.username)
-            user.address = data.get('address', user.address)
-            print("Antes de salvar:", user.address)
-            phone = data.get('phone', user.phone)
-            print("Antes de salvar:", phone)
-            user.country = data.get('country', user.country)
+            if 'firstname' in data:
+                user.firstname = data.get('firstname')
+            if 'lastname' in data:
+                user.lastname = data.get('lastname')
+            if 'email' in data:
+                user.email = data.get('email')
+            if 'address' in data:
+                user.address = data.get('address')
+            if 'country' in data:
+                user.country = data.get('country')
             
+
             if 'image' in request.FILES:
                 user.image = request.FILES['image']
 
+            phone = data.get('phone')
             if phone and not re.fullmatch(r'\d{9}', phone):
                 raise ValidationError("O número de telefone deve conter exatamente 9 dígitos.")
-            user.phone = phone
+            if 'phone' in data:
+                user.phone = phone
 
-            print("Antes de salvar:", user.last_name)
+
             user.save()
-            print("Depois de salvar:", user.last_name)
+
 
             updated_user_serializer = UserSerializer(user)
             return Response({'message': 'Perfil atualizado com sucesso.', 'user': updated_user_serializer.data})

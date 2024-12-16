@@ -20,7 +20,7 @@ export class ProfileComponent implements OnInit {
   editing = false;
   numberOfPurchases: number = 0;
   changingPassword = false;
-  showPasswordFields: boolean = false; // Controla a exibição dos campos de senha
+  showPasswordFields: boolean = false; 
   passwords = {
     old_password: '',
     new_password: '',
@@ -43,8 +43,11 @@ export class ProfileComponent implements OnInit {
       const data = await this.profileService.getProfile();
 
       this.user = data.user;
+
+      console.log("user", this.user)
       this.purchases = data.purchases;
       this.numberOfPurchases = data.number_of_purchases;
+      console.log(this.numberOfPurchases)
 
 
     } catch (error) {
@@ -70,11 +73,16 @@ export class ProfileComponent implements OnInit {
       country: this.user.country,
     };
 
+
     try {
       await this.profileService.updateProfile(updateData);
       alert('Perfil atualizado com sucesso!');
+      console.log('Problema aqui');
+      await this.loadProfile();
+
       this.editing = false;
     } catch (error) {
+      await this.loadProfile();
       console.error('Erro ao atualizar perfil:', error);
       alert('Erro ao atualizar perfil.');
     }
@@ -93,7 +101,7 @@ export class ProfileComponent implements OnInit {
   }
 
   togglePasswordChange(): void {
-    alert('Alteração de senha ainda não implementada.');
+    this.showPasswordFields = true; 
   }
 
   async showOrderDetails(orderId: number): Promise<void> {
@@ -124,14 +132,24 @@ export class ProfileComponent implements OnInit {
     }
 
     try {
-      await this.profileService.changePassword(this.passwords.old_password, this.passwords.new_password);
+      await this.profileService.changePassword(this.passwords);
       alert('Senha alterada com sucesso!');
-      this.togglePasswordChange();
+      this.cancelPasswordChange();
     } catch (error) {
       console.error('Erro ao alterar senha:', error);
       alert('Erro ao alterar senha.');
     }
   }
+
+  cancelPasswordChange(): void {
+    this.showPasswordFields = false;
+    this.passwords = {
+      old_password: '',
+      new_password: '',
+      confirm_new_password: '',
+    };
+  }
+
 
   
 
