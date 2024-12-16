@@ -100,6 +100,7 @@ export class AdminProductsTableComponent implements OnInit {
     try {
       await this.productService.updateProductStock(this.selectedProduct.id, updatedStockSize);
       await this.fetchProducts();
+      alert('Stock updated successfully!');
       this.closeStockModal();
     } catch (error) {
       console.error('Error updating stock:', error);
@@ -113,7 +114,6 @@ openPromotionModal(product: any): void {
   this.newPromotionPrice = null;
 }
 
-// Fecha o modal de promoção
 closePromotionModal(): void {
   this.selectedProductForPromotion = null;
   this.newPromotionPrice = null;

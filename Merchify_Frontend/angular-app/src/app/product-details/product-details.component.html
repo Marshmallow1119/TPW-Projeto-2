@@ -20,7 +20,7 @@
           <tbody>
             <tr><th>Categoria</th><td>{{ product.category }}</td></tr>
             <tr><th>Artista</th><td>{{ product.artist }}</td></tr>
-            <tr><th>Empresa</th><td>{{ product.company }}</td></tr>
+            <tr><th>Empresa</th><td>{{ product.company.name }}</td></tr>
             <tr><th>Data de Adição</th><td>{{ product.addedProduct | date }}</td></tr>
   
             <!-- Specific details for product types -->
@@ -85,7 +85,7 @@
           <h5>Está com dúvidas em relação ao produto?</h5>
           <p>Converse diretamente com a empresa para tirar suas dúvidas sobre este produto.</p>
           <a
-            [routerLink]="'/chat/' + product.company?.id"
+            [routerLink]="'/chat/' + product.company.id"
             class="btn btn-success"
           >
             Converse com a Empresa

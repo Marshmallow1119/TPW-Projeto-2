@@ -3,7 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import { ChatService } from '../chat.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../auth.service';
+import { CompaniesService } from '../companhia.service';
+import { AuthService } from '../auth.service'; // Service to fetch user details
 import { User } from '../models/user';
 
 @Component({
@@ -16,23 +17,26 @@ import { User } from '../models/user';
 export class ChatComponent implements OnInit {
   messages: any[] = [];
   newMessage: string = '';
-  recipientId: number | undefined; // Can be a companyId or userId
-  userType: 'individual' | 'company' | 'admin' | undefined; // Determines the type of the current user
+  currentReceiver: any = null; // Holds company or user details
+  recipientId: number | undefined;
+  userType: 'individual' | 'company' | 'admin' | undefined;
   isLoading: boolean = false;
 
   constructor(
     private chatService: ChatService,
     private route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private companyService: CompaniesService,
   ) {}
 
   ngOnInit(): void {
     this.authService.getUserInfo().subscribe(
       (user: User) => {
-        this.userType = user.user_type as 'individual' | 'company' | 'admin'; // Explicitly cast
+        this.userType = user.user_type as 'individual' | 'company' | 'admin';
         console.log('User type:', this.userType);
-  
+
         this.recipientId = +this.route.snapshot.paramMap.get('id')!;
+        this.fetchReceiverDetails();
         this.fetchMessages();
       },
       (error) => {
@@ -41,52 +45,55 @@ export class ChatComponent implements OnInit {
     );
   }
 
+  async fetchReceiverDetails(): Promise<void> {
+    try {
+      if (this.userType === 'individual' && this.recipientId) {
+        // Fetch company details
+        this.currentReceiver = await this.companyService.getCompany(this.recipientId);
+        console.log('Current Receiver (Company):', this.currentReceiver);
+        this.currentReceiver.image
+      } else if (this.userType === 'company' && this.recipientId) {
+        console.log('Current Receiver (User):', this.currentReceiver);
+      }
+    } catch (error) {
+      console.error('Error fetching receiver details:', error);
+    }
+  }
+
   fetchMessages(): void {
     if (!this.recipientId || !this.userType) return;
 
     this.isLoading = true;
-    if (this.userType === 'individual') {
-      this.chatService.getMessagesWithCompany(this.recipientId).subscribe(
-        (response: any) => {
-          this.messages = response.messages;
-          this.isLoading = false;
-          console.log(this.messages);
+    const fetchMethod =
+      this.userType === 'individual'
+        ? this.chatService.getMessagesWithCompany(this.recipientId)
+        : this.chatService.getMessagesWithUser(this.recipientId);
 
-        },
-        (error) => {
-          console.error('Error fetching messages:', error);
-          this.isLoading = false;
-        }
-      );
-    } else if (this.userType === 'company') {
-      this.chatService.getMessagesWithUser(this.recipientId).subscribe(
-        (response: any) => {
-          this.messages = response.messages;
-          this.isLoading = false;
-        },
-        (error) => {
-          console.error('Error fetching messages:', error);
-          this.isLoading = false;
-        }
-      );
-    }
+    fetchMethod.subscribe(
+      (response: any) => {
+        this.messages = response.messages;
+        this.isLoading = false;
+      },
+      (error) => {
+        console.error('Error fetching messages:', error);
+        this.isLoading = false;
+      }
+    );
   }
 
   sendMessage(): void {
-    console.log('Sending message:', this.newMessage);
-    console.log('User type:', this.userType);
+    if (!this.newMessage.trim() || !this.recipientId) return;
 
-    if (!this.newMessage.trim() || !this.recipientId || (this.userType !== 'individual' && this.userType !== 'company')) return;
-
-    this.chatService.sendMessage(this.recipientId, this.newMessage, this.userType).subscribe(
+    if (this.userType === 'admin') {
+      console.error('Admin users cannot send messages.');
+      return;
+    }
+    this.chatService.sendMessage(this.recipientId, this.newMessage, this.userType!).subscribe(
       (response) => {
-        console.log('Message sent:', response);
         this.messages.push(response.message);
         this.newMessage = '';
       },
-      (error) => {
-        console.error('Error sending message:', error);
-      }
+      (error) => console.error('Error sending message:', error)
     );
   }
 }

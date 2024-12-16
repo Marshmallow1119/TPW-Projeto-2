@@ -45,34 +45,40 @@ export class ProductsPageComponent implements OnInit {
         this.productService.getProducts(),
         this.artistsService.getArtistas(),
       ]);
+  
       const artistMap = artists.reduce((map, artist) => {
         map[artist.id] = artist;
         return map;
       }, {} as { [key: number]: Artist });
   
       this.products = products.map(product => {
-        const productArtist = product.artist; 
-        const associatedArtist = typeof productArtist === 'number' 
-          ? artistMap[productArtist] 
-          : productArtist; 
+        const productArtist = product.artist;
+        const associatedArtist = typeof productArtist === 'number'
+          ? artistMap[productArtist]
+          : productArtist;
   
         return {
           ...product,
-          artist: associatedArtist, 
+          artist: associatedArtist,
         };
       });
+  
       this.artists = artists;
       this.filteredProducts = [...this.products];
-    
-      let favoriteProducts: favoriteProducts[] = await this.favoritesService.getFavorites('products');
+  
+      const favoritesResponse = await this.favoritesService.getFavorites('products');
+      const favoriteProducts = Array.isArray(favoritesResponse) ? favoritesResponse : favoritesResponse.results || [];
+  
       for (let product of this.products) {
-        product.is_favorited = favoriteProducts.some(favoriteProduct => favoriteProduct.product.id === product.id);
-      } 
+        product.is_favorited = favoriteProducts.some(
+          (favoriteProduct: favoriteProducts) => favoriteProduct.product.id === product.id
+        );
+      }
     } catch (error) {
       console.error('Erro ao carregar produtos e artistas:', error);
     }
   }
-
+  
 
   applyFilters(filters: any): void {
     console.log('Applying filters:', filters);

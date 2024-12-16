@@ -25,13 +25,13 @@
         <tr *ngFor="let company of companies" id="company-row-{{ company.id }}">
           <td class="text-center">
             <img
-              *ngIf="company.logo_base64"
-              [src]="'data:image/png;base64,' + company.logo_base64"
+              *ngIf="company.image_url"
+              [src]="company.image_url"
               [alt]="company.name"
               class="company-logo rounded"
             />
             <img
-              *ngIf="!company.logo_base64"
+              *ngIf="!company.image_url"
               src="/media/company_default.png"
               alt="Default Logo"
               class="company-logo rounded"

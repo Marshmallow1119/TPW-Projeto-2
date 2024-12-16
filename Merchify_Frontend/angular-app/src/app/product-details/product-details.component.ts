@@ -68,8 +68,8 @@ export class ProductDetailsComponent implements OnInit {
         description: response.description || 'Descrição não disponível.',
         price: response.price,
         image_url: response.image_url,
-        artist: response.artist.name, // If `artist` is just an ID, handle accordingly
-        company: response.company.name, // If `company` is just an ID, handle accordingly
+        artist: response.artist.name,
+        company: response.company,
         category: response.category,
         addedProduct: new Date(response.addedProduct), // Convert to Date object
         count: response.count,
@@ -88,7 +88,8 @@ export class ProductDetailsComponent implements OnInit {
   
       console.log('stock:', this.product.stock);
       console.log('product_type:', this.product.product_type);
-
+      console.log(this.product.company);
+      console.log(this.product.company.id);
       console.log('Sizes:', this.sizes);
     } catch (error) {
       console.error('Error loading product details:', error);

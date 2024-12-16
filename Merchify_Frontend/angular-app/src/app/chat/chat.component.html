@@ -1,41 +1,71 @@
 <div class="chat-container">
-    <!-- Header -->
-    <div class="chat-header">
-      <h5 *ngIf="userType === 'individual'">Chat com a Empresa</h5>
-      <h5 *ngIf="userType === 'company'">Chat com o Usuário</h5>
-      <p class="text-muted">Converse diretamente {{ userType === 'individual' ? 'com a empresa' : 'com o usuário' }} para tirar dúvidas.</p>
-    </div>
-  
-    <!-- Messages -->
-    <div class="chat-body">
-      <div *ngIf="isLoading" class="loading-spinner">
-        <p>Carregando mensagens...</p>
-      </div>
-      <div *ngIf="!isLoading && messages.length === 0" class="no-messages">
-        <p class="text-muted">Ainda não há mensagens neste chat.</p>
-      </div>
-      <div *ngFor="let message of messages" class="message" [class.sent]="(message.is_from_company && userType === 'company') || (!message.is_from_company && userType === 'individual')" [class.received]="!message.is_from_company && userType === 'company' || message.is_from_company && userType === 'individual'">
-        <p class="message-content">{{ message.text }}</p>
-        <small class="message-timestamp">{{ message.date | date: 'shortTime' }}</small>
-      </div>
-    </div>
-  
-    <!-- Input Box -->
-    <div class="chat-footer">
-      <input
-        type="text"
-        [(ngModel)]="newMessage"
-        placeholder="Digite sua mensagem..."
-        class="chat-input"
-        [disabled]="isLoading"
-      />
-      <button
-        (click)="sendMessage()"
-        class="btn btn-primary"
-        [disabled]="isLoading || !newMessage.trim()"
-      >
-        Enviar
-      </button>
+  <!-- Header -->
+  <div class="chat-header d-flex align-items-center">
+    <!-- Display Company Profile Picture if Available -->
+    <img
+      *ngIf="currentReceiver?.image_url"
+      [src]="currentReceiver.image_url"
+      alt="Profile Picture"
+      class="receiver-profile-pic me-3"
+    />
+    <div>
+      <h5 *ngIf="userType === 'individual'">
+        Chat com {{ currentReceiver?.name || 'a Empresa' }}
+      </h5>
+      <h5 *ngIf="userType === 'company'">
+        Chat com {{ currentReceiver?.name || 'o Usuário' }}
+      </h5>
+      <p class="text-muted">
+        Converse diretamente {{
+          userType === 'individual' ? 'com a empresa' : 'com o usuário'
+        }}
+        para tirar dúvidas.
+      </p>
     </div>
   </div>
   
+  <!-- Messages -->
+  <div class="chat-body">
+    <div *ngIf="isLoading" class="loading-spinner">
+      <p>Carregando mensagens...</p>
+    </div>
+    <div *ngIf="!isLoading && messages.length === 0" class="no-messages">
+      <p class="text-muted">Ainda não há mensagens neste chat.</p>
+    </div>
+    <div
+      *ngFor="let message of messages"
+      class="message"
+      [class.sent]="
+        (message.is_from_company && userType === 'company') ||
+        (!message.is_from_company && userType === 'individual')
+      "
+      [class.received]="
+        !message.is_from_company && userType === 'company' ||
+        message.is_from_company && userType === 'individual'
+      "
+    >
+      <p class="message-content">{{ message.text }}</p>
+      <small class="message-timestamp">
+        {{ message.date | date: 'shortTime' }}
+      </small>
+    </div>
+  </div>
+
+  <!-- Input Box -->
+  <div class="chat-footer">
+    <input
+      type="text"
+      [(ngModel)]="newMessage"
+      placeholder="Digite sua mensagem..."
+      class="chat-input"
+      [disabled]="isLoading"
+    />
+    <button
+      (click)="sendMessage()"
+      class="btn btn-primary"
+      [disabled]="isLoading || !newMessage.trim()"
+    >
+      Enviar
+    </button>
+  </div>
+</div>
