@@ -12,7 +12,6 @@ export class ChatService {
 
   constructor(private http: HttpClient) {}
 
-  // Helper function to get headers with the Authorization token
   private getAuthHeaders(): HttpHeaders {
     const accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
@@ -21,7 +20,6 @@ export class ChatService {
     return new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
   }
 
-  // Fetch messages with a company
   getMessagesWithCompany(companyId: number): Observable<any> {
     const url = `${this.baseUrl}/chat/company/${companyId}/messages/`;
     const headers = this.getAuthHeaders();

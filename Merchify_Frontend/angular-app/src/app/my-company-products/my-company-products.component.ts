@@ -5,26 +5,31 @@ import { ProdutosCompanhiaService } from '../produtos-companhia.service';
 import { CommonModule } from '@angular/common';
 import { CONFIG } from '../config';
 import { RouterModule } from '@angular/router'; // Importação necessária
+import { ProductsService } from '../products.service';
+import { SizeStockModalComponent } from '../size-stock-modal/size-stock-modal.component';
 
 
 
 @Component({
   selector: 'app-my-company-products',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SizeStockModalComponent],
   templateUrl: './my-company-products.component.html',
   styleUrl: './my-company-products.component.css'
 })
 export class MyCompanyProductsComponent {
   company: any;
   products: Product[] = [];
-  isAuthenticated: boolean = false; // Placeholder, set based on actual authentication logic
-  user: any = null; // Placeholder for user object
+  isAuthenticated: boolean = false; 
+  user: any = null; 
   selectedProduct: Product | null = null;
   baseUrl: string = CONFIG.baseUrl;
+  isStockModalOpen: boolean = false;
+
 
   constructor(
     private route: ActivatedRoute,
     private produtosCompanhiaService: ProdutosCompanhiaService,
+    private productsService: ProductsService,
     private router: Router
   ) {}
 
@@ -56,20 +61,35 @@ export class MyCompanyProductsComponent {
   }
 
   onAddProduct(): void {
-    // Redireciona para a página de adicionar produto
     this.router.navigate(['/companies', this.company.id, 'products', 'add']);
   }
 
-  openClothingStockModal(product: Product): void {
-    console.log('Abrindo modal de estoque para roupas:', product);
+  openStockModal(product: Product): void {
+    console.log('Opening stock modal for product:', product);
     this.selectedProduct = product;
-    // Lógica para abrir o modal pode ser adicionada aqui se usar uma biblioteca específica
+    this.isStockModalOpen = true;
+    console.log('Selected product:', this.selectedProduct);
   }
 
-  openStockModal(product: Product): void {
-    console.log('Abrindo modal de estoque geral:', product);
-    this.selectedProduct = product;
-    // Lógica para abrir o modal pode ser adicionada aqui se usar uma biblioteca específica
+  closeStockModal(): void {
+    console.log('Closing stock modal');
+    this.selectedProduct = null;
+    this.isStockModalOpen = false;
+  }
+
+  async onSaveStockChanges(updatedStockSize: { size: string; stock: number }[]): Promise<void> {
+    if (!this.selectedProduct) {
+      console.error('No product selected');
+      return;
+    }
+
+    try {
+      await this.productsService.updateProductStock(this.selectedProduct.id, updatedStockSize);
+      await this.loadCompanyProducts();
+      this.closeStockModal();
+    } catch (error) {
+      console.error('Error updating stock:', error);
+    }
   }
 
   async onDeleteProduct(productId: number): Promise<void> {
@@ -77,7 +97,6 @@ export class MyCompanyProductsComponent {
       try {
         await this.produtosCompanhiaService.deleteProduct(productId);
         console.log(`Produto ${productId} eliminado com sucesso.`);
-        // Remover o produto da lista localmente para evitar uma nova chamada à API
         this.products = this.products.filter((product) => product.id !== productId);
       } catch (error) {
         console.error('Erro ao excluir o produto:', error);

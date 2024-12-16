@@ -4,7 +4,7 @@
   }
   
   .dark-theme {
-    --background-color: #121212;
+    --background-color: #343a40 !important;
     --text-color: #ffffff;
   }
   
@@ -23,7 +23,8 @@
   }
 .sidebar-filter {
     background-color: #f8f9fa;
-    color: #212529; 
+    color: #343a40; 
+    border: 2px solid #f8f9fa;
   }
   
   .dark-theme .sidebar-filter {
@@ -59,6 +60,7 @@
 
   .dark-theme .logo{
     filter: brightness(0) invert(1) !important;
+    background-color: transparent !important;
   }
 
   .dark-theme .card{
@@ -99,3 +101,132 @@
     text-decoration: none; /* Optional: Remove underline in all states */
   }
   
+
+  body.dark-theme {
+    background-color: #343a40; /* Example dark background */
+    color: #ffffff; /* General text color */
+  }
+  
+  body.dark-theme a {
+    color: #ffffff; /* White text color for links */
+    background-color: #343a40;
+  }
+  
+  body.dark-theme a.btn {
+    border-color: #ffffff; /* White border for button links */
+    color: #ffffff; /* White text color for button links */
+  }
+  
+  body.dark-theme a .fa, 
+  body.dark-theme a .bi {
+    color: #ffffff; /* White color for icons inside links */
+  }
+  
+  body.dark-theme .navbar {
+    background-color: #222222; /* Dark background for navbar */
+  }
+  body.dark-theme span{
+    color: #ffffff; /* White text color for navbar links */
+    border-color: #ffffff;
+  }
+  body.dark-theme span:hover{
+    color: #ffffff; /* White text color for navbar links */
+    border-color: #ffffff;
+    background-color: #222222;
+  }
+  body.dark-theme button{
+    color: #ffffff; /* White text color for navbar links */
+    border-color: #ffffff;
+  }
+  body.dark-theme div{
+    color: #ffffff; /* White text color for navbar links */
+    border-color: #ffffff;
+    background-color: #343a40;
+  }
+  body.dark-theme .navbar-toggler{
+    color: #ffffff; /* White text color for navbar links */
+    border-color: #ffffff;
+  }
+
+  body.dark-theme h5{
+    color: #ffffff !important
+  }
+
+  body.dark-theme h1{
+    color: #ffffff !important
+  }
+
+  body.dark-theme h2{
+    color: #ffffff !important
+  }
+
+  body.dark-theme h3{
+    color: #ffffff !important
+  }
+
+  body.dark-theme h4{
+    color: #ffffff !important
+  }
+
+  body.dark-theme h6{
+    color: #ffffff !important
+  }
+
+  body.dark-theme img{
+    background-color: #ffffff !important;
+  }
+
+  body.dark-theme table{
+    color: #ffffff !important;
+    border: #ffffff !important;
+  }
+
+  body.dark-theme th{
+    color: #ffffff !important;
+    background-color: #343a40 !important;
+  }
+
+  body.dark-theme td{
+    color: #ffffff !important;
+    background-color: #343a40 !important;
+  }
+
+
+
+
+  body.dark-theme input:focus {
+    color: #000000 !important; /* Black text when input is focused */
+  }
+
+  body.dark-theme .sidebar {
+    color: #ffffff !important;
+    background-color: #343a40 !important;
+
+  }
+
+  body.dark-theme .sidebar a {
+    color: #ffffff !important;
+  }
+  
+  body.dark-theme .sidebar a:hover {
+    color: #ffffff !important;
+    background-color: #222222 !important;
+  }
+
+  body.dark-theme .seven {
+    color: #ffffff !important;
+    background-color: #343a40 !important;
+
+  }
+
+  body.dark-theme .modal {
+    background-color: transparent;
+  }
+
+  body.dark-theme label {
+    color: hsl(0, 0%, 100%) !important;
+  }
+
+  body.dark-theme .btn-close {
+    filter: brightness(0) invert(1) !important;
+  }

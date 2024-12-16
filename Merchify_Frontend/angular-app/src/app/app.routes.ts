@@ -40,6 +40,7 @@ export const routes: Routes = [
   { path: 'my-company-products/:company_id', component: MyCompanyProductsComponent },
   { path: 'companies/:company_id/products/:product_id/edit', component: EditProductComponent },
   { path: 'profile', component: ProfileComponent },
+  { path: 'admin/add/company', component: AddCompanyComponent }
 
   
 ];

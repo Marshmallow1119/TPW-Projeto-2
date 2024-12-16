@@ -33,13 +33,6 @@ export class ProdutosCompanhiaService {
         throw new Error(`Erro HTTP! status: ${data.status}`);
       }
       const response = await data.json(); 
-      if (response.products) {
-        response.products.forEach((product: any) => {
-          product.image_url = product.image
-            ? `http://localhost:8000${product.image}` // Ensure full URL for images
-            : null;
-        });
-      }
       if (response.company) {
         response.company.image = response.company.logo
           ? `http://localhost:8000${response.company.logo}` // Full URL for the logo

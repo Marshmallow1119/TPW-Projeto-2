@@ -10,12 +10,12 @@
           <div class="d-flex align-items-center">
             <img
               *ngIf="chat.company.logo_base64"
-              [src]="chat.company.logo_base64"
+              [src]="'data:image/png;base64,' + chat.company.logo_base64"
               alt="{{ chat.company.name }}"
               class="company-logo mr-3"
             />
             <div>
-              <h5 class="mb-0">{{ chat.company.name }}</h5>
+              <h3 class="mb-0" style="padding-left: 20px;">{{ chat.company.name }}</h3>
             </div>
           </div>
         </a>

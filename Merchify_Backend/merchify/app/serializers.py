@@ -99,6 +99,7 @@ class ProductSerializer(serializers.ModelSerializer):
     average_rating = serializers.FloatField(source='get_average_rating', read_only=True)
     product_type = serializers.CharField(source='get_product_type', read_only=True)
     stock = serializers.IntegerField(source='get_stock', read_only=True)
+    stock_size = serializers.SerializerMethodField()
     specific_details = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
     artist= ArtistSerializer(read_only=True)
@@ -127,7 +128,20 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_image_url(self, obj):
         request = self.context.get('request')
+        print(obj.image.url)
         return request.build_absolute_uri(obj.image.url) if obj.image and request else None
+    
+    def get_stock_size(self, obj):
+        """Return stock for all product types."""
+        product_type = obj.get_product_type()
+
+        if product_type == 'Clothing':
+            return [{'size': size.size, 'stock': size.stock} for size in obj.clothing.sizes.all()]
+
+        if product_type == 'CD':
+            return [{'size': 'Default', 'stock': obj.cd.stock}]
+
+        return [{'size': 'Default', 'stock': obj.get_stock()}]
     
 # Size Serializer
 class SizeSerializer(serializers.ModelSerializer):

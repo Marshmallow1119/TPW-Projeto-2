@@ -1,17 +1,18 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Product, Vinil, CD, Clothing, Accessory } from '../models/produto';
 import { ProductsService } from '../products.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DeleteProductModalComponent } from '../delete-product-modal/delete-product-modal.component';
+import { SizeStockModalComponent } from '../size-stock-modal/size-stock-modal.component';
 
 @Component({
   selector: 'app-admin-products-table',
   standalone: true,
   templateUrl: './admin-products-table.component.html',
-  styleUrl: './admin-products-table.component.css',
-  imports: [CommonModule, RouterModule, DeleteProductModalComponent, FormsModule],
+  styleUrls: ['./admin-products-table.component.css'],
+  imports: [CommonModule, RouterModule, DeleteProductModalComponent, SizeStockModalComponent,FormsModule],
 })
 export class AdminProductsTableComponent implements OnInit {
   products: Product[] = [];
@@ -19,7 +20,7 @@ export class AdminProductsTableComponent implements OnInit {
   selectedProduct: Product | null = null;
   selectedProductForPromotion: any = null; // Produto selecionado para promoção
   newPromotionPrice: number | null = null; // Novo preço inserido no modal
-
+  isStockModalOpen: boolean = false; // Track modal state
   
   constructor(private productService: ProductsService) {}
 
@@ -38,6 +39,7 @@ export class AdminProductsTableComponent implements OnInit {
     }
   }
 
+  // Type guards for different product types
   isVinil(product: Product): product is Vinil {
     return product.product_type === 'Vinil';
   }
@@ -54,28 +56,59 @@ export class AdminProductsTableComponent implements OnInit {
     return product.product_type === 'Accessory';
   }
 
+  // Handle delete logic
   deleteProduct(id: number): void {
     this.productService.deleteProduct(id);
     this.products = this.products.filter((product) => product.id !== id);
   }
-  
+
   openDeleteModal(product: Product): void {
     console.log('Opening modal for product:', product);
     this.selectedProduct = product;
     console.log('Selected product:', this.selectedProduct);
   }
-  
+
   closeDeleteModal(): void {
     console.log('Closing modal');
     this.selectedProduct = null;
   }
-  
+
   onConfirmDelete(productId: number): void {
     console.log('Deleting product with ID:', productId);
     this.deleteProduct(productId);
     this.closeDeleteModal();
   }
-  // Abre o modal de promoção
+
+  openStockModal(product: Product): void {
+    console.log('Opening stock modal for product:', product);
+    this.selectedProduct = product;
+    this.isStockModalOpen = true;
+  }
+
+  closeStockModal(): void {
+    console.log('Closing stock modal');
+    this.selectedProduct = null;
+    this.isStockModalOpen = false;
+  }
+
+  async onSaveStockChanges(updatedStockSize: { size: string; stock: number }[]): Promise<void> {
+    if (!this.selectedProduct) {
+      console.error('No product selected');
+      return;
+    }
+
+    try {
+      await this.productService.updateProductStock(this.selectedProduct.id, updatedStockSize);
+      await this.fetchProducts();
+      this.closeStockModal();
+    } catch (error) {
+      console.error('Error updating stock:', error);
+      this.errorMessage = 'Error updating stock';
+    }
+  }
+
+
+    // Abre o modal de promoção
 openPromotionModal(product: any): void {
   this.selectedProductForPromotion = { ...product }; // Clona o produto para preservar o estado original
   this.newPromotionPrice = product.price; // Preenche o preço atual
@@ -109,6 +142,4 @@ async applyPromotion(): Promise<void> {
     }
   }
 }
-
-
 }
