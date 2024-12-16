@@ -22,6 +22,9 @@ export interface Product {
   specific_details?: any;
   favorites_count: number;
   reviews_count: number;
+  old_price?: number;
+  is_on_promotion?: boolean;
+
 }
 
 export interface Vinil extends Product {

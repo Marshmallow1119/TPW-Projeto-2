@@ -80,13 +80,11 @@ def home(request):
 @permission_classes([IsAuthenticated])
 def balance(request):
     user = request.user
-    print(user)
 
     if request.method == 'GET':
         return Response({'user': user.username, 'balance': str(user.balance)})
 
     elif request.method in ['POST', 'PUT']:
-        print(request.data)
         serializer = BalanceSerializer(data=request.data)
         if serializer.is_valid():
             amount = serializer.validated_data['amount']
@@ -273,6 +271,46 @@ def produtos(request):
 
     serializer = ProductSerializer(produtos, many=True, context={'request': request})
     return Response(serializer.data)
+
+
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def add_promotion(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    data = request.data
+
+    new_price = data.get('new_price')
+    if not new_price:
+        return Response({'error': 'New price is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    product.old_price = product.price
+    product.price = new_price
+    product.save()
+
+
+    return Response({'message': 'Promoção aplicada com sucesso!'})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @api_view(['GET'])
 def artistas(request):
@@ -620,9 +658,7 @@ def manage_cart(request, user_id=None, product_id=None, item_id=None):
         if item_id:
             try:
                 data = json.loads(request.body)
-                print(data)
                 quantity = int(data.get("quantity", 1))
-                print(quantity)
                 cart_item = get_object_or_404(CartItem, id=item_id)
                 product = cart_item.product
 
@@ -977,7 +1013,6 @@ def remove_from_favorites_company(request, company_id):
 @permission_classes([IsAuthenticated])
 def apply_discount(request):
     discount_code = request.query_params.get('discount_code', '').strip().lower()
-    print("Received discount code:", discount_code)
 
     user = request.user
 
@@ -1028,14 +1063,11 @@ def process_payment(request):
 
         with transaction.atomic():
 
-            print("User balance before purchase:", user.balance)
-            print("Final total:", final_total)
 
             user.balance -= Decimal(final_total)
             user.number_of_purchases += 1
             user.save()
 
-            print("User balance after purchase:", user.balance)
 
 
             purchase_data = {
@@ -1096,17 +1128,13 @@ def calculate_shipping_cost(cart):
 @api_view(['GET'])
 def company_home(request):
     company_id = request.user.company.id if request.user.user_type == 'company' else None
-    print("Company ID:", company_id)
     return render(request, 'company_home.html', {'company_id': company_id})
 
 @api_view(['GET'])
 def company_products(request, company_id):
-    print(f"Received company_id: {company_id}")  # Debugging: Log the company_id
     company = get_object_or_404(Company, id=company_id)
-    print(f"Found company: {company.name}")  # Debugging: Log the company name
 
     products = Product.objects.filter(company=company)
-    print(f"Number of products found: {products.count()}")  # Debugging: Log the product count
 
     products_data = []
     for product in products:
@@ -1374,7 +1402,6 @@ def reviews(request, product_id):
             return Response({"status": "error", "message": "Authentication required"}, status=401)
 
         user = request.user
-        print(f"User: {user}")
 
         review_form = ReviewForm(request.data)
         if review_form.is_valid():

@@ -109,5 +109,24 @@ export class ProductsService {
   }
   
   
+  async addPromotion(product: Product, newPrice: number): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseUrl}/product/${product.id}/add-promotion/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ new_price: newPrice }),
+      });
   
+      if (!response.ok) {
+        throw new Error('Erro ao aplicar a promoção.');
+      }
+    } catch (error) {
+      console.error('Error adding promotion:', error);
+      throw error; // Propaga o erro para o componente lidar com ele
+    }
+  }
+  
+          
 }
