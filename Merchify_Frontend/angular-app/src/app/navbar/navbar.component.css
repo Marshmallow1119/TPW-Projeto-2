@@ -192,3 +192,9 @@
   background-color: #000000; /* Fundo branco no hover */
   color: #ffffff; /* Vermelho no hover */
 }
+
+.btn-outline-light.text-white:hover {
+  color: black !important; /* Altera a cor do texto para preto */
+  background-color: white !important; /* Opcional: fundo branco */
+  border-color: white !important; /* Garante que a borda mantenha a cor */
+}

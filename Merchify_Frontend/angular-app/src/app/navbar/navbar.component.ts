@@ -44,10 +44,8 @@ export class NavbarComponent implements OnInit {
       console.log('NavbarComponent received user:', user);
       this.user = user;
       this.cdr.detectChanges();
-      if (this.authService.isAuthenticated()) {
-      this.loadBalance();
-      }
     });
+      this.loadBalance();
   }
 
   logout(): void {
@@ -77,6 +75,7 @@ export class NavbarComponent implements OnInit {
         console.log('Balance fetched successfully:', response);
         if (this.user) {
           this.user.balance = response.balance; 
+          this.cdr.detectChanges();
         }
       },
       (error) => {

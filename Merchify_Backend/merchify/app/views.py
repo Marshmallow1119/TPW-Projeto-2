@@ -180,6 +180,13 @@ def profile(request):
         
         else:
 
+            data = request.data
+
+            if 'image' in request.FILES:  # Capturar a imagem enviada
+                profile_image = request.FILES['image']
+                user.image = profile_image  # Salvar a imagem no campo correspondente
+        
+            # Atualizar outros campos
             if 'firstname' in data:
                 user.firstname = data.get('firstname')
             if 'lastname' in data:
@@ -190,21 +197,15 @@ def profile(request):
                 user.address = data.get('address')
             if 'country' in data:
                 user.country = data.get('country')
-            
-
-            if 'image' in request.FILES:
-                user.image = request.FILES['image']
-
+        
             phone = data.get('phone')
             if phone and not re.fullmatch(r'\d{9}', phone):
                 raise ValidationError("O número de telefone deve conter exatamente 9 dígitos.")
             if 'phone' in data:
                 user.phone = phone
-
-
+        
             user.save()
-
-
+        
             updated_user_serializer = UserSerializer(user)
             return Response({'message': 'Perfil atualizado com sucesso.', 'user': updated_user_serializer.data})
 

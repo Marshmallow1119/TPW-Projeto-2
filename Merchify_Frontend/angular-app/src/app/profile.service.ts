@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CONFIG } from './config';
+import { Observable, from } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -40,33 +41,32 @@ export class ProfileService {
     }
   }
 
-  async updateProfile(data: any): Promise<any> {
+  async updateProfile(data: FormData): Promise<any> {
     try {
       const token = localStorage.getItem('accessToken');
-      if (!token) {
-        throw new Error('Token de autenticação não encontrado.');
-      }
-      console.log(data)
+      if (!token) throw new Error('Token de autenticação não encontrado.');
+  
       const response = await fetch(`${this.baseUrl}/account/profile`, {
         method: 'PUT',
         headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // NÃO defina o Content-Type manualmente
         },
-        body: JSON.stringify(data),
+        body: data,
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Erro ao atualizar o perfil.');
       }
-
+  
       return await response.json();
     } catch (error) {
       console.error('Erro em updateProfile:', error);
       throw error;
     }
   }
+  
+  
 
 
   async deleteAccount(): Promise<void> {
@@ -107,6 +107,5 @@ export class ProfileService {
       throw new Error(errorData.error || 'Erro ao alterar senha.');
     }
   }
-  
 
 }
