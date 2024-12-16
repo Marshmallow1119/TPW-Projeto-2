@@ -380,7 +380,6 @@ def productDetails(request, identifier):
         
         reviews = product.reviews.all()
         review_serializer = ReviewSerializer(reviews, many=True)
-r generalizações a partir de observações específicas
         product_data = product_serializer.data
         product_data['reviews'] = review_serializer.data
 
