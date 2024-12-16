@@ -36,6 +36,7 @@ export class ProductsPageComponent implements OnInit {
   
   async ngOnInit(): Promise<void> {
     await this.loadProductsAndArtistsData();
+    
   }
 
   private async loadProductsAndArtistsData(): Promise<void> {
@@ -54,7 +55,6 @@ export class ProductsPageComponent implements OnInit {
         const associatedArtist = typeof productArtist === 'number' 
           ? artistMap[productArtist] 
           : productArtist; 
-  
   
         return {
           ...product,
