@@ -10,6 +10,9 @@ export class BalanceService {
   constructor() {}
 
   private async getToken(): Promise<string> {
+    if (localStorage.getItem('accessToken') === null) {
+      throw new Error('Token de autenticação ausente. Faça login novamente.1');
+    }
     const token = localStorage.getItem('accessToken');
     if (!token) {
       throw new Error('Token de autenticação ausente. Faça login novamente.');
@@ -17,9 +20,7 @@ export class BalanceService {
     return token;
   }
 
-  /**
-   * Fetches the user's current balance.
-   */
+
   async getBalance(): Promise<{ balance: number }> {
     const token = await this.getToken();
     try {
