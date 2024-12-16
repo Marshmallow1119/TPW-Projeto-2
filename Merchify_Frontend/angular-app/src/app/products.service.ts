@@ -136,7 +136,7 @@ export class ProductsService {
       };
     } catch (error) {
       console.error('Error adding promotion:', error);
-      throw error; // Propaga o erro para o componente lidar com ele
+      throw error; 
     }
   }
   

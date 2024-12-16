@@ -5,6 +5,7 @@ import { ProductsService } from '../products.service';
 import { Artist } from '../models/artista';
 import { ArtistsService } from '../artists.service';
 import { Router } from '@angular/router';
+import { Product } from '../models/produto';
 
 @Component({
   selector: 'app-filtro',
@@ -19,6 +20,8 @@ export class FiltroComponent implements OnInit {
   @Input() genres: string[] = [];
   @Input() showArtistFilter: boolean = true;
   @Input() sizes: string[] = [];
+  @Input() is_on_promotion: Product[] = [];
+
 
   artists: Artist[] = [];
   selectedArtist: string = ''; // To store the selected artist ID
@@ -57,6 +60,7 @@ export class FiltroComponent implements OnInit {
       this.genres = filters.genres;
       this.colors = filters.colors;
       this.sizes = filters.sizes;
+      this.is_on_promotion = filters.is_on_promotion;
     });
 
     this.artistsService.getArtistas().then((artists) => {

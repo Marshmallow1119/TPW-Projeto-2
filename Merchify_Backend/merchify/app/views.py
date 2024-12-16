@@ -185,7 +185,7 @@ def profile(request):
             if 'image' in request.FILES:  # Capturar a imagem enviada
                 profile_image = request.FILES['image']
                 user.image = profile_image  # Salvar a imagem no campo correspondente
-        
+
             # Atualizar outros campos
             if 'firstname' in data:
                 user.firstname = data.get('firstname')
@@ -197,15 +197,15 @@ def profile(request):
                 user.address = data.get('address')
             if 'country' in data:
                 user.country = data.get('country')
-        
+
             phone = data.get('phone')
             if phone and not re.fullmatch(r'\d{9}', phone):
                 raise ValidationError("O número de telefone deve conter exatamente 9 dígitos.")
             if 'phone' in data:
                 user.phone = phone
-        
+
             user.save()
-        
+
             updated_user_serializer = UserSerializer(user)
             return Response({'message': 'Perfil atualizado com sucesso.', 'user': updated_user_serializer.data})
 
@@ -1340,7 +1340,8 @@ def get_filters(request):
     try:
         vinil_genres = Vinil.objects.values_list('genre', flat=True).distinct()
         cd_genres = CD.objects.values_list('genre', flat=True).distinct()
-        genres = set(vinil_genres).union(cd_genres)  
+        genres = set(vinil_genres).union(cd_genres) 
+
 
         clothing_colors = Clothing.objects.values_list('color', flat=True).distinct()
         accessory_colors = Accessory.objects.values_list('color', flat=True).distinct()
@@ -1350,11 +1351,14 @@ def get_filters(request):
 
         materials = Accessory.objects.values_list('material', flat=True).distinct()
 
+        is_on_promotion = Product.objects.values_list('is_on_promotion', flat=True).distinct()
+
         filters = {
             'genres': list(genres),
             'colors': list(colors),
             'sizes': list(sizes),
             'materials': list(materials),
+            'is_on_promotion': list(is_on_promotion),
         }
 
         return Response(filters)
