@@ -32,7 +32,20 @@
               </div>
             </div>
           </td>
-          <td>{{ item.product.price | currency: 'EUR' }}</td>
+          <td>
+            <div *ngIf="item.product.is_on_promotion; else normalPrice">
+              <span class="text-muted" style="text-decoration: line-through;">
+                {{ item.product.old_price | currency: 'EUR' }}
+              </span>
+              <span class="text-danger fw-bold ms-2">
+                {{ item.product.price | currency: 'EUR' }}
+              </span>
+              <span class="badge bg-warning text-dark ms-2">Promoção</span>
+            </div>
+            <ng-template #normalPrice>
+              {{ item.product.price | currency: 'EUR' }}
+            </ng-template>
+          </td>
           <td>
             <input
               type="number"

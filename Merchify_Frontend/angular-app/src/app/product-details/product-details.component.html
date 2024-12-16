@@ -11,7 +11,20 @@
           <p class="text-muted">Este produto foi visto {{ product.count }} vezes</p>
         </div>
         <p class="text-muted">{{ product.artist?.name }}</p>
-        <h3 class="text-success">{{ product.price | number: '1.2-2' }}€</h3>
+        <div class="d-flex align-items-center">
+          <div *ngIf="product.is_on_promotion" class="d-flex align-items-center">
+            <h3 class="text-muted me-2" style="text-decoration: line-through;">
+              {{ product.old_price | currency: 'EUR' }}
+            </h3>
+            <h3 class="text-danger fw-bold me-2">
+              {{ product.price | currency: 'EUR' }}
+            </h3>
+            <span class="badge bg-warning text-dark badge-large">Promoção</span>
+          </div>
+          <div *ngIf="!product.is_on_promotion">
+            <h3 class="text-success">{{ product.price | currency: 'EUR' }}</h3>
+          </div>
+        </div>        
         <p class="lead">{{ product.description }}</p>
   
         <!-- Product Details -->

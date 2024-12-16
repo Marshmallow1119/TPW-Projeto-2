@@ -88,7 +88,9 @@ export class PaymentPageComponent implements OnInit {
               releaseDate: item.product.specific_details.releaseDate,
               stock: item.product.specific_details.stock,
               imageBase64: item.product.specific_details.image_base64,
-            }
+            },
+            is_on_promotion: item.product.is_on_promotion || false,
+            old_price: item.product.old_price || null,
           },
           quantity: item.quantity,
           size: item.size,
@@ -96,10 +98,10 @@ export class PaymentPageComponent implements OnInit {
         }));
   
         this.cart = {
-          id: response.cart_id, // Ajuste se necessário
+          id: response.cart_id, 
           user: this.user as User,
-          date: new Date(), // Ajuste conforme necessário
-          items: this.cartItems, // Lista de itens já mapeada
+          date: new Date(),
+          items: this.cartItems, 
           total: this.cartItems.reduce((sum, item) => sum + item.total, 0)
         };
   
@@ -122,6 +124,7 @@ export class PaymentPageComponent implements OnInit {
 
   calculateFinalTotal() {
     this.finalTotal = this.cartTotal + this.shippingCost - (this.discountValue || 0);
+    console.log('Final total:', this.finalTotal);
   }
 
   async applyDiscount() {

@@ -28,9 +28,19 @@
               </div>
             </div>
             <div class="col-3 text-right">
-              <h5 class="text-primary font-weight-bold">
-                &euro; {{ item.product.price | number: '1.2-2' }}
-              </h5>
+              <div *ngIf="item.product.is_on_promotion; else normalPrice">
+                <span class="text-muted" style="text-decoration: line-through;">
+                  {{ item.product.old_price | currency: 'EUR' }}
+                </span>
+                <span class="text-danger fw-bold ms-2">
+                  {{ item.product.price | currency: 'EUR' }}
+                </span>
+              </div>
+              <ng-template #normalPrice>
+                <h5 class="text-primary font-weight-bold">
+                  &euro; {{ item.product.price | number: '1.2-2' }}
+                </h5>
+              </ng-template>
             </div>
             <div class="col-1 text-right">
               <button
