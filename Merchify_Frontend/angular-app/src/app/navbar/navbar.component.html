@@ -53,7 +53,7 @@ style="padding: 0.25rem 0; min-height: 50px;">
         <li *ngIf="user?.user_type === 'company'" class="nav-item">
           <a 
           class="nav-link" 
-          [routerLink]="['/my-company-products', user?.company?.id || 0]" 
+          [routerLink]="['/my-company-products', user?.company?.id || 4]" 
           routerLinkActive="active" 
           [ngClass]="{ 'text-white': theme === 'christmas' }"
         >
