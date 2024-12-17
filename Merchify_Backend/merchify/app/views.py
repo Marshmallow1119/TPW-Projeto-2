@@ -475,7 +475,7 @@ def artistsProducts(request, name):
 def productDetails(request, identifier):
     if request.method == 'GET':
         product = get_object_or_404(Product, id=identifier)
-        product.count += 1
+        product.count += 0.5
         product.save()
         company_data = CompanySerializer(product.company).data if product.company else None
 
@@ -1420,10 +1420,9 @@ def admin_product_delete(request, product_id):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def delete_review(request, review_id):
-    print("DEBUG: Review ID recebido no pedido ->", review_id)  # Verifica o ID da review
-    print("DEBUG: Utilizador autenticado ->", request.user)  # Verifica quem está autenticado
-    print("DEBUG: Tipo de utilizador ->", request.user.user_type)  # Verifica o tipo de utilizador
-
+    print("DEBUG: Review ID recebido no pedido ->", review_id) 
+    print("DEBUG: Utilizador autenticado ->", request.user)  
+    print("DEBUG: Tipo de utilizador ->", request.user.user_type) 
     review = get_object_or_404(Review, id=review_id)
     product = review.product
     company = product.company

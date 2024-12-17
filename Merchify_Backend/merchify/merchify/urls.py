@@ -89,7 +89,7 @@ urlpatterns = [
     path('ws/products/<int:product_id>/stock/', views.update_product_stock, name='stock'),
     path('ws/product/<int:product_id>/cancel-promotion/', views.cancel_promotion, name='cancel_promotion'),
     path('ws/unread-messages/', views.get_number_unread_messages, name='get_number_unread_messages'),
-    path('ws/reviews/<int:review_id>/', views.delete_review, name='delete_review'),
+    path('ws/reviews/<int:review_id>/delete', views.delete_review, name='delete_review'),
 
 ]   
 
