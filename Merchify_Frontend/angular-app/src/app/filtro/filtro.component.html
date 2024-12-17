@@ -86,6 +86,13 @@
             <option *ngFor="let color of colors" [value]="color">{{ color }}</option>
           </select>
         </div>
+        <h5>Tamanho</h5>
+        <div class="form-group">
+          <select name="size" [(ngModel)]="filters.size" class="form-control" (change)="onFilterChange()" >
+            <option value="">Todos</option>
+            <option *ngFor="let size of sizes" [value]="size">{{ size }}</option>
+          </select>
+        </div>
       </div>
   
       <div *ngIf="selectedType === 'Accessory'" id="accessory-filters">
@@ -94,13 +101,6 @@
           <select name="colorAccessory" [(ngModel)]="filters.colorAccessory" class="form-control" (change)="onFilterChange()" >
             <option value="">Todas</option>
             <option *ngFor="let color of colors" [value]="color">{{ color }}</option>
-          </select>
-        </div>
-        <h5>Tamanho</h5>
-        <div class="form-group">
-          <select name="size" [(ngModel)]="filters.size" class="form-control" (change)="onFilterChange()" >
-            <option value="">Todos</option>
-            <option *ngFor="let size of sizes" [value]="size">{{ size }}</option>
           </select>
         </div>
       </div>

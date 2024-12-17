@@ -645,9 +645,6 @@ def login(request):
             return Response({
                 'access': str(refresh.access_token),
                 'refresh': str(refresh),
-                'username': user.username,
-                'id': user.id,
-                'user_type': user.user_type,
                 'user': user_data
             }, status=status.HTTP_200_OK)
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)

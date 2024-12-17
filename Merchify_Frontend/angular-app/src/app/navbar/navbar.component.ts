@@ -74,6 +74,7 @@ export class NavbarComponent implements OnInit {
         console.error('Failed to fetch unread messages count:', error);
       },
     });
+    console.log(this.user);
   }
 
   logout(): void {
