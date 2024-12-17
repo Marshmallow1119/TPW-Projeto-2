@@ -1,12 +1,10 @@
 <div class="product-card">
-  <!-- Artist Identifier -->
   <div class="artist-identifier" *ngIf="product.artist">
     <a [routerLink]="['/products', product.artist.name]">
       <img [src]="product.artist.image_url" [alt]="product.artist.name" />
     </a>
   </div>
 
-  <!-- Favorite Icon -->
   <i
     *ngIf="!isAuthenticaded || user?.user_type === 'individual'"
     class="fa fa-heart favorite-icon"
@@ -14,7 +12,6 @@
     (click)="toggleFavorite($event,product.id)">
   </i>
 
-  <!-- Product Details -->
   <a [routerLink]="['/product', product.id]" class="d-block" style="text-decoration: none;">
     <img [src]="product.image_url" [alt]="product.name" class="product-image" />
     <div class="p-3 text-center">

@@ -52,19 +52,17 @@ export class PaymentPageComponent implements OnInit {
     try {
       console.log('userId:', userId);
   
-      // Chamada ao serviço para obter o carrinho
       const response = await this.cartService.getCart(userId);
   
-      // Verifica se os dados foram retornados corretamente
       if (response && response.cart_items) {
         this.cartItems = response.cart_items.map((item: any) => ({
           id: item.id,
           cart: { 
             id: item.cart, 
             user: this.user as User, 
-            date: new Date(), // Ajuste conforme necessário
-            items: [], // Será populado depois
-            total: 0 // Será calculado
+            date: new Date(), 
+            items: [], 
+            total: 0 
           },
           product: {
             id: item.product.id,
@@ -150,7 +148,7 @@ export class PaymentPageComponent implements OnInit {
     try {
       await this.cartService.removeCartItem(this.user?.id || 0, itemId);
       this.cartItems = this.cartItems.filter((item) => item.cartItemId !== itemId);
-      await this.loadCart(this.user?.id || 0); // Reload the cart
+      await this.loadCart(this.user?.id || 0); 
       console.log('Cart reloaded:', this.cartItems);
       this.calculateTotal();
       this.calculateFinalTotal();
@@ -161,40 +159,45 @@ export class PaymentPageComponent implements OnInit {
 
   getImageSrc(imageBase64: string | null): string {
     if (!imageBase64) {
-      return 'assets/images/default-product.png'; // Caminho para uma imagem padrão
+      return 'assets/images/default-product.png'; 
     }
-    return `data:image/jpeg;base64,${imageBase64}`; // Adicione o prefixo correto
+    return `data:image/jpeg;base64,${imageBase64}`; 
   }
 
   async submitPayment() {
+    // Verifica se os campos obrigatórios estão preenchidos
     if (!this.paymentMethod || !this.shippingAddress) {
       alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
   
+    // Cria o objeto com os dados de pagamento a ser enviado para a API
     const paymentData = {
       payment_method: this.paymentMethod,
       shipping_address: this.shippingAddress,
       discountApplied: this.discountApplied,
     };
   
+    console.log('Payment data:', paymentData);
+  
     const loader = document.getElementById('loading-indicator');
-    if (loader) loader.style.display = 'block'; // Show the loader
+    if (loader) loader.style.display = 'block'; 
   
     try {
       const result = await this.paymentService.submitPayment(paymentData);
+      console.log('Pagamento processado com sucesso:', result);
+  
       alert('Pagamento processado com sucesso!');
-      //atualizar o balance utilizando o serviço de balanceService
-      console.log('Novo saldo:', result.new_balance);
+  
       this.authService.updateUserBalance(result.new_balance);
-
+  
       this.router.navigate(['/']); 
     } catch (error: any) {
-      alert('Erro inesperado: não foi possível processar o pagamento.');
       console.error('Erro inesperado:', error);
     } finally {
       if (loader) loader.style.display = 'none'; 
     }
   }
+  
   
 }

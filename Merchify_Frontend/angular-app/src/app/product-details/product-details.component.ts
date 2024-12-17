@@ -156,7 +156,7 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   private saveToRecentlySeen(productId: number): void {
-    const maxItems = 5; // Maximum number of recently seen products to store
+    const maxItems = 5; 
     let recentlySeen = JSON.parse(localStorage.getItem('recentlySeenProducts') || '[]');
   
     recentlySeen = recentlySeen.filter((id: number) => id !== productId);

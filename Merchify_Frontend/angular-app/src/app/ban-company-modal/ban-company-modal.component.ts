@@ -19,7 +19,7 @@ export class BanCompanyModalComponent {
 
   confirmBan(): void {
     if (this.selectedCompanyId !== null) {
-      this.confirmActionEvent.emit(this.selectedCompanyId); // Emit the selected ID as a number
+      this.confirmActionEvent.emit(this.selectedCompanyId); 
     }
   }
 }

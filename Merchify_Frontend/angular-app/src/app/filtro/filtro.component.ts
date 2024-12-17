@@ -24,8 +24,8 @@ export class FiltroComponent implements OnInit {
 
 
   artists: Artist[] = [];
-  selectedArtist: string = ''; // To store the selected artist ID
-  selectedArtistName: string = ''; // Store the selected artist's name
+  selectedArtist: string = ''; 
+  selectedArtistName: string = '';
 
   productTypes = [
     { value: 'Vinil', label: 'Vinil' },
@@ -79,7 +79,7 @@ export class FiltroComponent implements OnInit {
   }
 
   onArtistChange(): void {
-    this.filters.artist = this.selectedArtist; // Update the selected artist in filters
+    this.filters.artist = this.selectedArtist; 
     this.emitFilterChanges();
   }
 
@@ -93,11 +93,11 @@ export class FiltroComponent implements OnInit {
       size: '',
       min_price: null,
       max_price: null,
-      artist: '', // Reset artist filter
+      artist: '', 
       onSale: false,
     };
     this.selectedType = '';
-    this.selectedArtist = ''; // Reset selected artist
+    this.selectedArtist = ''; 
     this.emitFilterChanges();
   }
 
@@ -107,9 +107,9 @@ export class FiltroComponent implements OnInit {
   }
 
   selectArtist(artist: Artist): void {
-    this.selectedArtist = artist.id.toString(); // Convert to string
+    this.selectedArtist = artist.id.toString();
     this.selectedArtistName = artist.name;
-    this.filters.artist = artist.id.toString(); // Convert to string
+    this.filters.artist = artist.id.toString(); 
     this.emitFilterChanges();
   }
   

@@ -36,19 +36,17 @@ export class CartComponent implements OnInit {
     try {
       console.log('userId:', userId);
   
-      // Chamada ao serviço para obter o carrinho
       const response = await this.cartService.getCart(userId);
   
-      // Verifica se os dados foram retornados corretamente
       if (response && response.cart_items) {
         this.cartItems = response.cart_items.map((item: any) => ({
           id: item.id,
           cart: { 
             id: item.cart, 
             user: this.user as User, 
-            date: new Date(), // Ajuste conforme necessário
-            items: [], // Será populado depois
-            total: 0 // Será calculado
+            date: new Date(), 
+            items: [], 
+            total: 0
           },
           product: {
             id: item.product.id,
@@ -112,17 +110,17 @@ export class CartComponent implements OnInit {
 
   getImageSrc(imageBase64: string | null): string {
     if (!imageBase64) {
-      return 'assets/images/default-product.png'; // Caminho para uma imagem padrão
+      return 'assets/images/default-product.png'; 
     }
-    return `data:image/jpeg;base64,${imageBase64}`; // Adicione o prefixo correto
+    return `data:image/jpeg;base64,${imageBase64}`; 
   }
   
 
   async updateCartItem(item: any) {
   try {
-    const userId = this.user?.id || 0; // Obtém o ID do usuário
+    const userId = this.user?.id || 0; 
     await this.cartService.updateCartItem(userId, item.id, { quantity: item.quantity }); // Chama o serviço
-    this.calculateTotal(); // Recalcula o total do carrinho
+    this.calculateTotal(); 
   } catch (error) {
     console.error('Erro ao atualizar o item do carrinho:', error);
   }
@@ -130,9 +128,9 @@ export class CartComponent implements OnInit {
 
   async removeCartItem(itemId: number) {
     try {
-      await this.cartService.removeCartItem(this.user?.id || 0, itemId); // Passa o ID do usuário e do item
-      this.cartItems = this.cartItems.filter(item => item.id !== itemId); // Remove o item do array local
-      this.calculateTotal(); // Recalcula o total do carrinho
+      await this.cartService.removeCartItem(this.user?.id || 0, itemId); 
+      this.cartItems = this.cartItems.filter(item => item.id !== itemId);
+      this.calculateTotal(); 
     } catch (error) {
       console.error('Erro ao remover o item do carrinho:', error);
     }

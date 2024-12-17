@@ -123,9 +123,9 @@ export class EditProductComponent implements OnInit {
       const group = this.productForm.get(control);
       if (group) {
         if (control === productType) {
-          group.enable(); // Enable the relevant FormGroup
+          group.enable(); 
         } else {
-          group.disable({ emitEvent: false }); // Disable and prevent emitting events for others
+          group.disable({ emitEvent: false }); 
         }
       }
     });
@@ -146,11 +146,9 @@ export class EditProductComponent implements OnInit {
         return;
       }
 
-      // Update the form value
       this.productForm.patchValue({ image: file });
       this.productForm.get('image')?.updateValueAndValidity();
 
-      // Preview the new image
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreview = reader.result as string;
@@ -163,14 +161,12 @@ export class EditProductComponent implements OnInit {
     if (this.productForm.valid) {
       const formData = new FormData();
   
-      // Append basic fields
       formData.append('productType', this.productForm.get('productType')?.value);
       formData.append('artist', this.productForm.get('artist')?.value);
       formData.append('name', this.productForm.get('name')?.value);
       formData.append('description', this.productForm.get('description')?.value);
       formData.append('price', this.productForm.get('price')?.value);
   
-      // Dynamically build specific_details JSON object
       const productType = this.productForm.get('productType')?.value;
       const specificDetails = this.productForm.get(productType)?.value; // Get the formGroup for the selected productType
   
@@ -179,7 +175,6 @@ export class EditProductComponent implements OnInit {
         console.log('Specific Details:', specificDetails);
       }
   
-      // Append the image if it exists
       const image = this.productForm.get('image')?.value;
       if (image) {
         formData.append('image', image);

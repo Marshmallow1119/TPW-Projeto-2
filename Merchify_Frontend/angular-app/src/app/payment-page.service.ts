@@ -61,9 +61,15 @@ async submitPayment(paymentData: { payment_method: string; shipping_address: str
       body: JSON.stringify(paymentData),
     });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erro no servidor ao processar o pagamento.');
+    }
+    console.log('Payment response:', response);
     return await response.json();
   } catch (error: any) {
     console.error('Erro ao processar o pagamento:', error);
+    alert(error.message || 'Erro no servidor ao processar o pagamento.');
     throw new Error('Erro no servidor ao processar o pagamento.');
   }
 }

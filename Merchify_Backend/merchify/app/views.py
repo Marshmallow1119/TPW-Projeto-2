@@ -1229,12 +1229,16 @@ def apply_discount(request):
 def process_payment(request):
     user = request.user
 
+    print(f"User: {user}")
+
     try:
         cart = Cart.objects.get(user=user)
         cart_items = CartItem.objects.filter(cart=cart)
 
         if not cart_items.exists():
             return Response({"error": "O carrinho está vazio."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        print(f"Cart items: {cart_items}")
 
         payment_method = request.data.get('payment_method')
         shipping_address = request.data.get('shipping_address')
@@ -1251,6 +1255,16 @@ def process_payment(request):
         final_total = total + shipping_cost
 
 
+        final_total2 = Decimal(str(final_total)).quantize(Decimal('0.01'))
+        user_balance2 = Decimal(str(user.balance)).quantize(Decimal('0.01'))
+
+        if user_balance2 < final_total2:
+            return Response({
+                "error": "Saldo insuficiente para processar o pagamento.",
+                "balance": str(user.balance),  # Enviar o saldo atual do usuário
+                "needed_amount": str(final_total)  # Enviar o valor necessário
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         with transaction.atomic():
 
             user.balance -= Decimal(final_total)
@@ -1258,7 +1272,7 @@ def process_payment(request):
             user.save()
 
 
-
+            print(f"User balance after purchase: {user.balance}")
             purchase_data = {
                 "user": user.id,
                 "date": now().date(),
