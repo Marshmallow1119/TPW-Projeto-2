@@ -27,6 +27,11 @@ export class ThemeService {
   private applyTheme(): void {
     if (isPlatformBrowser(this.platformId)) {
       if (this.isDarkMode) {
+        if (document.body.classList.contains('theme-christmas')) {
+          document.body.classList.remove('theme-christmas');
+          document.body.classList.add('theme-default');
+        }
+        localStorage.setItem('theme', 'default');
         document.body.classList.add('dark-theme');
       } else {
         document.body.classList.remove('dark-theme');
@@ -49,14 +54,13 @@ export class ThemeService {
   }
 
   changeTheme(theme: string): void {
-    this.currentTheme.next(theme); // Notify subscribers
-    // Apply the theme to the body
-    if (isPlatformBrowser(this.platformId)) {
-      document.body.className = ''; // Clear existing theme classes
-      document.body.classList.add(`theme-${theme}`); // Add new theme class
-      localStorage.setItem('theme', theme); // Save theme in localStorage
+    this.currentTheme.next(theme); 
+    if (isPlatformBrowser(this.platformId)) 
+      document.body.className = ''; 
+      document.body.classList.add(`theme-${theme}`);
+      localStorage.setItem('theme', theme);
     }
-  }
+
 
   private loadThemeFromStorage(): void {
     if (isPlatformBrowser(this.platformId)) {

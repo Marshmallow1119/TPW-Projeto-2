@@ -132,7 +132,7 @@ style="padding: 0.25rem 0; min-height: 50px;">
 
           <li class="nav-item dropdown" style="list-style-type: none; margin: 0; padding: 0;">
             <a
-              class="nav-link dropdown-toggle d-flex align-items-center justify-content-center rounded-circle bg-light brush_circle"
+              class="nav-link dropdown-toggle d-flex align-items-center justify-content-center rounded-circle  theme-button"
               *ngSwitchCase="'admin'"
               href="#"
               id="themeDropdown"
@@ -140,14 +140,12 @@ style="padding: 0.25rem 0; min-height: 50px;">
               data-bs-toggle="dropdown"
               aria-expanded="false"
               [ngClass]="{
-                'bg-light': theme !== 'christmas',
-                'bg-white': theme === 'christmas',
-                'text-black': theme === 'christmas'
+                'bg-light border-dark text-black': theme == 'default',
+                'bg-white border-white text-black': theme === 'christmas',
               }"
               style="
                 width: 40px; 
                 height: 40px; 
-                border: 1px solid #000000; 
                 padding: 0;
                 margin-right: 10px;"
             >

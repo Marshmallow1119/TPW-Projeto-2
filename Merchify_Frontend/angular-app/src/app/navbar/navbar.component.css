@@ -152,10 +152,22 @@
     }
     
     .navbar-christmas .fa-paint-brush {
-      color: #000000 !important; /* Ícone do pincel preto */
+      color: #000000 !important; 
       padding-left: 0px;
     }
+
+    .navbar-default .fa-paint-brush {
+      color: #ffffff !important; 
+      padding-left: 0px;
+    }
+
+    .border-dark {
+      border: 1px solid #000000 
+    }
     
+    .border-white {
+      border: 1px solid #ffffff 
+    }
     .fa-paint-brush{
       padding-left: 0px;
     }
