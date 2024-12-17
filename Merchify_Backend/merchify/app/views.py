@@ -183,11 +183,10 @@ def profile(request):
 
             data = request.data
 
-            if 'image' in request.FILES:  # Capturar a imagem enviada
+            if 'image' in request.FILES:  
                 profile_image = request.FILES['image']
-                user.image = profile_image  # Salvar a imagem no campo correspondente
+                user.image = profile_image  
 
-            # Atualizar outros campos
             if 'firstname' in data:
                 user.firstname = data.get('firstname')
             if 'lastname' in data:
@@ -283,29 +282,26 @@ def produtos(request):
         product_type = request.data.get('productType')
         artist_id = request.data.get('artist')
         image_file = request.FILES.get('image')
+        company_id = request.data.get('company') 
 
         if not all([name, description, price, product_type]):
             return Response({"error": "Missing required fields."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Parse specific_details JSON string
         specific_details = request.data.get('specific_details', '{}')
         try:
             specific_details = json.loads(specific_details)
         except json.JSONDecodeError:
             return Response({"error": "Invalid specific_details format."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Create the product
         artist_obj = get_object_or_404(Artist, id=artist_id)
-        product = Product.objects.create(
-            name=name,
-            description=description,
-            price=price,
-            artist=artist_obj,
-            company=request.user.company if request.user.user_type == 'company' else None,
-            image=image_file
-        )
 
-        # Handle specific product type details
+        company_obj = None
+        if request.user.user_type == 'company':
+            company_obj = request.user.company
+        elif request.user.user_type == 'admin' and company_id: 
+            company_obj = get_object_or_404(Company, id=company_id)
+
+
         if product_type == 'vinil':
             Vinil.objects.create(
                 name=name,
@@ -313,7 +309,7 @@ def produtos(request):
                 price=price,
                 category='Vinyl',
                 artist=artist_obj,
-                company=request.user.company if request.user.user_type == 'company' else None,
+                company=company_obj,
                 image=image_file,
                 genre=specific_details.get('genre'),
                 lpSize=specific_details.get('lpSize'),
@@ -327,7 +323,7 @@ def produtos(request):
                 category='CD',
                 price=price,
                 artist=artist_obj,
-                company=request.user.company if request.user.user_type == 'company' else None,
+                company=company_obj,
                 image=image_file,
                 genre=specific_details.get('genre'),
                 releaseDate=specific_details.get('releaseDate'),
@@ -340,7 +336,7 @@ def produtos(request):
                 category='Clothing',
                 price=price,
                 artist=artist_obj,
-                company=request.user.company if request.user.user_type == 'company' else None,
+                company=company_obj,
                 image=image_file,
                 color=specific_details.get('color')
             )
@@ -351,7 +347,7 @@ def produtos(request):
                 price=price,
                 category='Accessory',
                 artist=artist_obj,
-                company=request.user.company if request.user.user_type == 'company' else None,
+                company=company_obj,
                 image=image_file,
                 material=specific_details.get('material'),
                 color=specific_details.get('color'),
@@ -361,6 +357,7 @@ def produtos(request):
 
         product_serializer = ProductSerializer(product, context={'request': request})
         return Response(product_serializer.data, status=status.HTTP_201_CREATED)
+
 
 
 @api_view(['POST'])
@@ -375,10 +372,8 @@ def add_promotion(request, product_id):
     if not new_price:
         return Response({'error': 'New price is required.'}, status=status.HTTP_400_BAD_REQUEST)
     
-    # Salva o preço antigo antes de alterar
     old_price = product.price
     
-    # Atualiza o preço e salva o produto
     product.old_price = old_price
     product.price = new_price
     product.is_on_promotion = True
@@ -402,7 +397,6 @@ def cancel_promotion(request, product_id):
     if not product.is_on_promotion:
         return Response({'error': 'O produto não está em promoção.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Reverter o preço antigo
     product.price = product.old_price
     product.old_price = None
     product.is_on_promotion = False
@@ -507,15 +501,15 @@ def productDetails(request, identifier):
             if product.image:
                 print(product.image.path)
                 default_storage.delete(product.image.path)  
-            product.image = image_file  # Save new image
+            product.image = image_file 
 
-        specific_details_json = request.data.get('specific_details', '{}')  # Get as JSON string
+        specific_details_json = request.data.get('specific_details', '{}')  
         try:
-            specific_details = json.loads(specific_details_json)  # Parse JSON
+            specific_details = json.loads(specific_details_json) 
         except json.JSONDecodeError:
             return Response({"error": "Invalid JSON for specific_details"}, status=status.HTTP_400_BAD_REQUEST)
 
-        product_type = product.category.lower()  # Assuming category holds the product type like 'vinil'
+        product_type = product.category.lower() 
 
 
         if product_type == 'vinyl':
