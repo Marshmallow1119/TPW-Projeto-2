@@ -12,6 +12,10 @@
         <th scope="col">Imagem</th>
         <th scope="col">Username</th>
         <th scope="col">Email</th>
+        <th scope="col">Telefone</th>
+        <th scope="col">Tipo de utilizador</th>
+        <th scope="col">Country</th>
+        <th scope="col">Saldo</th>
         <th scope="col" class="text-center">Ações</th>
       </tr>
     </thead>
@@ -26,6 +30,10 @@
         </td>
         <td>{{ user.username }}</td>
         <td>{{ user.email }}</td>
+        <td>{{ user.phone }}</td>
+        <td>{{ user.user_type }}</td>
+        <td>{{ user.country }}</td>
+        <td>{{ user.balance | currency: 'EUR' }}</td>
         <td class="text-center">
           <button class="btn btn-danger btn-sm" (click)="openBanUserModal(user.id)">
             <i class="fas fa-ban"></i> Banir Utilizador
