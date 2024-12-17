@@ -43,7 +43,14 @@ style="padding: 0.25rem 0; min-height: 50px;">
           <a class="nav-link" [routerLink]="'/admin-home'" routerLinkActive="active" [ngClass]="{ 'text-white': theme === 'christmas' }">Dashboard</a>
         </li>
         <li *ngIf="user?.user_type === 'company'" class="nav-item">
-          <a class="nav-link"  [routerLink]="['/my-company-products', user.company.id]"   routerLinkActive="active" [ngClass]="{ 'text-white': theme === 'christmas' }">Os meus Produtos</a>
+          <a 
+          class="nav-link" 
+          [routerLink]="['/my-company-products', user?.company?.id || 0]" 
+          routerLinkActive="active" 
+          [ngClass]="{ 'text-white': theme === 'christmas' }"
+        >
+          Os meus Produtos
+        </a>
         </li>
       </ul>
 
