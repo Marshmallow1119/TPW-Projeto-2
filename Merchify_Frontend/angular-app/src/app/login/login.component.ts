@@ -23,7 +23,6 @@ export class LoginComponent {
   onSubmit() {
     this.authService.login(this.username, this.password).subscribe({
       next: (response: any) => {
-        this.errorMessage = null;
         localStorage.setItem('accessToken', response.access);
         localStorage.setItem('refreshToken', response.refresh);
         console.log('User type:', response.user.user_type);

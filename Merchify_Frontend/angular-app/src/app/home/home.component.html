@@ -35,7 +35,7 @@
   <div *ngIf="theme === 'default'" id="carouselExampleIndicators" class="carousel slide w-100" data-bs-ride="carousel" style="margin: 0; padding: 0;">
     <div class="carousel-inner w-100">
       <div *ngFor="let slide of slides; let i = index" class="carousel-item" [class.active]="i === 0">
-        <a [routerLink]="['/artistsProducts', slide.name]">
+        <a [routerLink]="['/products', slide.name]">
           <img [src]="slide.image" class="d-block w-100" [alt]="slide.alt" style="height: 700px; width: 100%; object-fit: cover;" />
         </a>
       </div>
@@ -58,6 +58,17 @@
 
   </div>
   
+
+  <div *ngIf="recentlySeenProducts.length > 0" class="section-background mt-5">
+    <div class="section-background">
+      <app-products-list
+      title="Produtos recentemente adicionados"
+      [products]="recentlySeenProducts"
+      [showButton]="false"
+      buttonLink="/products"
+    ></app-products-list>
+    </div>
+  </div>
 
 
 

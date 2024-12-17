@@ -49,7 +49,6 @@ export class AuthService {
 
         console.log('User logged in:', user);
 
-      // Redirecionamento imediato baseado no user_type
       if (user.user_type === 'admin') {
         console.log('User is admin, redirecting to admin home');
         this.router.navigate(['/admin-home']);
@@ -184,20 +183,7 @@ export class AuthService {
           localStorage.setItem('accessToken', response.access);
           localStorage.setItem('refreshToken', response.refresh);
           
-          console.log('User logged in:', response.user);
-          const user: User = {
-            id: response.id,
-            username: response.username,
-            user_type: response.user_type,
-            number_of_purchases: 0,
-            firstname: response.firstname,
-            lastname: response.lastname,
-            address: response.address,
-            email: response.email,
-            phone: response.phone,
-            country: response.country,
-            balance: 0 
-          };
+          const user: User = response.user;
   
           this.userSubject.next(user); 
           console.log('User registered and logged in:', user);
