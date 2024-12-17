@@ -274,3 +274,16 @@
   .dark-theme .theme-button{
     color: #ffffff !important;
   }
+
+
+  body.dark-theme .title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff !important;
+  }
+
+  body.dark-theme   .input-box .details {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #fff !important;
+  }

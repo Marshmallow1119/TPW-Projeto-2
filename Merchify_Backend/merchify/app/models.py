@@ -71,7 +71,7 @@ class Product(models.Model):
     company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='products', null=True)
     category = models.CharField(max_length=50)
     addedProduct = models.DateField(auto_now_add=True, null=True)
-    count = models.IntegerField(default=0)
+    count = models.FloatField(default=0)
     old_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     is_on_promotion = models.BooleanField(default=False)
 

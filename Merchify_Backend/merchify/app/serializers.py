@@ -45,7 +45,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'firstname', 'lastname', 'user_type',
-            'email', 'phone', 'country', 'image', 'balance', 'company', 'address'
+            'email', 'phone', 'country', 'image', 'balance', 'company', 'address', 'banned'
         ]
 
     def get_image(self, obj):
@@ -292,9 +292,19 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"password2": "Passwords do not match."})
         return data
 
+    def validate_image(self, value):
+        if value == 'null' or not value:
+            return None
+        return value
+
     def create(self, validated_data):
+        print(validated_data)  # Debugging
         validated_data.pop('password2')
         password = validated_data.pop('password1')
+
+        image = validated_data.pop('image', None)
+        user_type = validated_data.pop('user_type', 'individual')
+        
         user = User.objects.create_user(
             username=validated_data['username'],
             password=password,
@@ -302,7 +312,15 @@ class RegisterSerializer(serializers.ModelSerializer):
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
         )
+        
+        if image:
+            user.image = image
+        if user_type:
+            user.user_type = user_type
+
+        user.save()
         return user
+
 
 class ChatSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)

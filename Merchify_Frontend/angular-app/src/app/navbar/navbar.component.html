@@ -276,7 +276,7 @@ style="padding: 0.25rem 0; min-height: 50px;">
             <i class="fa fa-search"></i>
           </button>
         </form>
-    <div class="search-login-container ms-auto d-flex">
+    <div class="search-login-container ms-auto d-flex" style="margin-right: 10px;">
             <!-- Guest Login Section -->
             <ng-template #loginSection>
               <div class="login-button-container">
@@ -300,7 +300,9 @@ style="padding: 0.25rem 0; min-height: 50px;">
        [ngClass]="{
           'btn-outline-dark': theme !== 'christmas',
           'btn-outline-light text-white': theme === 'christmas'
-       }">
+       }"
+       *ngIf="user"
+       >
        <i class="fas fa-sign-out-alt"></i>
     </a>
 
