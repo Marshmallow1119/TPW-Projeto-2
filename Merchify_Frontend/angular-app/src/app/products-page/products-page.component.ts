@@ -99,6 +99,9 @@ export class ProductsPageComponent implements OnInit {
       else if (!filters.onSale && !product.is_on_promotion) {
         matchesSale =  true;
       }
+      else if (!filters.onSale && product.is_on_promotion) {
+        matchesSale =  true;
+      }
       else {
         matchesSale =  false;
       }

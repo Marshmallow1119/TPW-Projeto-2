@@ -9,6 +9,13 @@ import { filter } from 'rxjs';
 import { Company } from '../models/company';
 import { User } from '../models/user';
 import { AuthService } from '../auth.service';
+import { FavoritesService } from '../favorites.service';
+
+interface favoriteProducts {
+  product_id: number;
+  user_id: number;
+  product: Product;
+}
 
 @Component({
   standalone: true,
@@ -17,6 +24,7 @@ import { AuthService } from '../auth.service';
   templateUrl: './company-products.component.html',
   styleUrls: ['./company-products.component.css'],
 })
+
 export class CompanyProductsComponent implements OnInit {
   company: any;
   products: Product[] = [];
@@ -28,7 +36,8 @@ export class CompanyProductsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private produtosCompanhiaService: ProdutosCompanhiaService,
-    private authService: AuthService
+    private authService: AuthService,
+    private favoritesService: FavoritesService
   ) {}
 
   ngOnInit(): void {
@@ -56,6 +65,15 @@ export class CompanyProductsComponent implements OnInit {
     } catch (error) {
       console.error('Erro ao carregar companhia e produtos:', error);
     }
+
+    const favoritesResponse = await this.favoritesService.getFavorites('products');
+    const favoriteProducts = Array.isArray(favoritesResponse) ? favoritesResponse : favoritesResponse.results || [];
+
+    for (let product of this.products) {
+      product.is_favorited = favoriteProducts.some(
+        (favoriteProduct: favoriteProducts) => favoriteProduct.product.id === product.id
+      );
+    }
   }
   applyFilters(filters: any): void {
     console.log('Applying filters:', filters);
@@ -64,6 +82,20 @@ export class CompanyProductsComponent implements OnInit {
       console.log('Checking product:', product);
   
       const matchesType = !filters.type || product.product_type === filters.type;
+
+      let matchesSale = true;
+      if (filters.onSale && product.is_on_promotion) {
+        matchesSale =  true;
+      }
+      else if (!filters.onSale && !product.is_on_promotion) {
+        matchesSale =  true;
+      }
+      else if (!filters.onSale && product.is_on_promotion) {
+        matchesSale =  true;
+      }
+      else {
+        matchesSale =  false;
+      }
   
       const matchesPrice =
         (!filters.min_price || product.price >= filters.min_price) &&
@@ -100,9 +132,10 @@ export class CompanyProductsComponent implements OnInit {
         matchesColor,
         matchesSize,
         matchesArtist,
+        matchesSale,
       });
   
-      return matchesType && matchesPrice && matchesGenre && matchesColor && matchesSize && matchesArtist;
+      return matchesType && matchesPrice && matchesGenre && matchesColor && matchesSize && matchesArtist && matchesSale;
     });
   
     console.log('Filtered products:', this.filteredProducts);
@@ -120,8 +153,11 @@ export class CompanyProductsComponent implements OnInit {
     }
   }
 
-  onFavoriteToggled(product: any): void {
-    console.log('Favorite toggled for product:', product);
-    product.isFavorite = !product.isFavorite;
+  onFavoriteToggled(productId: number): void {
+    const product = this.products.find((p) => p.id === productId);
+    if (product) {
+      product.is_favorited = !product.is_favorited;
+      console.log(`Produto favorito alterado: ${productId}`);
+    }
   }
 }

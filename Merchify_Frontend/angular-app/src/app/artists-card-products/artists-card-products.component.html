@@ -2,12 +2,12 @@
     <div class="col-12 col-md-6 col-lg-4" *ngFor="let product of products">
       <div class="product-card">
         <!-- Favorite Icon -->
-        <i 
-          class="fa fa-heart favorite-icon" 
-          [class.filled]="product.is_favorited"
-          *ngIf="!isAuthenticated || user?.user_type === 'individual'" 
-          (click)="toggleFavorite(product.id)">
-        </i>
+        <i
+        *ngIf="!isAuthenticaded || user?.user_type === 'individual'"
+        class="fa fa-heart favorite-icon"
+        [ngClass]="{ filled: product.is_favorited }"
+        (click)="toggleFavorite($event,product.id)">
+      </i>
   
         <!-- Product Link -->
         <a [routerLink]="['/product', product.id]">
