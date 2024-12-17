@@ -497,10 +497,6 @@ def productDetails(request, identifier):
 
         if 'image' in request.FILES:
             image_file = request.FILES['image']
-            print(image_file)
-            if product.image:
-                print(product.image.path)
-                default_storage.delete(product.image.path)  
             product.image = image_file 
 
         specific_details_json = request.data.get('specific_details', '{}')  

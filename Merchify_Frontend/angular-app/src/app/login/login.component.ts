@@ -33,6 +33,7 @@ export class LoginComponent {
           this.router.navigate([redirectUrl]);
           return;
         }
+        console.log(response.user);
         switch (response.user_type) {
           case 'individual':
             this.router.navigate(['/']);
