@@ -47,9 +47,6 @@ export class CartComponent implements OnInit {
             date: new Date(), 
             items: [], 
             total: 0
-            date: new Date(), 
-            items: [], 
-            total: 0
           },
           product: {
             id: item.product.id,
