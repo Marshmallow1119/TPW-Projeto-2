@@ -153,7 +153,7 @@
     
     .navbar-christmas .fa-paint-brush {
       color: #000000 !important; /* Ícone do pincel preto */
-      padding-left: 10px;
+      padding-left: 0px;
     }
     
     .bg-white {
@@ -203,4 +203,8 @@
   color: black !important; /* Altera a cor do texto para preto */
   background-color: white !important; /* Opcional: fundo branco */
   border-color: white !important; /* Garante que a borda mantenha a cor */
+}
+
+.nav-link::after {
+  content: none; /* Remove qualquer conteúdo */
 }
