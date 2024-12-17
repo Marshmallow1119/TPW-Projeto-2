@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg " 
+<nav class="navbar navbar-expand-lg" 
 [ngClass]="{
   'navbar-light bg-light': theme !== 'christmas',
   'navbar-christmas': theme === 'christmas'
@@ -39,303 +39,164 @@ style="padding: 0.25rem 0; min-height: 50px;">
         <li class="nav-item">
           <a class="nav-link" [routerLink]="'/companhias-page'" routerLinkActive="active" [ngClass]="{ 'text-white': theme === 'christmas' }">Empresas</a>
         </li>
-        <!--Se for admin tem uma opcao dashboard-->
         <li *ngIf="user?.user_type === 'admin'" class="nav-item">
           <a class="nav-link" [routerLink]="'/admin-home'" routerLinkActive="active" [ngClass]="{ 'text-white': theme === 'christmas' }">Dashboard</a>
         </li>
       </ul>
 
-
-
       <!-- Search and Theme Button -->
       <div class="search-login-container ms-auto d-flex">
+        <!-- Guest Login Section -->
+        <ng-template #loginSection>
+          <div class="login-button-container">
+            <a class="btn btn-outline-dark" [ngClass]="{
+              'btn-outline-dark': theme !== 'christmas',
+              'btn-outline-light': theme === 'christmas'
+            }" (click)="handleLogin()">
+              <i class="fa fa-user"></i> Login
+            </a>
+          </div>
+        </ng-template>
+        <ng-container *ngIf="!user">
+          <ng-container *ngTemplateOutlet="loginSection"></ng-container>
+        </ng-container>
+      </div>
 
-
-
-          <!-- Login Section -->
-          <ng-template #loginSection>
-            <div class="login-button-container">
-              <a class="btn btn-outline-dark" [ngClass]="{
-                'btn-outline-dark': theme !== 'christmas',
-                'btn-outline-light': theme === 'christmas'
-              }" (click)="handleLogin()"><i class="fa fa-user"></i>Login</a>
-            </div>
-            <form class="d-flex align-items-center" (submit)="onSearch()">
-              <input
-                class="form-control search-input"
-                type="text"
-                placeholder="Pesquisar"
-                [(ngModel)]="searchQuery"
-                name="search"
-                (keyup)="onKeyUp()"
-              />
-              <button class="btn btn-outline-dark search-button" type="submit">
-                <i class="fa fa-search"></i>
-              </button>
-            </form>
-          </ng-template>
-          <ng-container *ngIf="!user">
-            <ng-container *ngTemplateOutlet="loginSection"></ng-container>
-          </ng-container>
+      <!-- User Options -->
+      <div *ngIf="user" class="ms-auto d-flex align-items-center">
+        <div class="navbar-text me-3 fw-bold fs-5" [ngClass]="{ 'text-white': theme === 'christmas' }">
+          Bem-Vindo(a), {{ user.username }}
         </div>
-            <!-- User-specific options -->
-            <div *ngIf="user" class="ms-auto d-flex align-items-center" [ngClass]="{ 'text-white': theme === 'christmas' }">
-              <div class="navbar-text me-3 fw-bold fs-5">
-                Bem-Vindo(a), {{ user.username }}
-              </div>
-              <form class="d-flex align-items-center me-3" style="margin-right: 10px;" (submit)="onSearch()">
-                <input
-                  class="form-control search-input"
-                  type="text"
-                  placeholder="Pesquisar"
-                  [(ngModel)]="searchQuery"
-                  name="search"
-                  (keyup)="onKeyUp()"
-                />
-                <button class="btn btn-outline-dark search-button" type="submit" [ngClass]="{
-                  'btn-outline-dark': theme !== 'christmas',
-                  'btn-outline-light': theme === 'christmas'
+        
+        <!-- Search Form -->
+        <form class="d-flex align-items-center me-3" (submit)="onSearch()">
+          <input
+            class="form-control search-input"
+            type="text"
+            placeholder="Pesquisar"
+            [(ngModel)]="searchQuery"
+            name="search"
+            (keyup)="onKeyUp()"
+          />
+          <button class="btn btn-outline-dark" type="submit" [ngClass]="{
+            'btn-outline-dark': theme !== 'christmas',
+            'btn-outline-light': theme === 'christmas'
+          }">
+            <i class="fa fa-search"></i>
+          </button>
+        </form>
+
+        <!-- User Actions -->
+        <ng-container [ngSwitch]="user.user_type">
+          <!-- Individual User Options -->
+          <a *ngSwitchCase="'individual'" routerLink="/profile" class="btn btn-outline-dark me-2" [ngClass]="{
+            'btn-outline-dark': theme !== 'christmas',
+            'btn-outline-light': theme === 'christmas'
+          }">
+            <i class="fa fa-user"></i>
+          </a>
+          <span *ngSwitchCase="'individual'" class="btn btn-outline-dark me-2" [ngClass]="{
+            'btn-outline-dark': theme !== 'christmas',
+            'btn-outline-light': theme === 'christmas'
+          }">
+            Saldo: {{ user.balance | currency:'EUR' }}
+          </span>
+          <button *ngSwitchCase="'individual'" class="btn btn-outline-success me-2" data-bs-toggle="modal" data-bs-target="#addFundsModal">
+            <i class="fa fa-plus"></i>
+          </button>
+          <a *ngSwitchCase="'individual'" routerLink="/manage_cart" class="btn btn-outline-dark me-2">
+            <i class="fa fa-shopping-cart"></i>
+          </a>
+          <a *ngSwitchCase="'individual'" routerLink="/favorites" class="btn btn-outline-dark me-2">
+            <i class="fa fa-heart text-danger"></i>
+          </a>
+
+          <a routerLink="/chat" class="btn btn-outline-dark me-2 position-relative" [ngClass]="{
+            'btn-outline-dark': theme !== 'christmas',
+            'btn-outline-light text-white': theme === 'christmas'
+          }"
+          *ngIf="user?.user_type === 'individual' || user?.user_type === 'company'"
+          >
+          <i class="fa fa-message"></i>
+          <!-- Unread Messages Badge -->
+          <span
+            *ngIf="unreadMessagesCount > 0"
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+            style="font-size: 0.8rem;"
+          >
+            {{ unreadMessagesCount }}
+            <span class="visually-hidden">unread messages</span>
+          </span>
+        </a>
+
+          <!-- Admin User Options -->
+          <a *ngSwitchCase="'admin'" routerLink="/admin/add/company" class="btn btn-outline-dark me-2">
+            <i class="fa fa-plus"></i> Adicionar Empresa
+          </a>
+
+
+          <li class="nav-item dropdown" style="list-style-type: none; margin: 0; padding: 0;">
+            <a
+              class="nav-link dropdown-toggle d-flex align-items-center justify-content-center rounded-circle bg-light"
+              *ngSwitchCase="'admin'"
+              href="#"
+              id="themeDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              [ngClass]="{
+                'bg-light': theme !== 'christmas',
+                'bg-white': theme === 'christmas',
+                'text-black': theme === 'christmas'
+              }"
+              style="
+                width: 40px; 
+                height: 40px; 
+                border: 1px solid #ccc; 
+                padding: 0;
+                margin-right: 10px;"
+            >
+              <i class="fa fa-paint-brush" style="font-size: 20px;"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm rounded" aria-labelledby="themeDropdown">
+              <li>
+                <a class="dropdown-item d-flex align-items-center" (click)="changeTheme('default')" [ngClass]="{
+                  'hover-default': theme === 'default',
+                  'hover-dark': theme === 'dark',
+                  'hover-christmas': theme === 'christmas'
                 }">
-                  <i class="fa fa-search"></i>
-                </button>
-              </form>
-              <ng-container [ngSwitch]="user.user_type">
-                <a *ngSwitchCase="'individual'" routerLink="/profile" class="btn btn-outline-dark me-2" [ngClass]="{ 
-                  'btn-outline-dark': theme !== 'christmas', 
-                  'btn-outline-light text-white': theme === 'christmas' 
-                }" >
-                  <i class="fa fa-user"></i>
+                  <i class="fa fa-circle text-primary me-2"></i>
+                  <span>Padrão</span>
                 </a>
-                <div class="d-flex align-items-center">
-                  <!-- Display User Balance -->
-                  <span *ngSwitchCase="'individual'" class="btn btn-outline-dark me-2"[ngClass]="{ 
-                    'btn-outline-dark': theme !== 'christmas', 
-                    'btn-outline-light text-white': theme === 'christmas' 
-                  }">
-                    Saldo: {{ user.balance | currency: 'EUR' }}
-                  </span>
-                
-                  <!-- Add Funds Button -->
-                  <button 
-                    *ngSwitchCase="'individual'" 
-                    class="btn btn-outline-success me-2" 
-                    data-bs-toggle="modal" 
-                    data-bs-target="#addFundsModal"
-                    [ngClass]="{ 
-                      'btn-outline-dark': theme !== 'christmas', 
-                      'btn-outline-light text-white': theme === 'christmas' 
-                    }"
-                  >
-                    <i class="fa fa-plus"></i>
-                  </button>
-                </div>
-                
-                <!-- Add Funds Modal -->
-                <div 
-                  class="modal fade" 
-                  id="addFundsModal" 
-                  tabindex="-1" 
-                  aria-labelledby="addFundsModalLabel" 
-                  aria-hidden="true"
-                >
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="addFundsModalLabel">Adicionar Saldo</h5>
-                        <button 
-                          type="button" 
-                          class="btn-close" 
-                          data-bs-dismiss="modal" 
-                          aria-label="Close"
-                        ></button>
-                      </div>
-                      <div class="modal-body">
-                        <form>
-                          <!-- Payment Method Selection -->
-                          <div class="mb-3">
-                            <label for="paymentMethod" class="form-label">Método de Pagamento</label>
-                            <select 
-                              id="paymentMethod" 
-                              class="form-select" 
-                              [(ngModel)]="selectedPaymentMethod" 
-                              name="paymentMethod"
-                            >
-                              <option value="" disabled selected>Selecione um método</option>
-                              <option value="Transferência Bancária">Transferência Bancária</option>
-                              <option value="MBWay">MBWay</option>
-                              <option value="PayPal">PayPal</option>
-                              <option value="Cartão de Crédito">Cartão de Crédito</option>
-                              <option value="Criptomoeda">Criptomoeda</option>
-                            </select>
-                          </div>
-                
-                          <!-- Amount Input -->
-                          <div class="mb-3">
-                            <label for="amount" class="form-label">Valor a Adicionar (€)</label>
-                            <input 
-                              type="number" 
-                              id="amount" 
-                              class="form-control" 
-                              [(ngModel)]="amount" 
-                              name="amount" 
-                              min="1" 
-                              placeholder="Insira o valor"
-                            />
-                          </div>
-                        </form>
-                      </div>
-                      <div class="modal-footer">
-                        <button 
-                          type="button" 
-                          class="btn btn-secondary" 
-                          data-bs-dismiss="modal"
-                        >
-                          Cancelar
-                        </button>
-                        <button 
-                          type="button" 
-                          class="btn btn-success" 
-                          [disabled]="!selectedPaymentMethod || !amount || amount <= 0"
-                          (click)="addFunds()"
-                        >
-                          Confirmar
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-
-                <a *ngSwitchCase="'individual'" routerLink="/manage_cart" class="btn btn-outline-dark me-2" [ngClass]="{
-                  'btn-outline-dark': theme !== 'christmas',
-                  'btn-outline-light text-white': theme === 'christmas'
+              </li>
+              <li>
+                <a class="dropdown-item d-flex align-items-center" (click)="changeTheme('christmas')" [ngClass]="{
+                  'hover-default': theme === 'default',
+                  'hover-dark': theme === 'dark',
+                  'hover-christmas': theme === 'christmas'
                 }">
-                  <i class="fa fa-shopping-cart"></i>
+                  <i class="fa fa-tree text-success me-2"></i>
+                  <span>Natal</span>
                 </a>
-                <a *ngSwitchCase="'individual'" routerLink="/favorites" routerLinkActive="active" class="btn btn-outline-dark me-2" [ngClass]="{
-                  'btn-outline-dark': theme !== 'christmas',
-                  'btn-outline-light text-white': theme === 'christmas'
-                }">
-                  <i class="fa fa-heart text-danger"></i>
-                </a>
+              </li>
+            </ul>
+          </li>
+          <a *ngSwitchCase="'admin'" routerLink="/profile" class="btn btn-outline-dark me-2">
+            <i class="fa fa-user"></i>
+          </a>
+        </ng-container>
 
-                <a *ngSwitchCase="'individual'" routerLink="/chat" class="btn btn-outline-dark me-2" [ngClass]="{
-                  'btn-outline-dark': theme !== 'christmas',
-                  'btn-outline-light text-white': theme === 'christmas'
-                }">
-                <a *ngSwitchCase="'individual'" routerLink="/chat" class="btn btn-outline-dark me-2 position-relative">
-                  <i class="fa fa-message"></i>
-                  <!-- Unread Messages Badge -->
-                  <span
-                    *ngIf="unreadMessagesCount > 0"
-                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                    style="font-size: 0.8rem;"
-                  >
-                    {{ unreadMessagesCount }}
-                    <span class="visually-hidden">Unread messages</span>
-                  </span>
-                </a>
-                <a *ngSwitchCase="'company'" routerLink="/chat" class="btn btn-outline-dark me-2 position-relative">
-                  <i class="fa fa-message"></i>
-                </a>
-      
-                <a *ngSwitchCase="'admin'" routerLink="/profile" class="btn btn-outline-dark me-2" [ngClass]="{
-                  'btn-outline-dark': theme !== 'christmas',
-                  'btn-outline-light text-white': theme === 'christmas'
-                }">
-                  <i class="fa fa-user"></i>
-                </a>
-
-                <a *ngSwitchCase="'admin'" routerLink="/admin/add/company" class="btn btn-outline-dark me-2" [ngClass]="{
-                  'btn-outline-dark': theme !== 'christmas',
-                  'btn-outline-light text-white': theme === 'christmas'
-                }">
-                  <i class="fa fa-plus"></i> Adicionar Empresa
-                </a>
-      
-                <a *ngSwitchCase="'company'" [routerLink]="'/my-company-products/' + user.company?.id" class="btn btn-outline-dark me-2" [ngClass]="{
-                  'btn-outline-dark': theme !== 'christmas',
-                  'btn-outline-light text-white': theme === 'christmas'
-                }">
-                  <i class="bi bi-archive-fill"></i> Ver os meus produtos
-                </a>
-
-                <a *ngSwitchCase="'company'" routerLink="/profile" class="btn btn-outline-dark me-2" [ngClass]="{
-                  'btn-outline-dark': theme !== 'christmas',
-                  'btn-outline-light text-white': theme === 'christmas'
-                }">
-                  <i class="fa fa-user"></i>
-                </a>
-
-                <a *ngSwitchCase="'company'" routerLink="/chat" class="btn btn-outline-dark me-2" [ngClass]="{
-                  'btn-outline-dark': theme !== 'christmas',
-                  'btn-outline-light text-white': theme === 'christmas'
-                }">
-                  <i class="fa fa-message"></i>
-                </a>
-
-                <li class="nav-item dropdown" style="list-style-type: none; margin: 0; padding: 0;">
-                  <a
-                    class="nav-link dropdown-toggle d-flex align-items-center justify-content-center rounded-circle bg-light"
-                    *ngSwitchCase="'admin'"
-                    href="#"
-                    id="themeDropdown"
-                    role="button"
-                    *ngIf="user?.user_type === 'admin'"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                    [ngClass]="{
-                      'bg-light': theme !== 'christmas',
-                      'bg-white': theme === 'christmas',
-                      'text-black': theme === 'christmas'
-                    }"
-                    style="
-                      width: 40px; 
-                      height: 40px; 
-                      border: 1px solid #ccc; 
-                      padding: 0;
-                      margin-right: 10px;"
-                  >
-                    <i class="fa fa-paint-brush" style="font-size: 20px;"></i>
-                  </a>
-                  <ul class="dropdown-menu dropdown-menu-end shadow-sm rounded" aria-labelledby="themeDropdown">
-                    <li>
-                      <a class="dropdown-item d-flex align-items-center" (click)="changeTheme('default')" [ngClass]="{
-                        'hover-default': theme === 'default',
-                        'hover-dark': theme === 'dark',
-                        'hover-christmas': theme === 'christmas'
-                      }">
-                        <i class="fa fa-circle text-primary me-2"></i>
-                        <span>Padrão</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item d-flex align-items-center" (click)="changeTheme('christmas')" [ngClass]="{
-                        'hover-default': theme === 'default',
-                        'hover-dark': theme === 'dark',
-                        'hover-christmas': theme === 'christmas'
-                      }">
-                        <i class="fa fa-tree text-success me-2"></i>
-                        <span>Natal</span>
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-                
-              </ng-container>
-
-              <a (click)="logout()" class="btn btn-outline-dark" [ngClass]="{
-                'btn-outline-dark': theme !== 'christmas',
-                'btn-outline-light text-white': theme === 'christmas'
-              }"><i class="fas fa-sign-out-alt"></i></a>
-            </div>
-              
-              <app-theme-button></app-theme-button>
-
-      <!-- Display Login Section If User Is Not Logged In -->
-
-
+        <!-- Logout -->
+        <a (click)="logout()" class="btn btn-outline-dark" [ngClass]="{
+          'btn-outline-dark': theme !== 'christmas',
+          'btn-outline-light text-white': theme === 'christmas'
+        }">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
+      </div>
     </div>
+    <app-theme-button></app-theme-button>
+
   </div>
 </nav>
 
