@@ -654,9 +654,10 @@ def register_view(request):
             password=data['password1'],  # Senha já validada
             phone=data['phone'],
             country=data['country'],
+            user_type='individual'  # Garantir que o tipo de usuário seja sempre "individual"
         )
 
-        print("user", user)
+        print("user na view", user.user_type)
 
         if 'image' in data and data['image']:
             user.image = data['image']

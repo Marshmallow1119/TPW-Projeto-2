@@ -183,7 +183,8 @@ export class AuthService {
         if (response.access && response.refresh) {
           localStorage.setItem('accessToken', response.access);
           localStorage.setItem('refreshToken', response.refresh);
-  
+          
+          console.log('User logged in:', response.user);
           const user: User = {
             id: response.id,
             username: response.username,
