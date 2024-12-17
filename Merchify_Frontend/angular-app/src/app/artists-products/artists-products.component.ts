@@ -6,6 +6,13 @@ import { ArtistsCardProductsComponent } from '../artists-card-products/artists-c
 import { ProdutosArtistaService } from '../produtos-artista.service';
 import { User } from '../models/user';
 import { AuthService } from '../auth.service';
+import { FavoritesService } from '../favorites.service';
+
+interface favoriteProducts {
+  product_id: number;
+  user_id: number;
+  product: any;
+}
 
 
 @Component({
@@ -29,7 +36,8 @@ export class ArtistsProductsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private produtosArtistaService: ProdutosArtistaService,
-    private authService: AuthService
+    private authService: AuthService,
+    private favoritesService: FavoritesService
   ) {}
 
   ngOnInit(): void {
@@ -65,6 +73,17 @@ export class ArtistsProductsComponent implements OnInit {
     } catch (error) {
       console.error('Erro ao carregar artista e produtos:', error);
     }
+
+    const favoritesResponse = await this.favoritesService.getFavorites('products');
+    const favoriteProducts = Array.isArray(favoritesResponse) ? favoritesResponse : favoritesResponse.results || [];
+
+    for (let product of this.products) {
+      product.is_favorited = favoriteProducts.some(
+        (favoriteProduct: favoriteProducts) => favoriteProduct.product.id === product.id
+      );
+    }
+
+
   }
 
   sortProducts(order: string): void {
@@ -103,10 +122,12 @@ export class ArtistsProductsComponent implements OnInit {
       else if (!filters.onSale && !product.is_on_promotion) {
         matchesSale =  true;
       }
+      else if (!filters.onSale && product.is_on_promotion) {
+        matchesSale =  true;
+      }
       else {
         matchesSale =  false;
       }
-        
   
       const matchesPrice =
         (!filters.min_price || product.price >= filters.min_price) &&

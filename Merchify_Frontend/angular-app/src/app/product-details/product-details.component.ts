@@ -54,22 +54,25 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   private async loadProductDetails(productId: number): Promise<void> {
-    console.log('Loading product details:', productId); // Debug log
+    console.log('Loading product details:', productId);
     this.loading = true;
     this.errorMessage = '';
-  
+
     try {
       const response = await this.productDetailsService.getProductDetails(productId);
       console.log('Raw Product details:', response);
-  
+
       this.product = response;
+      if (this.product) {
+        console.log('Product details:', this.product);
+        this.saveToRecentlySeen(this.product.id);
+      }
 
       if (this.product && this.product.product_type === 'Clothing') {
         this.sizes = this.product.specific_details.sizes || [];
       } else {
         this.sizes = [];
       }
-  
     } catch (error) {
       console.error('Error loading product details:', error);
       this.errorMessage = 'Erro ao carregar os detalhes do produto. Tente novamente mais tarde.';
@@ -151,6 +154,22 @@ export class ProductDetailsComponent implements OnInit {
         });
     }
   }
+
+  private saveToRecentlySeen(productId: number): void {
+    const maxItems = 5; // Maximum number of recently seen products to store
+    let recentlySeen = JSON.parse(localStorage.getItem('recentlySeenProducts') || '[]');
+  
+    recentlySeen = recentlySeen.filter((id: number) => id !== productId);
+  
+    recentlySeen.unshift(productId);
+  
+    if (recentlySeen.length > maxItems) {
+      recentlySeen.pop();
+    }
+  
+    localStorage.setItem('recentlySeenProducts', JSON.stringify(recentlySeen));
+  }
+  
 
   async addToCart(): Promise<void> {
     if (!this.authService.isAuthenticated()) {
