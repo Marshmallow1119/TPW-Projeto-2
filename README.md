@@ -1,4 +1,4 @@
-# TPW - Projeto 1 - Descrição e Funcionalidades
+# TPW - Projeto 2 - Descrição e Funcionalidades
 
 ## Merchify
 
@@ -139,12 +139,6 @@ https://alof.pythonanywhere.com/
 
 Para concluir, o projeto Merchify foi bastante enriquecedor para todos os membros. Aprendemos a trabalhar com Django e a desenvolver uma aplicação web de raiz. A aplicação desenvolvida é bastante completa e oferece várias funcionalidades que permitem ao utilizador ter uma experiência agradável e intuitiva. À medida que fomos desenvolvendo a aplicação, fomos ganhando mais ideias e não conseguíamos parar de implementar novas funcionalides devido ao interesse pela linguagem. A aplicação Merchify é um projeto que nos orgulha e que nos deu a oportunidade de aplicar os conhecimentos adquiridos sobre Django.
 
-## NOTA
-
-19
-
-
-# TPW-Projeto-2
 
 
 python -m venv venv
