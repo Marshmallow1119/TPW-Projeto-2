@@ -107,6 +107,80 @@ style="padding: 0.25rem 0; min-height: 50px;">
           }" >
             <i class="fa fa-plus"></i>
           </button>
+          <!-- Add Funds Modal -->
+          <div 
+          class="modal fade" 
+          id="addFundsModal" 
+          tabindex="-1" 
+          aria-labelledby="addFundsModalLabel" 
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="addFundsModalLabel">Adicionar Saldo</h5>
+                <button 
+                  type="button" 
+                  class="btn-close" 
+                  data-bs-dismiss="modal" 
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <!-- Payment Method Selection -->
+                  <div class="mb-3">
+                    <label for="paymentMethod" class="form-label">Método de Pagamento</label>
+                    <select 
+                      id="paymentMethod" 
+                      class="form-select" 
+                      [(ngModel)]="selectedPaymentMethod" 
+                      name="paymentMethod"
+                    >
+                      <option value="" disabled selected>Selecione um método</option>
+                      <option value="Transferência Bancária">Transferência Bancária</option>
+                      <option value="MBWay">MBWay</option>
+                      <option value="PayPal">PayPal</option>
+                      <option value="Cartão de Crédito">Cartão de Crédito</option>
+                      <option value="Criptomoeda">Criptomoeda</option>
+                    </select>
+                  </div>
+        
+                  <!-- Amount Input -->
+                  <div class="mb-3">
+                    <label for="amount" class="form-label">Valor a Adicionar (€)</label>
+                    <input 
+                      type="number" 
+                      id="amount" 
+                      class="form-control" 
+                      [(ngModel)]="amount" 
+                      name="amount" 
+                      min="1" 
+                      placeholder="Insira o valor"
+                    />
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button 
+                  type="button" 
+                  class="btn btn-secondary" 
+                  data-bs-dismiss="modal"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="button" 
+                  class="btn btn-success" 
+                  [disabled]="!selectedPaymentMethod || !amount || amount <= 0"
+                  (click)="addFunds()"
+                >
+                  Confirmar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
           <a *ngSwitchCase="'individual'" routerLink="/manage_cart" class="btn btn-outline-dark me-2" [ngClass]="{
             'btn-outline-dark': theme !== 'christmas',
             'btn-outline-light': theme === 'christmas'

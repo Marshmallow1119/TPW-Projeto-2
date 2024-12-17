@@ -163,9 +163,14 @@ export class NavbarComponent implements OnInit {
 
 
   changeTheme(theme: string): void {
-    this.themeService.changeTheme(theme);
-    window.location.reload(); // Optional: Reload the page if theme affects global styles
+    this.isLoading = true; 
+  
+    setTimeout(() => {
+      this.themeService.changeTheme(theme); // Aplica o tema
+      this.isLoading = false; 
+    }, 1500);
   }
+  
 
 
 }
