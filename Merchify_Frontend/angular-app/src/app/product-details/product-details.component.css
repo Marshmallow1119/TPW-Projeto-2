@@ -18,3 +18,24 @@
     color: gold;
   }
   
+  .text-muted {
+    text-decoration: line-through;
+    color: #6c757d;
+  }
+  
+  .text-danger {
+    font-weight: bold;
+    color: #dc3545;
+  }
+  
+  .badge.bg-warning {
+    background-color: #ffc107;
+    color: #212529;
+  }
+
+  .badge-large {
+    font-size: 1.2rem;  
+    border-radius: 0.5rem;
+  }
+  
+  

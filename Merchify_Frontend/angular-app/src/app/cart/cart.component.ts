@@ -72,7 +72,9 @@ export class CartComponent implements OnInit {
               releaseDate: item.product.specific_details.releaseDate,
               stock: item.product.specific_details.stock,
               imageBase64: item.product.specific_details.image_base64,
-            }
+            },
+            is_on_promotion: item.product.is_on_promotion || false, // Verifica promoção
+            old_price: item.product.old_price || null, // Preço antigo
           },
           quantity: item.quantity,
           size: item.size,

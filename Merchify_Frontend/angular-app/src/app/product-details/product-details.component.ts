@@ -77,6 +77,8 @@ export class ProductDetailsComponent implements OnInit {
         product_type: response.product_type,
         stock: response.stock || 0,
         specific_details: response.specific_details || null,
+        is_on_promotion: response.is_on_promotion,
+        old_price: response.old_price,
       };
   
       if (this.product.product_type === 'Clothing') {
@@ -85,12 +87,6 @@ export class ProductDetailsComponent implements OnInit {
         this.sizes = [];
       }
 
-  
-      console.log('stock:', this.product.stock);
-      console.log('product_type:', this.product.product_type);
-      console.log(this.product.company);
-      console.log(this.product.company.id);
-      console.log('Sizes:', this.sizes);
     } catch (error) {
       console.error('Error loading product details:', error);
       this.errorMessage = 'Erro ao carregar os detalhes do produto. Tente novamente mais tarde.';

@@ -36,6 +36,7 @@ export class ProductsPageComponent implements OnInit {
   
   async ngOnInit(): Promise<void> {
     await this.loadProductsAndArtistsData();
+    
   }
 
   private async loadProductsAndArtistsData(): Promise<void> {

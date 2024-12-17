@@ -67,7 +67,6 @@ def home(request):
 
         artists_data = ArtistSerializer(artists, many=True, context={'request': request}).data
         recent_products_data = ProductSerializer(recent_products, many=True, context={'request': request}).data
-
         return Response({
             'artists': artists_data,
             'recent_products': recent_products_data,
@@ -182,6 +181,13 @@ def profile(request):
         
         else:
 
+            data = request.data
+
+            if 'image' in request.FILES:  # Capturar a imagem enviada
+                profile_image = request.FILES['image']
+                user.image = profile_image  # Salvar a imagem no campo correspondente
+
+            # Atualizar outros campos
             if 'firstname' in data:
                 user.firstname = data.get('firstname')
             if 'lastname' in data:
@@ -192,10 +198,6 @@ def profile(request):
                 user.address = data.get('address')
             if 'country' in data:
                 user.country = data.get('country')
-            
-
-            if 'image' in request.FILES:
-                user.image = request.FILES['image']
 
             phone = data.get('phone')
             if phone and not re.fullmatch(r'\d{9}', phone):
@@ -203,9 +205,7 @@ def profile(request):
             if 'phone' in data:
                 user.phone = phone
 
-
             user.save()
-
 
             updated_user_serializer = UserSerializer(user)
             return Response({'message': 'Perfil atualizado com sucesso.', 'user': updated_user_serializer.data})
@@ -367,11 +367,8 @@ def produtos(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def add_promotion(request, product_id):
-    print('add_promotion')
     product = get_object_or_404(Product, id=product_id)
     data = request.data
-
-    print(data)
 
     new_price = data.get('new_price')
 
@@ -387,7 +384,6 @@ def add_promotion(request, product_id):
     product.is_on_promotion = True
     product.save()
 
-    # Retorna os três valores no JSON
     return Response({
         'message': 'Promoção aplicada com sucesso!',
         'old_price': old_price,
@@ -413,23 +409,6 @@ def cancel_promotion(request, product_id):
     product.save()
 
     return Response({'message': 'Promoção cancelada com sucesso!'})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 @api_view(['GET'])
@@ -1520,7 +1499,8 @@ def get_filters(request):
     try:
         vinil_genres = Vinil.objects.values_list('genre', flat=True).distinct()
         cd_genres = CD.objects.values_list('genre', flat=True).distinct()
-        genres = set(vinil_genres).union(cd_genres)  
+        genres = set(vinil_genres).union(cd_genres) 
+
 
         clothing_colors = Clothing.objects.values_list('color', flat=True).distinct()
         accessory_colors = Accessory.objects.values_list('color', flat=True).distinct()
@@ -1530,11 +1510,14 @@ def get_filters(request):
 
         materials = Accessory.objects.values_list('material', flat=True).distinct()
 
+        is_on_promotion = Product.objects.values_list('is_on_promotion', flat=True).distinct()
+
         filters = {
             'genres': list(genres),
             'colors': list(colors),
             'sizes': list(sizes),
             'materials': list(materials),
+            'is_on_promotion': list(is_on_promotion),
         }
 
         return Response(filters)
@@ -1801,7 +1784,6 @@ def update_product_stock(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
         product_type = product.get_product_type()
-        print("Request Data:", request.data)
 
         # Ensure request data is properly structured
         if not isinstance(request.data, list):
@@ -1847,7 +1829,6 @@ def update_product_stock(request, product_id):
                 product.stock = stock_value
                 product.save()
 
-            print("Updated Product Stock:", stock_value)
             return Response({'message': 'Stock updated successfully'}, status=status.HTTP_200_OK)
 
     except Product.DoesNotExist:

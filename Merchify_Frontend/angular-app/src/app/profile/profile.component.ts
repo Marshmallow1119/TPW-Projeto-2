@@ -26,6 +26,8 @@ export class ProfileComponent implements OnInit {
     new_password: '',
     confirm_new_password: '',
   }; 
+  uploadedImage: File | null = null; // Armazena a imagem carregada
+
 
   constructor(private authService: AuthService, private profileService: ProfileService) {}
 
@@ -62,31 +64,30 @@ export class ProfileComponent implements OnInit {
 
   async saveChanges(): Promise<void> {
     if (!this.user) return;
-
-    const updateData = {
-      firstname: this.user.firstname,
-      lastname: this.user.lastname,
-      email: this.user.email,
-      username: this.user.username,
-      phone: this.user.phone,
-      address: this.user.address,
-      country: this.user.country,
-    };
-
-
+  
+    const formData = new FormData();
+    formData.append('firstname', this.user.firstname || '');
+    formData.append('lastname', this.user.lastname || '');
+    formData.append('email', this.user.email || '');
+    formData.append('phone', this.user.phone || '');
+    formData.append('address', this.user.address || '');
+    formData.append('country', this.user.country || '');
+  
+    if (this.uploadedImage) {
+      formData.append('image', this.uploadedImage); // Adicionar a imagem
+    }
+  
     try {
-      await this.profileService.updateProfile(updateData);
+      await this.profileService.updateProfile(formData); // Enviar FormData
       alert('Perfil atualizado com sucesso!');
-      console.log('Problema aqui');
       await this.loadProfile();
-
       this.editing = false;
     } catch (error) {
-      await this.loadProfile();
       console.error('Erro ao atualizar perfil:', error);
       alert('Erro ao atualizar perfil.');
     }
   }
+  
 
   async deleteAccount(): Promise<void> {
     if (confirm('Tem certeza que deseja deletar sua conta?')) {
@@ -115,8 +116,8 @@ export class ProfileComponent implements OnInit {
   onImageSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      // Faça upload do arquivo ou pré-visualize
       console.log('Imagem selecionada:', file);
+      this.uploadedImage = file; 
     }
   }
 

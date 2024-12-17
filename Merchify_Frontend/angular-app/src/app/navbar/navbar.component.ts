@@ -7,12 +7,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BalanceService } from '../balance-service.service';
 import { ChatService } from '../chat.service';
+import { ThemeService } from '../theme.service';
 
 @Injectable({
   providedIn: 'root',
 })
 @Component({
   selector: 'app-navbar',
+  standalone: true,
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
   imports: [ThemeButtonComponent, RouterModule, CommonModule, FormsModule],
@@ -26,6 +28,7 @@ export class NavbarComponent implements OnInit {
   isLoading: boolean | undefined;
   unreadMessagesCount: number = 0;
   dataLoaded: boolean = false;
+  theme: string = 'default';
 
   constructor(
     private authService: AuthService,
@@ -33,9 +36,14 @@ export class NavbarComponent implements OnInit {
     private router: Router,
     private balanceService: BalanceService,
     private chatService: ChatService,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
+    this.themeService.theme$.subscribe((theme) => {
+      console.log('NavbarComponent received theme:', theme);
+      this.theme = theme;
+    });
     this.authService.user$.subscribe((user) => {
       console.log('NavbarComponent received user:', user);
       this.user = user;
@@ -55,9 +63,8 @@ export class NavbarComponent implements OnInit {
         this.dataLoaded = true;
       }
     });
+      this.loadBalance();
   }
-  
-
   fetchUnreadMessagesCount(): void {
     this.chatService.getUnreadMessagesCount().subscribe({
       next: (response: { unread_count: number; }) => {
@@ -96,6 +103,7 @@ export class NavbarComponent implements OnInit {
         console.log('Balance fetched successfully:', response);
         if (this.user) {
           this.user.balance = response.balance; 
+          this.cdr.detectChanges();
         }
       },
       (error) => {
@@ -152,13 +160,9 @@ export class NavbarComponent implements OnInit {
 
 
   changeTheme(theme: string): void {
-    console.log('Changing theme to:', theme);
-   //this.isLoading = true; // Inicia o carregamento
-   //setTimeout(() => {
-   //  // Altera o tema aplicando uma classe no body
-   //  document.body.className = ''; // Remove classes anteriores
-   //  document.body.classList.add(`theme-${theme}`);
-   //  this.isLoading = false; // Finaliza o carregamento
-   //}, 1000); // Simula o tempo de carregamento (1 segundo)
+    this.themeService.changeTheme(theme);
+    window.location.reload(); // Optional: Reload the page if theme affects global styles
   }
+
+
 }

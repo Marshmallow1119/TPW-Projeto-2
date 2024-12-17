@@ -1,7 +1,18 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light" style="padding: 0.25rem 0; min-height: 50px;">
+<nav class="navbar navbar-expand-lg " 
+[ngClass]="{
+  'navbar-light bg-light': theme !== 'christmas',
+  'navbar-christmas': theme === 'christmas'
+}"
+style="padding: 0.25rem 0; min-height: 50px;">
   <div class="container-fluid">
     <a class="navbar-brand" routerLink="/">
-      <img src="assets/logo.png" class="logo" alt="Logo" width="80" />
+      <img
+        src="assets/logo.png"
+        class="logo"
+        alt="Logo"
+        width="80"
+        [ngClass]="{ 'christmas-logo': theme === 'christmas' }"
+      />
     </a>
     <button
       class="navbar-toggler"
@@ -17,20 +28,20 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link" [routerLink]="'/'" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+          <a class="nav-link" [routerLink]="'/'" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [ngClass]="{ 'text-white': theme === 'christmas' }">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" [routerLink]="'/products-page'" routerLinkActive="active">Produtos</a>
+          <a class="nav-link" [routerLink]="'/products-page'" routerLinkActive="active" [ngClass]="{ 'text-white': theme === 'christmas' }">Produtos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" [routerLink]="'/artists-page'" routerLinkActive="active">Artistas e Bandas</a>
+          <a class="nav-link" [routerLink]="'/artists-page'" routerLinkActive="active" [ngClass]="{ 'text-white': theme === 'christmas' }">Artistas e Bandas</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" [routerLink]="'/companhias-page'" routerLinkActive="active">Empresas</a>
+          <a class="nav-link" [routerLink]="'/companhias-page'" routerLinkActive="active" [ngClass]="{ 'text-white': theme === 'christmas' }">Empresas</a>
         </li>
         <!--Se for admin tem uma opcao dashboard-->
         <li *ngIf="user?.user_type === 'admin'" class="nav-item">
-          <a class="nav-link" [routerLink]="'/admin-home'" routerLinkActive="active">Dashboard</a>
+          <a class="nav-link" [routerLink]="'/admin-home'" routerLinkActive="active" [ngClass]="{ 'text-white': theme === 'christmas' }">Dashboard</a>
         </li>
       </ul>
 
@@ -44,7 +55,10 @@
           <!-- Login Section -->
           <ng-template #loginSection>
             <div class="login-button-container">
-              <a class="btn btn-outline-dark"(click)="handleLogin()"><i class="fa fa-user"></i> Login</a>
+              <a class="btn btn-outline-dark" [ngClass]="{
+                'btn-outline-dark': theme !== 'christmas',
+                'btn-outline-light': theme === 'christmas'
+              }" (click)="handleLogin()"><i class="fa fa-user"></i>Login</a>
             </div>
             <form class="d-flex align-items-center" (submit)="onSearch()">
               <input
@@ -65,7 +79,7 @@
           </ng-container>
         </div>
             <!-- User-specific options -->
-            <div *ngIf="user" class="ms-auto d-flex align-items-center">
+            <div *ngIf="user" class="ms-auto d-flex align-items-center" [ngClass]="{ 'text-white': theme === 'christmas' }">
               <div class="navbar-text me-3 fw-bold fs-5">
                 Bem-Vindo(a), {{ user.username }}
               </div>
@@ -78,17 +92,26 @@
                   name="search"
                   (keyup)="onKeyUp()"
                 />
-                <button class="btn btn-outline-dark search-button" type="submit">
+                <button class="btn btn-outline-dark search-button" type="submit" [ngClass]="{
+                  'btn-outline-dark': theme !== 'christmas',
+                  'btn-outline-light': theme === 'christmas'
+                }">
                   <i class="fa fa-search"></i>
                 </button>
               </form>
               <ng-container [ngSwitch]="user.user_type">
-                <a *ngSwitchCase="'individual'" routerLink="/profile" class="btn btn-outline-dark me-2">
+                <a *ngSwitchCase="'individual'" routerLink="/profile" class="btn btn-outline-dark me-2" [ngClass]="{ 
+                  'btn-outline-dark': theme !== 'christmas', 
+                  'btn-outline-light text-white': theme === 'christmas' 
+                }" >
                   <i class="fa fa-user"></i>
                 </a>
                 <div class="d-flex align-items-center">
                   <!-- Display User Balance -->
-                  <span *ngSwitchCase="'individual'" class="btn btn-outline-dark me-2">
+                  <span *ngSwitchCase="'individual'" class="btn btn-outline-dark me-2"[ngClass]="{ 
+                    'btn-outline-dark': theme !== 'christmas', 
+                    'btn-outline-light text-white': theme === 'christmas' 
+                  }">
                     Saldo: {{ user.balance | currency: 'EUR' }}
                   </span>
                 
@@ -98,6 +121,10 @@
                     class="btn btn-outline-success me-2" 
                     data-bs-toggle="modal" 
                     data-bs-target="#addFundsModal"
+                    [ngClass]="{ 
+                      'btn-outline-dark': theme !== 'christmas', 
+                      'btn-outline-light text-white': theme === 'christmas' 
+                    }"
                   >
                     <i class="fa fa-plus"></i>
                   </button>
@@ -179,13 +206,23 @@
                 </div>
                 
 
-                <a *ngSwitchCase="'individual'" routerLink="/manage_cart" class="btn btn-outline-dark me-2">
+                <a *ngSwitchCase="'individual'" routerLink="/manage_cart" class="btn btn-outline-dark me-2" [ngClass]="{
+                  'btn-outline-dark': theme !== 'christmas',
+                  'btn-outline-light text-white': theme === 'christmas'
+                }">
                   <i class="fa fa-shopping-cart"></i>
                 </a>
-                <a *ngSwitchCase="'individual'" routerLink="/favorites" routerLinkActive="active" class="btn btn-outline-dark me-2">
+                <a *ngSwitchCase="'individual'" routerLink="/favorites" routerLinkActive="active" class="btn btn-outline-dark me-2" [ngClass]="{
+                  'btn-outline-dark': theme !== 'christmas',
+                  'btn-outline-light text-white': theme === 'christmas'
+                }">
                   <i class="fa fa-heart text-danger"></i>
                 </a>
 
+                <a *ngSwitchCase="'individual'" routerLink="/chat" class="btn btn-outline-dark me-2" [ngClass]="{
+                  'btn-outline-dark': theme !== 'christmas',
+                  'btn-outline-light text-white': theme === 'christmas'
+                }">
                 <a *ngSwitchCase="'individual'" routerLink="/chat" class="btn btn-outline-dark me-2 position-relative">
                   <i class="fa fa-message"></i>
                   <!-- Unread Messages Badge -->
@@ -200,42 +237,58 @@
                 </a>
                 <a *ngSwitchCase="'company'" routerLink="/chat" class="btn btn-outline-dark me-2 position-relative">
                   <i class="fa fa-message"></i>
-                  <!-- Unread Messages Badge -->
-                  <span
-                    *ngIf="unreadMessagesCount > 0"
-                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                    style="font-size: 0.8rem;"
-                  >
-                    {{ unreadMessagesCount }}
-                    <span class="visually-hidden">Unread messages</span>
-                  </span>
                 </a>
       
-                <a *ngSwitchCase="'admin'" routerLink="/profile" class="btn btn-outline-dark me-2">
+                <a *ngSwitchCase="'admin'" routerLink="/profile" class="btn btn-outline-dark me-2" [ngClass]="{
+                  'btn-outline-dark': theme !== 'christmas',
+                  'btn-outline-light text-white': theme === 'christmas'
+                }">
                   <i class="fa fa-user"></i>
                 </a>
 
-                <a *ngSwitchCase="'admin'" routerLink="/admin/add/company" class="btn btn-outline-dark me-2">
+                <a *ngSwitchCase="'admin'" routerLink="/admin/add/company" class="btn btn-outline-dark me-2" [ngClass]="{
+                  'btn-outline-dark': theme !== 'christmas',
+                  'btn-outline-light text-white': theme === 'christmas'
+                }">
                   <i class="fa fa-plus"></i> Adicionar Empresa
                 </a>
       
-                <a *ngSwitchCase="'company'" [routerLink]="'/my-company-products/' + user.company?.id" class="btn btn-outline-dark me-2">
+                <a *ngSwitchCase="'company'" [routerLink]="'/my-company-products/' + user.company?.id" class="btn btn-outline-dark me-2" [ngClass]="{
+                  'btn-outline-dark': theme !== 'christmas',
+                  'btn-outline-light text-white': theme === 'christmas'
+                }">
                   <i class="bi bi-archive-fill"></i> Ver os meus produtos
                 </a>
 
-                <a *ngSwitchCase="'company'" routerLink="/profile" class="btn btn-outline-dark me-2">
+                <a *ngSwitchCase="'company'" routerLink="/profile" class="btn btn-outline-dark me-2" [ngClass]="{
+                  'btn-outline-dark': theme !== 'christmas',
+                  'btn-outline-light text-white': theme === 'christmas'
+                }">
                   <i class="fa fa-user"></i>
+                </a>
+
+                <a *ngSwitchCase="'company'" routerLink="/chat" class="btn btn-outline-dark me-2" [ngClass]="{
+                  'btn-outline-dark': theme !== 'christmas',
+                  'btn-outline-light text-white': theme === 'christmas'
+                }">
+                  <i class="fa fa-message"></i>
                 </a>
 
                 <li class="nav-item dropdown" style="list-style-type: none; margin: 0; padding: 0;">
                   <a
                     class="nav-link dropdown-toggle d-flex align-items-center justify-content-center rounded-circle bg-light"
+                    *ngSwitchCase="'admin'"
                     href="#"
                     id="themeDropdown"
                     role="button"
                     *ngIf="user?.user_type === 'admin'"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
+                    [ngClass]="{
+                      'bg-light': theme !== 'christmas',
+                      'bg-white': theme === 'christmas',
+                      'text-black': theme === 'christmas'
+                    }"
                     style="
                       width: 40px; 
                       height: 40px; 
@@ -247,13 +300,21 @@
                   </a>
                   <ul class="dropdown-menu dropdown-menu-end shadow-sm rounded" aria-labelledby="themeDropdown">
                     <li>
-                      <a class="dropdown-item d-flex align-items-center" (click)="changeTheme('default')">
+                      <a class="dropdown-item d-flex align-items-center" (click)="changeTheme('default')" [ngClass]="{
+                        'hover-default': theme === 'default',
+                        'hover-dark': theme === 'dark',
+                        'hover-christmas': theme === 'christmas'
+                      }">
                         <i class="fa fa-circle text-primary me-2"></i>
                         <span>Padrão</span>
                       </a>
                     </li>
                     <li>
-                      <a class="dropdown-item d-flex align-items-center" (click)="changeTheme('christmas')">
+                      <a class="dropdown-item d-flex align-items-center" (click)="changeTheme('christmas')" [ngClass]="{
+                        'hover-default': theme === 'default',
+                        'hover-dark': theme === 'dark',
+                        'hover-christmas': theme === 'christmas'
+                      }">
                         <i class="fa fa-tree text-success me-2"></i>
                         <span>Natal</span>
                       </a>
@@ -263,7 +324,10 @@
                 
               </ng-container>
 
-              <a (click)="logout()" class="btn btn-outline-dark"><i class="fas fa-sign-out-alt"></i></a>
+              <a (click)="logout()" class="btn btn-outline-dark" [ngClass]="{
+                'btn-outline-dark': theme !== 'christmas',
+                'btn-outline-light text-white': theme === 'christmas'
+              }"><i class="fas fa-sign-out-alt"></i></a>
             </div>
               
               <app-theme-button></app-theme-button>
@@ -276,7 +340,5 @@
 </nav>
 
 <div *ngIf="isLoading" class="loading-overlay">
-  <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Carregando...</span>
-  </div>
+  <img src="assets/loading.gif" alt="Loading..." class="loading-gif" />
 </div>
