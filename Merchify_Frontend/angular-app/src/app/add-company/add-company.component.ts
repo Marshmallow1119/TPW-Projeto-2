@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CompaniesService } from '../companhia.service';
 
 @Component({
@@ -27,8 +28,7 @@ export class AddCompanyComponent implements OnInit {
     { key: 'email', label: 'Email do Usuário', type: 'email' },
     { key: 'password2', label: 'Confirme a Senha', type: 'password' },
   ];
-
-  constructor(private fb: FormBuilder, private companyService: CompaniesService) {
+  constructor(private fb: FormBuilder, private companyService: CompaniesService, private router: Router) {
     this.addCompanyForm = this.fb.group({});
   }
 
@@ -96,7 +96,7 @@ export class AddCompanyComponent implements OnInit {
     try {
       const response = await this.companyService.addCompany(formData); // Await service call
       this.messages = [{ type: 'success', text: response.message }];
-      this.addCompanyForm.reset();
+      this.router.navigate(['/admin-home']);
     } catch (error) {
       this.messages = [{ type: 'danger', text: 'Falha ao adicionar a empresa. Verifique os detalhes.' }];
       console.error('Error:', error);

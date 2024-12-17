@@ -66,6 +66,7 @@ export class NavbarComponent implements OnInit {
     });
       this.loadBalance();
   }
+  
   fetchUnreadMessagesCount(): void {
     if (this.user && this.user.user_type === 'admin') {
       console.log('Admin user detected. Skipping unread messages count fetch.');
@@ -74,7 +75,7 @@ export class NavbarComponent implements OnInit {
     else{
     this.chatService.getUnreadMessagesCount().subscribe({
       next: (response: { unread_count: number; }) => {
-        this.unreadMessagesCount = response.unread_count || 0; // Assuming the response has `unread_count`
+        this.unreadMessagesCount = response.unread_count || 0;
       },
       error: (error) => {
         console.error('Failed to fetch unread messages count:', error);
@@ -135,13 +136,11 @@ export class NavbarComponent implements OnInit {
       const response = await this.balanceService.addFunds(this.amount);
       console.log('Funds added successfully:', response);
   
-      // Update balance and reload navbar
       this.balance = response.new_balance; 
       alert('Saldo adicionado com sucesso!');
       
-      this.loadBalance(); // Reload balance dynamically
+      this.loadBalance();
   
-      // Close modal logic
       const modalElement = document.getElementById('addFundsModal');
       if (modalElement) {
         modalElement.classList.remove('show');

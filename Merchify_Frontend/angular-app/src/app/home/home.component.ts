@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterModule } from '@angular/router';
 import { ProductsListComponent } from '../products-list/products-list.component';
@@ -12,6 +12,7 @@ import { ProfileService } from '../profile.service';
 import { ThemeService } from '../theme.service';
 import { CountdownModule } from 'ngx-countdown';
 import { switchMap } from 'rxjs';
+import { ProductsService } from '../products.service';
 
 @Component({
   selector: 'app-home',
@@ -20,7 +21,7 @@ import { switchMap } from 'rxjs';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   showPromotion: boolean = true;
   homeService: HomeService = inject(HomeService);
   recentProducts: Product[] = [];
@@ -31,6 +32,7 @@ export class HomeComponent {
   numberOfPurchases: number = 0;
   userType: string = ''; 
   theme: string = 'default'; 
+  recentlySeenProducts: Product[] = [];
   
   slides = [
     {
@@ -53,7 +55,8 @@ export class HomeComponent {
   constructor(
     private authService: AuthService,
     private profileService: ProfileService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private productServices: ProductsService
   ) {
     this.themeService.theme$.pipe(
       switchMap((theme) => {
@@ -75,6 +78,24 @@ export class HomeComponent {
     });
     this.loadHomeData();
   }
+
+  ngOnInit(): void {
+    if (localStorage.getItem('recentlySeenProducts')) {
+      const recentProductIds: number[] = JSON.parse(localStorage.getItem('recentlySeenProducts') || '[]');
+      
+      const productPromises = recentProductIds.map((id) => this.productServices.getProduct(id));
+      
+      Promise.all(productPromises)
+        .then((products) => {
+          this.recentlySeenProducts = products;
+          console.log('Recently Seen Products:', this.recentlySeenProducts);
+        })
+        .catch((error) => {
+          console.error('Failed to fetch recently seen products:', error);
+        });
+    }
+  }
+  
 
   async loadHomeData() {
     try {

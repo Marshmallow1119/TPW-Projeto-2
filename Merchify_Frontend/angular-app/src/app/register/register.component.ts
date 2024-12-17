@@ -65,6 +65,7 @@ export class RegisterComponent {
 
     this.authService.register(formData).subscribe({
       next: () => {
+        
         this.router.navigate(['/']);
       },
       error: (err) => {
