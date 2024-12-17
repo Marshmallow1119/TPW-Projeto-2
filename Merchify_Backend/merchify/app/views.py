@@ -360,6 +360,16 @@ def produtos(request):
 
 
 
+@api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def delete_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    print(product)
+    product.delete()
+    return Response({"Deleted with sucess"})
+
+
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
