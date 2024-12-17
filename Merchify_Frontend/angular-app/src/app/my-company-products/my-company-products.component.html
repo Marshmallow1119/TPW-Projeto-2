@@ -2,16 +2,18 @@
     <h1 class="my-4 text-center">Produtos de {{ company?.name }}</h1>
   
     <!-- Mensagem quando não houver produtos -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <a></a>
-      <p *ngIf="!products.length" class="text-muted mb-0">
-        Não existem produtos disponíveis. Clique em "Adicionar Produto" para começar a adicionar!
-      </p>
-    </div>
-  
-    <button class="btn btn-dark mb-4 w-100" [routerLink]="['/add/product']">
+    <!-- Centralizar a mensagem e o botão -->
+  <div *ngIf="!products.length" class="d-flex flex-column align-items-center mb-4 text-center">
+    <p class="text-muted mb-3">
+      Não existem produtos disponíveis. Clique em "Adicionar Produto" para começar a adicionar!
+    </p>
+  </div>
+
+  <div class="d-flex justify-content-center mb-4">
+    <button class="btn btn-dark" [routerLink]="['/add/product']">
       Adicionar Produto
     </button>
+  </div>
   
     <div class="row">
       <div
@@ -55,8 +57,7 @@
             </div>
           </a>
   
-          <!-- Botões de Ações -->
-          <!-- Botões de Ações -->
+
           <div class="d-flex flex-column gap-2 mt-2">
             <div class="row g-2  mb-3" >
               <!-- Stock Button -->
