@@ -54,6 +54,7 @@ export class MyCompanyProductsComponent {
       if (data) {
         this.company = data.company;
         this.products = data.products;
+        console.log(this.products);
       } else {
         console.error('Nenhum dado retornado da API.');
       }
