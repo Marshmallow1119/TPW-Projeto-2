@@ -104,7 +104,7 @@ def balance(request):
                 })
 
             elif request.method == 'PUT':
-                
+
                 if user.balance < Decimal(amount):
                     return Response({'error': 'Insufficient balance.'}, status=status.HTTP_400_BAD_REQUEST)
                 
@@ -1252,8 +1252,6 @@ def process_payment(request):
 
 
         with transaction.atomic():
-
-
 
             user.balance -= Decimal(final_total)
             user.number_of_purchases += 1
