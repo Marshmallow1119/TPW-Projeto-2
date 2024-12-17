@@ -14,7 +14,7 @@ from django.contrib.auth.models import Group, User as AuthUser
 from django.contrib import messages
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.db import transaction, IntegrityError
-from django.db.models import Avg, Q
+from django.db.models import Avg, Q, Count
 from django.http import JsonResponse, Http404
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, resolve, Resolver404
@@ -26,6 +26,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils.timezone import now
 from django.contrib.auth import update_session_auth_hash
 from django.core.files.storage import default_storage
+
 
 
 
@@ -1286,24 +1287,36 @@ def company_home(request):
     company_id = request.user.company.id if request.user.user_type == 'company' else None
     return render(request, 'company_home.html', {'company_id': company_id})
 
+
+
 @api_view(['GET'])
 def company_products(request, company_id):
     company = get_object_or_404(Company, id=company_id)
 
-    products = Product.objects.filter(company=company)
+    products = Product.objects.filter(company=company).annotate(
+        favorites_count=Count('favorites'),
+        reviews_count=Count('reviews')
+    )
 
     products_data = ProductSerializer(products, many=True, context={'request': request}).data
 
+    # Adiciona os valores de favoritos e reviews manualmente
+    for product, serialized_product in zip(products, products_data):
+        serialized_product['favorites_count'] = product.favorites_count
+        serialized_product['reviews_count'] = product.reviews_count
+
+    # Monta a resposta final
     response = {
         'company': {
             'id': company.id,
             'name': company.name,
-            'logo': company.logo.url if company.logo else None,
+            'logo': request.build_absolute_uri(company.logo.url) if company.logo else None,
         },
         'products': products_data,
     }
 
     return Response(response)
+
 
 
 @api_view(['GET'])

@@ -198,5 +198,7 @@ async cancelPromotion(product: Product): Promise<void> {
   }
 }
 
+
+
   
 }
