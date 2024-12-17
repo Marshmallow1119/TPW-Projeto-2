@@ -25,8 +25,6 @@ export class SearchService {
       }
   
       const data = await response.json();
-      console.log('Fetched Search Results:', data); // Debug log
-        console.log('Fetched Search Results:', data); // Debug log
       const artists: Artist[] = (data.artists || [])
   
       const products: Product[] = (data.products || [])

@@ -8,28 +8,28 @@
           <span class="text-muted"><strong>Data:</strong></span>
           <span>{{ order.date }}</span>
         </div>
-        <div class="info-item">
+        <div class="info-item" *ngIf="order.shipping_fee">
           <span class="text-muted"><strong>Portes de Envio:</strong></span>
           <span>{{ order.shipping_fee | currency: 'EUR' }}</span>
         </div>
         <div class="info-item">
-          <span class="text-muted"><strong>Total:</strong></span>
-          <span>{{ order.total_amount | currency: 'EUR' }}</span>
+          <span class="text-muted"><strong>Total: </strong></span>
+          <span>{{ order.total_amount }}€</span>
         </div>
         <div class="info-item">
-          <span class="text-muted"><strong>Método de Pagamento:</strong></span>
+          <span class="text-muted"><strong>Método de Pagamento: </strong></span>
           <span>{{ order.paymentMethod }}</span>
         </div>
         <div class="info-item">
-          <span class="text-muted"><strong>Endereço de Envio:</strong></span>
+          <span class="text-muted"><strong>Endereço de Envio: </strong></span>
           <span>{{ order.shippingAddress }}</span>
         </div>
         <div class="info-item">
-          <span class="text-muted"><strong>Estado:</strong></span>
+          <span class="text-muted"><strong>Estado: </strong></span>
           <span>{{ order.status }}</span>
         </div>
       </div>
-      <h6 class="mt-3 text-muted"><strong>Produtos:</strong></h6>
+      <h6 class="mt-3 text-muted"><strong>Produtos: </strong></h6>
       <ul class="list-unstyled">
         <li *ngFor="let product of order.products">
           - {{ product.product_details.name }} (Quantidade: {{ product.quantity }})
@@ -58,7 +58,7 @@ class="modal-overlay"
     <div *ngIf="selectedOrder">
       <p><strong>ID da Encomenda:</strong> {{ selectedOrder.id }}</p>
       <p><strong>Data:</strong> {{ selectedOrder.date }}</p>
-      <p><strong>Total:</strong> {{ selectedOrder.total_amount | currency: 'EUR' }}</p>
+      <p><strong>Total:</strong> {{ selectedOrder.total_amount }}€</p>
       <p><strong>Método de Pagamento:</strong> {{ selectedOrder.paymentMethod }}</p>
       <p><strong>Endereço de Envio:</strong> {{ selectedOrder.shippingAddress }}</p>
       <p><strong>Status:</strong> {{ selectedOrder.status }}</p>
@@ -78,8 +78,8 @@ class="modal-overlay"
             <p class="mb-0">
               Nome: {{ product.product_details.name }} |
               Quantidade: {{ product.quantity }} | Preço Unitário:
-              {{ product.product_details.price | currency: 'EUR' }} | Preço Total:
-              {{ product.total | currency: 'EUR' }}
+              {{ product.product_details.price }}€ | Preço Total:
+              {{ product.total }}€
             </p>
           </div>
         </li>
@@ -109,7 +109,8 @@ class="modal-overlay"
       <div *ngIf="selectedOrder">
         <p><strong>ID da Encomenda:</strong> {{ selectedOrder.id }}</p>
         <p><strong>Data:</strong> {{ selectedOrder.date }}</p>
-        <p><strong>Total:</strong> {{ selectedOrder.total_amount | currency: 'EUR' }}</p>
+        <p><strong>Total:</strong> {{ selectedOrder.total_amount }}€</p>
+        <p><strong>Desconto:</strong> {{selectedOrder.discount_value }}€</p>
         <p><strong>Método de Pagamento:</strong> {{ selectedOrder.paymentMethod }}</p>
         <p><strong>Endereço de Envio:</strong> {{ selectedOrder.shippingAddress }}</p>
         <p><strong>Status:</strong> {{ selectedOrder.status }}</p>

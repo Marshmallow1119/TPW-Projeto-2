@@ -50,7 +50,6 @@ export class PaymentPageComponent implements OnInit {
 
   async loadCart(userId: number) {
     try {
-      console.log('userId:', userId);
   
       const response = await this.cartService.getCart(userId);
   
@@ -122,7 +121,6 @@ export class PaymentPageComponent implements OnInit {
 
   calculateFinalTotal() {
     this.finalTotal = this.cartTotal + this.shippingCost - (this.discountValue || 0);
-    console.log('Final total:', this.finalTotal);
   }
 
   async applyDiscount() {
@@ -144,12 +142,10 @@ export class PaymentPageComponent implements OnInit {
 
   async removeCartItem(itemId: number) {
     
-    console.log('Cart Item ID being passed:', itemId);
     try {
       await this.cartService.removeCartItem(this.user?.id || 0, itemId);
       this.cartItems = this.cartItems.filter((item) => item.cartItemId !== itemId);
       await this.loadCart(this.user?.id || 0); 
-      console.log('Cart reloaded:', this.cartItems);
       this.calculateTotal();
       this.calculateFinalTotal();
     } catch (error) {
@@ -176,6 +172,7 @@ export class PaymentPageComponent implements OnInit {
       payment_method: this.paymentMethod,
       shipping_address: this.shippingAddress,
       discountApplied: this.discountApplied,
+      discountValue: this.discountValue,
     };
   
     console.log('Payment data:', paymentData);

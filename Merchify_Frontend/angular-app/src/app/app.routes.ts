@@ -20,6 +20,7 @@ import { AddCompanyComponent } from './add-company/add-company.component';
 import { ListChatsComponent } from './list-chats/list-chats.component';
 import { ProfileComponent } from './profile/profile.component';
 import { AddProductComponent } from './add-product/add-product.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent }, // Home Route
@@ -27,20 +28,22 @@ export const routes: Routes = [
   { path: 'artists-page', component: ArtistsPageComponent },
   { path: 'companhias-page', component: CompaniesPageComponent },
   { path: 'search-results', component: SearchResultsComponent },
-  { path: 'product/:identifier', component: ProductDetailsComponent },
-  { path: 'products/:artistName', component:  ArtistsProductsComponent},
-  { path: 'company/:company_id/products', component: CompanyProductsComponent },
+  { path: 'product/:identifier', component: ProductDetailsComponent }, // Dynamic Route
+  { path: 'products/:artistName', component: ArtistsProductsComponent },
+  { path: 'company/:company_id', component: CompanyProductsComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent }, 
   { path: 'admin-home', component: AdminHomeComponent }, 
   { path: 'favorites', component: FavoritesComponent }, 
   { path: 'manage_cart', component: CartComponent },
   { path: 'payment-page', component: PaymentPageComponent },
-  { path: 'chat/:id', component: ChatComponent },
+  { path: 'chat/:id', component: ChatComponent }, // Dynamic Route
   { path: 'chat', component: ListChatsComponent },
-  { path: 'my-company-products/:company_id', component: MyCompanyProductsComponent },
-  { path: 'companies/:company_id/products/:product_id/edit', component: EditProductComponent },
+  { path: 'my-company-products/:company_id', component: MyCompanyProductsComponent }, // Dynamic Route
+  { path: 'companies/:company_id/products/:product_id/edit', component: EditProductComponent }, // Dynamic Route
   { path: 'profile', component: ProfileComponent },
   { path: 'admin/add/company', component: AddCompanyComponent },
-  { path: 'add/product', component: AddProductComponent }
+  { path: 'add/product', component: AddProductComponent },
+  { path: '**', component: PageNotFoundComponent }, 
 ];
+

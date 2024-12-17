@@ -42,13 +42,10 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.themeService.theme$.subscribe((theme) => {
-      console.log('NavbarComponent received theme:', theme);
       this.theme = theme;
     });
     this.authService.user$.subscribe((user) => {
-      console.log('NavbarComponent received user:', user);
       this.user = user;
-      console.log('User:', this.user);
       this.cdr.detectChanges();
   
       if (this.authService.isAuthenticated()) {
@@ -64,12 +61,10 @@ export class NavbarComponent implements OnInit {
         this.dataLoaded = true;
       }
     });
-      this.loadBalance();
   }
-  
+
   fetchUnreadMessagesCount(): void {
     if (this.user && this.user.user_type === 'admin') {
-      console.log('Admin user detected. Skipping unread messages count fetch.');
       return;
     }
     else{
@@ -108,7 +103,6 @@ export class NavbarComponent implements OnInit {
   loadBalance(): void {
     this.balanceService.getBalance().then(
       (response) => {
-        console.log('Balance fetched successfully:', response);
         if (this.user) {
           this.user.balance = response.balance; 
           this.cdr.detectChanges();
@@ -123,7 +117,6 @@ export class NavbarComponent implements OnInit {
   
   selectPaymentMethod(method: string): void {
     this.selectedPaymentMethod = method;
-    console.log('Selected Payment Method:', this.selectedPaymentMethod);
   }
 
   async addFunds(): Promise<void> {
@@ -134,7 +127,6 @@ export class NavbarComponent implements OnInit {
   
     try {
       const response = await this.balanceService.addFunds(this.amount);
-      console.log('Funds added successfully:', response);
   
       this.balance = response.new_balance; 
       alert('Saldo adicionado com sucesso!');

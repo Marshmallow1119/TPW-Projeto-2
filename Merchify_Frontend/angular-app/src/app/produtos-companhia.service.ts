@@ -11,20 +11,12 @@ export class ProdutosCompanhiaService {
 
   constructor(private router:Router) {}
 
-  /**
-   * Obtém os produtos de uma companhia específica.
-   * @param name Nome da companhia.
-   *     path('ws/company/<int:company_id>/products/', views.company_products, name='company_products'),
-   */
-
   async getCompanhiaProdutos(company_id: number): Promise<any> {
-    console.log("company_id:  " + company_id); 
     if (!company_id) {
       console.error('ID da companhia está vazio ou inválido');
       return null;
     }
     const url = `${this.baseUrl}/company/${company_id}/products/`;
-    console.log(`Fetching products for company: ${company_id} from URL: ${url}`);
 
     try {
       const data = await fetch(url); 
@@ -35,8 +27,8 @@ export class ProdutosCompanhiaService {
       const response = await data.json(); 
       if (response.company) {
         response.company.image = response.company.logo
-          ? `http://localhost:8000${response.company.logo}` // Full URL for the logo
-          : '/assets/logo.png'; // Fallback logo
+          ? `http://localhost:8000${response.company.logo}` 
+          : '/assets/logo.png'; 
       }
       return response; 
     } catch (error) {

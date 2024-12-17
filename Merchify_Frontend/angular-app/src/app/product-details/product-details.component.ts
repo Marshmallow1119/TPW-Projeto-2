@@ -54,17 +54,14 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   private async loadProductDetails(productId: number): Promise<void> {
-    console.log('Loading product details:', productId);
     this.loading = true;
     this.errorMessage = '';
 
     try {
       const response = await this.productDetailsService.getProductDetails(productId);
-      console.log('Raw Product details:', response);
 
       this.product = response;
       if (this.product) {
-        console.log('Product details:', this.product);
         this.saveToRecentlySeen(this.product.id);
       }
 
@@ -156,7 +153,7 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   private saveToRecentlySeen(productId: number): void {
-    const maxItems = 5; 
+    const maxItems = 4; 
     let recentlySeen = JSON.parse(localStorage.getItem('recentlySeenProducts') || '[]');
   
     recentlySeen = recentlySeen.filter((id: number) => id !== productId);
@@ -202,13 +199,11 @@ export class ProductDetailsComponent implements OnInit {
       if (!productId) {
         throw new Error('Produto não encontrado.');
       }
-      console.log('Adicionando ao carrinho:', { userId, productId, data });
 
       const response = await this.cartService.addToCart(userId, productId, data);
-      console.log('Produto adicionado ao carrinho:', response);
 
       alert('Produto adicionado ao carrinho com sucesso!');
-      await this.loadProductDetails(productId); // Reload product details to update stock
+      await this.loadProductDetails(productId);
       this.router.navigate(['/manage_cart']);
     } catch (error) {
       console.error('Erro ao adicionar ao carrinho:', error);

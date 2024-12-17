@@ -12,14 +12,11 @@ export class ArtistsService {
   private baseUrl: string = CONFIG.baseUrl;
   constructor(private router:Router) { }
 
-  //    path('ws/artists/', views.artistas, name='artistas'),
+  //path('ws/artists/', views.artistas, name='artistas'),
   async getArtistas(): Promise<Artist[]> {
     const url = `${this.baseUrl}/artists/`;
     try {
       const response: Response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch Artists: ${response.statusText}`);
-      }
       const artists: Artist[] = (await response.json()) ?? [];
       return artists;
     } catch (error) {

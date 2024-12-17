@@ -26,7 +26,6 @@ export class OrderComponent {
   viewDetails(): void {
     this.selectedOrder = this.order;
     this.isModalOpen = true;
-    console.log('Detalhes da Encomenda:', this.selectedOrder);
   }
 
   closeModal(): void {

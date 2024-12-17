@@ -26,7 +26,6 @@ export class AdminProductsTableComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.fetchProducts();
-    console.log('Products:', this.products);
   }
 
   async fetchProducts(): Promise<void> {

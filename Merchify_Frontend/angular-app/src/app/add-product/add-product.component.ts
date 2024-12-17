@@ -65,7 +65,6 @@ export class AddProductComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Fetch artists
     this.artistsService.getArtistas()
       .then(artists => {
         this.artists = artists;
@@ -74,7 +73,6 @@ export class AddProductComponent implements OnInit {
         console.error('Error fetching artists:', error);
       });
 
-    // Fetch user info and conditionally load companies
     this.authService.getUserInfo().subscribe({
       next: (user) => {
         this.isAdmin = user?.user_type === 'admin';

@@ -4,7 +4,7 @@ import { ActivatedRoute, Router  } from '@angular/router';
 import { ProdutosCompanhiaService } from '../produtos-companhia.service';
 import { CommonModule } from '@angular/common';
 import { CONFIG } from '../config';
-import { RouterModule } from '@angular/router'; // Importação necessária
+import { RouterModule } from '@angular/router';
 import { ProductsService } from '../products.service';
 import { SizeStockModalComponent } from '../size-stock-modal/size-stock-modal.component';
 import { FormsModule } from '@angular/forms';
@@ -54,7 +54,6 @@ export class MyCompanyProductsComponent {
       if (data) {
         this.company = data.company;
         this.products = data.products;
-        console.log(this.products);
       } else {
         console.error('Nenhum dado retornado da API.');
       }
@@ -62,7 +61,6 @@ export class MyCompanyProductsComponent {
       console.error('Erro ao carregar produtos da empresa:', error)
       console.error(error);
     } finally {
-      console.log('Company and products loaded:', this.company, this.products);
     }
   }
 
@@ -71,14 +69,11 @@ export class MyCompanyProductsComponent {
   }
 
   openStockModal(product: Product): void {
-    console.log('Opening stock modal for product:', product);
     this.selectedProduct = product;
     this.isStockModalOpen = true;
-    console.log('Selected product:', this.selectedProduct);
   }
 
   closeStockModal(): void {
-    console.log('Closing stock modal');
     this.selectedProduct = null;
     this.isStockModalOpen = false;
   }
@@ -92,9 +87,9 @@ export class MyCompanyProductsComponent {
     try {
       await this.productsService.updateProductStock(this.selectedProduct.id, updatedStockSize);
       await this.loadCompanyProducts();
+      alert('Stock atualizado com sucesso!');
       this.closeStockModal();
     } catch (error) {
-      console.error('Error updating stock:', error);
     }
   }
 
@@ -102,7 +97,6 @@ export class MyCompanyProductsComponent {
     if (confirm('Tem certeza que deseja eliminar este produto?')) {
       try {
         await this.produtosCompanhiaService.deleteProduct(productId);
-        console.log(`Produto ${productId} eliminado com sucesso.`);
         this.products = this.products.filter((product) => product.id !== productId);
       } catch (error) {
         console.error('Erro ao excluir o produto:', error);
@@ -162,7 +156,6 @@ export class MyCompanyProductsComponent {
         await this.productsService.addPromotion(product, this.newPromotionPrice);
   
         alert('Promoção aplicada com sucesso!');
-        console.log('is_on_sale:', product.is_on_promotion);
         this.closePromotionModal();
         this.loadCompanyProducts(); 
       } catch (error) {

@@ -77,7 +77,6 @@ export class ProductsService {
       }
   
       const result = await response.json(); // Parse and return response data
-      console.log('Product updated successfully:', result);
       return result;
     } catch (error) {
       console.error('Error editing product:', error);
@@ -92,7 +91,6 @@ export class ProductsService {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      console.log('Fetched filters:', response);
       return await response.json();
     } catch (error) {
       console.error('Error fetching filters:', error);

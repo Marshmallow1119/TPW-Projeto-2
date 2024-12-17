@@ -90,7 +90,7 @@ urlpatterns = [
     path('ws/product/<int:product_id>/cancel-promotion/', views.cancel_promotion, name='cancel_promotion'),
     path('ws/unread-messages/', views.get_number_unread_messages, name='get_number_unread_messages'),
     path('ws/reviews/<int:review_id>/delete/', views.delete_review, name='delete_review'),
-    
+    path('ws/user/<int:user_id>/image/', views.get_user_image, name='get_user_image'),
 
 ]   
 

@@ -45,7 +45,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'firstname', 'lastname', 'user_type',
-            'email', 'phone', 'country', 'image', 'balance', 'company', 'address', 'banned'
+            'email', 'phone', 'country', 'balance', 'company', 'address', 'banned',  'image'
         ]
 
     def get_image(self, obj):
