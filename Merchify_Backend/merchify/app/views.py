@@ -303,7 +303,7 @@ def produtos(request):
 
 
         if product_type == 'vinil':
-            Vinil.objects.create(
+              product = Vinil.objects.create(
                 name=name,
                 description=description,
                 price=price,
@@ -317,7 +317,7 @@ def produtos(request):
                 stock=specific_details.get('stock', 0)
             )
         elif product_type == 'cd':
-            CD.objects.create(
+              product = CD.objects.create(
                 name=name,
                 description=description,
                 category='CD',
@@ -330,7 +330,7 @@ def produtos(request):
                 stock=specific_details.get('stock', 0)
             )
         elif product_type == 'clothing':
-            Clothing.objects.create(
+            product = Clothing.objects.create(
                 name=name,
                 description=description,
                 category='Clothing',
@@ -341,7 +341,7 @@ def produtos(request):
                 color=specific_details.get('color')
             )
         elif product_type == 'accessory':
-            Accessory.objects.create(
+              product = Accessory.objects.create(
                 name=name,
                 description=description,
                 price=price,
@@ -620,6 +620,7 @@ def login(request):
                 'refresh': str(refresh),
                 'user': user_data
             }, status=status.HTTP_200_OK)
+        print(user_data)
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1406,7 +1407,7 @@ def admin_product_delete(request, product_id):
     return redirect('admin_home')
 
 @api_view(['DELETE'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
+
 @permission_classes([IsAuthenticated])
 def delete_review(request, review_id):
     print("DEBUG: Review ID recebido no pedido ->", review_id)  # Verifica o ID da review
@@ -1498,7 +1499,7 @@ def get_filters(request):
         }, status=500)
 
 
-@api_view(['GET', 'POST', 'DELETE'])
+@api_view(['GET', 'POST'])
 def reviews(request, product_id):
     if request.method == 'GET':
         product = get_object_or_404(Product, id=product_id)

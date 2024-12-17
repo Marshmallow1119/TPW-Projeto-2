@@ -72,6 +72,14 @@
   
           <div class="col-md-6">
             <label for="image" class="form-label">Imagem do Produto</label>
+            <div class="mb-2">
+              <img 
+                *ngIf="imagePreview" 
+                [src]="imagePreview" 
+                alt="Imagem do Produto" 
+                class="img-thumbnail" 
+                style="max-height: 200px; width: auto;" />
+            </div>
             <input 
               type="file" 
               class="form-control" 
@@ -81,6 +89,7 @@
               Imagem é obrigatória.
             </div>
           </div>
+          
         </div>
   
         <!-- Dynamic Product Type Details -->

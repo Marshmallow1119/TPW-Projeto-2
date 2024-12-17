@@ -40,7 +40,7 @@ export class ThemeService {
     }
   }
 
-  private loadTheme(): void {
+  loadTheme(): void {
     if (isPlatformBrowser(this.platformId)) {
       const storedTheme = localStorage.getItem('isDarkMode');
       this.isDarkMode = storedTheme === 'true';
@@ -52,6 +52,7 @@ export class ThemeService {
     console.log('Current theme:', this.currentTheme.value);
     return this.currentTheme.value;
   }
+
 
   changeTheme(theme: string): void {
     this.currentTheme.next(theme); 

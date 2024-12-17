@@ -34,7 +34,7 @@ export class LoginComponent {
           return;
         }
         console.log(response.user);
-        switch (response.user_type) {
+        switch (response.user.user_type) {
           case 'individual':
             this.router.navigate(['/']);
             break;

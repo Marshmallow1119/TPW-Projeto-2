@@ -52,7 +52,6 @@ export class NavbarComponent implements OnInit {
       if (this.authService.isAuthenticated()) {
         Promise.all([this.loadBalance(), this.fetchUnreadMessagesCount()])
           .then(() => {
-            console.log('All data loaded');
             this.dataLoaded = true; 
           })
           .catch((error) => {
@@ -66,6 +65,11 @@ export class NavbarComponent implements OnInit {
       this.loadBalance();
   }
   fetchUnreadMessagesCount(): void {
+    if (this.user && this.user.user_type === 'admin') {
+      console.log('Admin user detected. Skipping unread messages count fetch.');
+      return;
+    }
+    else{
     this.chatService.getUnreadMessagesCount().subscribe({
       next: (response: { unread_count: number; }) => {
         this.unreadMessagesCount = response.unread_count || 0; // Assuming the response has `unread_count`
@@ -74,7 +78,7 @@ export class NavbarComponent implements OnInit {
         console.error('Failed to fetch unread messages count:', error);
       },
     });
-    console.log(this.user);
+  }
   }
 
   logout(): void {
@@ -124,12 +128,18 @@ export class NavbarComponent implements OnInit {
       alert('Por favor, selecione um método e insira um valor válido.');
       return;
     }
-
+  
     try {
       const response = await this.balanceService.addFunds(this.amount);
       console.log('Funds added successfully:', response);
+  
+      // Update balance and reload navbar
       this.balance = response.new_balance; 
       alert('Saldo adicionado com sucesso!');
+      
+      this.loadBalance(); // Reload balance dynamically
+  
+      // Close modal logic
       const modalElement = document.getElementById('addFundsModal');
       if (modalElement) {
         modalElement.classList.remove('show');
@@ -139,13 +149,14 @@ export class NavbarComponent implements OnInit {
         const backdrop = document.querySelector('.modal-backdrop');
         backdrop?.parentNode?.removeChild(backdrop);
       }
+  
       this.resetModal();
-      this.loadBalance();
     } catch (error) {
       console.error('Error adding funds:', error);
       alert('Erro ao adicionar saldo. Tente novamente.');
     }
   }
+  
   
   resetModal(): void {
     this.selectedPaymentMethod = null;

@@ -17,6 +17,7 @@ export class EditProductComponent implements OnInit {
   initialProductType: string = 'vinil';
   productTypes = ['vinil', 'cd', 'clothing', 'accessory'];
   productId: number = 0;
+  imagePreview: string | null = null;
 
   constructor(
     private fb: FormBuilder, 
@@ -69,6 +70,10 @@ export class EditProductComponent implements OnInit {
         description: product.description || '',
         price: product.price || '',
       });
+
+      if (product.image_url) {
+        this.imagePreview = product.image_url; // Assuming imageUrl contains the current image path
+      }
   
       const specificDetails = product.specific_details;
   
@@ -133,20 +138,24 @@ export class EditProductComponent implements OnInit {
   }
 
   onImageChange(event: Event): void {
-    console.log('Event triggered'); // Debug: Check if method is called at all
-  
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
-  
       if (!file.type.startsWith('image/')) {
         alert('Please upload a valid image file.');
         return;
       }
-  
-      console.log('Selected File:', file); // Check the selected file
+
+      // Update the form value
       this.productForm.patchValue({ image: file });
       this.productForm.get('image')?.updateValueAndValidity();
+
+      // Preview the new image
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(file);
     }
   }
   
@@ -189,6 +198,7 @@ export class EditProductComponent implements OnInit {
       alert('Form is invalid. Please check all required fields.');
     }
   }
+
   
   
 }
