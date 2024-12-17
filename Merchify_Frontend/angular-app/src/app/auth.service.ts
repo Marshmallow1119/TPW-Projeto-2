@@ -41,12 +41,26 @@ export class AuthService {
         if (!response.access || !response.refresh) {
           throw new Error('Missing tokens in the response');
         }
-        console.log(response);
-        let user: User = response.user;
-        this.userSubject.next(user);
         localStorage.setItem('accessToken', response.access);
         localStorage.setItem('refreshToken', response.refresh);
+
+        const user: User = response.user;
+        this.userSubject.next(user);
+
+        console.log('User logged in:', user);
+
+      // Redirecionamento imediato baseado no user_type
+      if (user.user_type === 'admin') {
+        console.log('User is admin, redirecting to admin home');
+        this.router.navigate(['/admin-home']);
+      } else {
+        console.log('User is not admin, redirecting to home');
+        const redirectUrl = localStorage.getItem('redirectUrl') || '/';
+        this.router.navigate([redirectUrl]);
+        localStorage.removeItem('redirectUrl');
+      }
       }),
+
       catchError((error) => {
         console.error('Login failed:', error);
         return throwError(() => error);
