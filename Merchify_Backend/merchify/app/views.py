@@ -218,149 +218,6 @@ def profile(request):
         return Response({'error': 'Método não suportado.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-@api_view(['GET', 'POST'])
-def produtos(request):
-    if request.method == 'GET':
-        produtos = Product.objects.all()
-
-        sort = request.GET.get('sort', 'featured')
-        if sort == 'priceAsc':
-            produtos = produtos.order_by('price')
-        elif sort == 'priceDesc':
-            produtos = produtos.order_by('-price')
-
-        product_type = request.GET.get('type')
-        if product_type:
-            if product_type == 'Vinil':
-                produtos = produtos.filter(vinil__isnull=False)
-                genre = request.GET.get('genreVinyl')
-                if genre:
-                    produtos = produtos.filter(vinil__genre=genre)
-
-            elif product_type == 'CD':
-                produtos = produtos.filter(cd__isnull=False)
-                genre = request.GET.get('genreCD')
-                if genre:
-                    produtos = produtos.filter(cd__genre=genre)
-
-            elif product_type == 'Clothing':
-                produtos = produtos.filter(clothing__isnull=False)
-                color = request.GET.get('colorClothing')
-                if color:
-                    produtos = produtos.filter(clothing__color=color)
-
-            elif product_type == 'Accessory':
-                produtos = produtos.filter(accessory__isnull=False)
-                color = request.GET.get('colorAccessory')
-                if color:
-                    produtos = produtos.filter(accessory__color=color)
-                size = request.GET.get('size')
-                if size:
-                    produtos = produtos.filter(accessory__size=size)
-
-        min_price = request.GET.get('min_price')
-        max_price = request.GET.get('max_price')
-        if min_price:
-            try:
-                produtos = produtos.filter(price__gte=float(min_price))
-            except ValueError:
-                logger.debug("Invalid minimum price provided.")
-        if max_price:
-            try:
-                produtos = produtos.filter(price__lte=float(max_price))
-            except ValueError:
-                logger.debug("Invalid maximum price provided.")
-
-        serializer = ProductSerializer(produtos, many=True, context={'request': request})
-        return Response(serializer.data)
-    elif request.method == 'POST':
-        if not (request.user.is_authenticated and (request.user.user_type == 'company' or request.user.user_type == 'admin')):
-            raise PermissionDenied("You do not have permission to add products.")
-
-        name = request.data.get('name')
-        description = request.data.get('description')
-        price = request.data.get('price')
-        product_type = request.data.get('productType')
-        artist_id = request.data.get('artist')
-        image_file = request.FILES.get('image')
-        company_id = request.data.get('company') 
-
-        if not all([name, description, price, product_type]):
-            return Response({"error": "Missing required fields."}, status=status.HTTP_400_BAD_REQUEST)
-
-        specific_details = request.data.get('specific_details', '{}')
-        try:
-            specific_details = json.loads(specific_details)
-        except json.JSONDecodeError:
-            return Response({"error": "Invalid specific_details format."}, status=status.HTTP_400_BAD_REQUEST)
-
-        artist_obj = get_object_or_404(Artist, id=artist_id)
-
-        company_obj = None
-        if request.user.user_type == 'company':
-            company_obj = request.user.company
-        elif request.user.user_type == 'admin' and company_id: 
-            company_obj = get_object_or_404(Company, id=company_id)
-
-
-        if product_type == 'vinil':
-              product = Vinil.objects.create(
-                name=name,
-                description=description,
-                price=price,
-                category='Vinyl',
-                artist=artist_obj,
-                company=company_obj,
-                image=image_file,
-                genre=specific_details.get('genre'),
-                lpSize=specific_details.get('lpSize'),
-                releaseDate=specific_details.get('releaseDate'),
-                stock=specific_details.get('stock', 0)
-            )
-        elif product_type == 'cd':
-              product = CD.objects.create(
-                name=name,
-                description=description,
-                category='CD',
-                price=price,
-                artist=artist_obj,
-                company=company_obj,
-                image=image_file,
-                genre=specific_details.get('genre'),
-                releaseDate=specific_details.get('releaseDate'),
-                stock=specific_details.get('stock', 0)
-            )
-        elif product_type == 'clothing':
-            product = Clothing.objects.create(
-                name=name,
-                description=description,
-                category='Clothing',
-                price=price,
-                artist=artist_obj,
-                company=company_obj,
-                image=image_file,
-                color=specific_details.get('color')
-            )
-        elif product_type == 'accessory':
-              product = Accessory.objects.create(
-                name=name,
-                description=description,
-                price=price,
-                category='Accessory',
-                artist=artist_obj,
-                company=company_obj,
-                image=image_file,
-                material=specific_details.get('material'),
-                color=specific_details.get('color'),
-                size=specific_details.get('size'),
-                stock=specific_details.get('stock', 0)
-            )
-
-        product_serializer = ProductSerializer(product, context={'request': request})
-        return Response(product_serializer.data, status=status.HTTP_201_CREATED)
-
-
-
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -575,13 +432,6 @@ def search(request):
         products = Product.objects.none()
         artists = Artist.objects.none()
 
-    if request.user.is_authenticated:
-        favorited_artist_ids = FavoriteArtist.objects.filter(user=request.user).values_list('artist_id', flat=True)
-        favorited_product_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
-    else:
-        favorited_artist_ids = []
-        favorited_product_ids = []
-
     artists_results = ArtistSerializer(artists, many=True, context={'request': request}).data
     product_results = ProductSerializer(products, many=True, context={'request': request}).data
     print(product_results)
@@ -590,6 +440,102 @@ def search(request):
         'artists': artists_results,
         'query': query,
     })
+
+
+@api_view(['GET', 'POST'])
+def produtos(request):
+    if request.method == 'GET':
+        produtos = Product.objects.all()
+        serializer = ProductSerializer(produtos, many=True, context={'request': request})
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        if not (request.user.is_authenticated and (request.user.user_type == 'company' or request.user.user_type == 'admin')):
+            raise PermissionDenied("You do not have permission to add products.")
+
+        name = request.data.get('name')
+        description = request.data.get('description')
+        price = request.data.get('price')
+        product_type = request.data.get('productType')
+        artist_id = request.data.get('artist')
+        image_file = request.FILES.get('image')
+        company_id = request.data.get('company') 
+
+        if not all([name, description, price, product_type]):
+            return Response({"error": "Missing required fields."}, status=status.HTTP_400_BAD_REQUEST)
+
+        specific_details = request.data.get('specific_details', '{}')
+        try:
+            specific_details = json.loads(specific_details)
+        except json.JSONDecodeError:
+            return Response({"error": "Invalid specific_details format."}, status=status.HTTP_400_BAD_REQUEST)
+
+        artist_obj = get_object_or_404(Artist, id=artist_id)
+
+        company_obj = None
+        if request.user.user_type == 'company':
+            company_obj = request.user.company
+        elif request.user.user_type == 'admin' and company_id: 
+            company_obj = get_object_or_404(Company, id=company_id)
+
+
+        if product_type == 'vinil':
+              product = Vinil.objects.create(
+                name=name,
+                description=description,
+                price=price,
+                category='Vinyl',
+                artist=artist_obj,
+                company=company_obj,
+                image=image_file,
+                genre=specific_details.get('genre'),
+                lpSize=specific_details.get('lpSize'),
+                releaseDate=specific_details.get('releaseDate'),
+                stock=0
+            )
+        elif product_type == 'cd':
+              product = CD.objects.create(
+                name=name,
+                description=description,
+                category='CD',
+                price=price,
+                artist=artist_obj,
+                company=company_obj,
+                image=image_file,
+                genre=specific_details.get('genre'),
+                releaseDate=specific_details.get('releaseDate'),
+                stock=0
+            )
+        elif product_type == 'clothing':
+            product = Clothing.objects.create(
+                name=name,
+                description=description,
+                category='Clothing',
+                price=price,
+                artist=artist_obj,
+                company=company_obj,
+                image=image_file,
+                color=0
+            )
+        elif product_type == 'accessory':
+              product = Accessory.objects.create(
+                name=name,
+                description=description,
+                price=price,
+                category='Accessory',
+                artist=artist_obj,
+                company=company_obj,
+                image=image_file,
+                material=specific_details.get('material'),
+                color=specific_details.get('color'),
+                size=specific_details.get('size'),
+                stock=0
+            )
+
+        product_serializer = ProductSerializer(product, context={'request': request})
+        return Response(product_serializer.data, status=status.HTTP_201_CREATED)
+
+
+
 
 @api_view(['POST'])
 def register_view(request):
