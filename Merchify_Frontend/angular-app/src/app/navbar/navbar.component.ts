@@ -47,6 +47,7 @@ export class NavbarComponent implements OnInit {
     this.authService.user$.subscribe((user) => {
       console.log('NavbarComponent received user:', user);
       this.user = user;
+      console.log('User:', this.user);
       this.cdr.detectChanges();
   
       if (this.authService.isAuthenticated()) {
