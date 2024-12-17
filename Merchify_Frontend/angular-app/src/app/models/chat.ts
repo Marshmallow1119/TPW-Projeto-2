@@ -6,6 +6,8 @@ export interface Chat {
     user: User;
     company: Company;
     created_at: Date;
+    user_unread_messages: number;
+    company_unread_messages: number;
 }
 
 export interface Message {

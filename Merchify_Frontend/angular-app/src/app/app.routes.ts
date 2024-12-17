@@ -19,6 +19,7 @@ import { ChatComponent } from './chat/chat.component';
 import { AddCompanyComponent } from './add-company/add-company.component';
 import { ListChatsComponent } from './list-chats/list-chats.component';
 import { ProfileComponent } from './profile/profile.component';
+import { AddProductComponent } from './add-product/add-product.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent }, // Home Route
@@ -40,7 +41,6 @@ export const routes: Routes = [
   { path: 'my-company-products/:company_id', component: MyCompanyProductsComponent },
   { path: 'companies/:company_id/products/:product_id/edit', component: EditProductComponent },
   { path: 'profile', component: ProfileComponent },
-  { path: 'admin/add/company', component: AddCompanyComponent }
-
-  
+  { path: 'admin/add/company', component: AddCompanyComponent },
+  { path: 'add/product', component: AddProductComponent }
 ];

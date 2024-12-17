@@ -1,0 +1,25 @@
+.container {
+    margin-top: 20px;
+    margin-bottom: 60px;
+  }
+  
+  .card {
+    padding: 20px;
+  }
+  
+  .mt-5 {
+    margin-top: 3rem;
+  }
+  
+  .mb-4 {
+    margin-bottom: 1.5rem;
+  }
+  
+  .shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+  }
+  

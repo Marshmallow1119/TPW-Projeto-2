@@ -4,7 +4,7 @@
     <!-- Display Company Profile Picture if Available -->
     <img
       *ngIf="currentReceiver?.image_url"
-      [src]="currentReceiver.image_url"
+      [src]="'data:image/png;base64,' + currentReceiver?.user.image"
       alt="Profile Picture"
       class="receiver-profile-pic me-3"
     />

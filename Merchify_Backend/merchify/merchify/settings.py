@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+from datetime import timedelta
 import os
 from pathlib import Path
 
@@ -165,6 +166,12 @@ REST_FRAMEWORK = {
     ),
 }
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # Adjust access token timeout
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    # Adjust refresh token timeout
+    'ROTATE_REFRESH_TOKENS': True,                 # Automatically rotate refresh tokens upon use
+    'BLACKLIST_AFTER_ROTATION': True,              # Blacklist rotated tokens
+}
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",

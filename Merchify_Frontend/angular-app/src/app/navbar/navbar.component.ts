@@ -6,6 +6,7 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BalanceService } from '../balance-service.service';
+import { ChatService } from '../chat.service';
 
 @Injectable({
   providedIn: 'root',
@@ -23,12 +24,15 @@ export class NavbarComponent implements OnInit {
   amount: number | null = null;
   balance: number = 0;
   isLoading: boolean | undefined;
+  unreadMessagesCount: number = 0;
+  dataLoaded: boolean = false;
 
   constructor(
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private balanceService: BalanceService
+    private balanceService: BalanceService,
+    private chatService: ChatService,
   ) {}
 
   ngOnInit(): void {
@@ -36,9 +40,32 @@ export class NavbarComponent implements OnInit {
       console.log('NavbarComponent received user:', user);
       this.user = user;
       this.cdr.detectChanges();
+  
       if (this.authService.isAuthenticated()) {
-      this.loadBalance();
+        Promise.all([this.loadBalance(), this.fetchUnreadMessagesCount()])
+          .then(() => {
+            console.log('All data loaded');
+            this.dataLoaded = true; 
+          })
+          .catch((error) => {
+            console.error('Error loading data:', error);
+            this.dataLoaded = true; 
+          });
+      } else {
+        this.dataLoaded = true;
       }
+    });
+  }
+  
+
+  fetchUnreadMessagesCount(): void {
+    this.chatService.getUnreadMessagesCount().subscribe({
+      next: (response: { unread_count: number; }) => {
+        this.unreadMessagesCount = response.unread_count || 0; // Assuming the response has `unread_count`
+      },
+      error: (error) => {
+        console.error('Failed to fetch unread messages count:', error);
+      },
     });
   }
 

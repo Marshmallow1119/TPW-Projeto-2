@@ -216,8 +216,13 @@
   body.dark-theme .seven {
     color: #ffffff !important;
     background-color: #343a40 !important;
-
   }
+
+  body.dark-theme h1::after, h1::before {
+    color: #ffffff !important;
+    background-color: transparent !important;
+  }
+
 
   body.dark-theme .modal {
     background-color: transparent;
@@ -235,3 +240,24 @@
     background-color: #343a40 !important;
     color: #ffffff !important;
   }
+  body.dark-theme .rounded-circle {
+    background-color: #343a40 !important;
+    color: #ffffff !important;
+  }
+
+  body.dark-theme ul {
+    background-color: #343a40 !important;
+    color: #ffffff !important;
+  }
+
+  body.dark-theme li:hover {
+    --bs-dropdown-link-hover-bg : #222222 !important;
+  }
+
+  body.dark-theme :hover {
+    --bs-dropdown-link-hover-bg : #222222 !important;
+    
+  }
+
+
+

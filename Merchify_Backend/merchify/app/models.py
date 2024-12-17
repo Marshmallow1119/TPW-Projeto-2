@@ -247,8 +247,8 @@ class Chat(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chats')
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='chats')  
     created_at = models.DateTimeField(auto_now_add=True)
-    last_user_timestamp = models.DateTimeField(auto_now_add=True)
-    last_company_timestamp = models.DateTimeField(auto_now_add=True)
+    last_user_timestamp = models.DateTimeField(default=timezone.now)
+    last_company_timestamp = models.DateTimeField(default=timezone.now)
 
     def clean(self):
         if self.user.user_type != 'individual':
@@ -259,6 +259,20 @@ class Chat(models.Model):
 
     def __str__(self):
         return f"Chat between {self.user.username} and {self.company.name}"
+
+    def get_user_unread_messages(self):
+        return self.messages.filter(
+            is_from_company=True,
+            chat=self,
+            date__gt=self.last_user_timestamp  
+        ).count()
+    
+    def get_company_unread_messages(self):
+        return self.messages.filter(
+            is_from_company=False,
+            chat=self,
+            date__gt=self.last_company_timestamp
+        ).count()
     
 class Message(models.Model):
     id = models.AutoField(primary_key=True)

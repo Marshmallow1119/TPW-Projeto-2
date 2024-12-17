@@ -20,6 +20,20 @@ export class ChatService {
     return new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
   }
 
+  getChats(id: number, userType: string): Observable<any> {
+    if (!localStorage.getItem('accessToken')) {
+      return throwError(() => new Error('No access token found'));
+    }
+    const token = localStorage.getItem('accessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    const url = `${this.baseUrl}/chats/${userType}/${id}/`; 
+    return this.http.get(url, { headers }).pipe(
+      catchError((error) => {
+        console.error('Error fetching chats:', error);
+        return throwError(() => new Error('Failed to fetch chats.'));
+      })
+    );
+  }
   getMessagesWithCompany(companyId: number): Observable<any> {
     const url = `${this.baseUrl}/chat/company/${companyId}/messages/`;
     const headers = this.getAuthHeaders();
@@ -31,7 +45,6 @@ export class ChatService {
     );
   }
 
-  // Fetch messages with a user
   getMessagesWithUser(userId: number): Observable<any> {
     const url = `${this.baseUrl}/chat/user/${userId}/messages/`;
     const headers = this.getAuthHeaders();
@@ -43,7 +56,6 @@ export class ChatService {
     );
   }
 
-  // Send a message based on user type
   sendMessage(id: number, message: string, userType: 'individual' | 'company'): Observable<any> {
     if (!message.trim()) {
       return throwError(() => new Error('Message text cannot be empty.'));
@@ -58,7 +70,6 @@ export class ChatService {
     }
   }
 
-  // Send a message to a company
   private sendMessageToCompany(companyId: number, message: string): Observable<any> {
     const url = `${this.baseUrl}/chat/company/${companyId}/send/`;
     const headers = this.getAuthHeaders();
@@ -70,7 +81,6 @@ export class ChatService {
     );
   }
 
-  // Send a message to a user
   private sendMessageToUser(userId: number, message: string): Observable<any> {
     const url = `${this.baseUrl}/chat/user/${userId}/send/`;
     const headers = this.getAuthHeaders();
@@ -81,14 +91,14 @@ export class ChatService {
       })
     );
   }
-
-  getChats(): Observable<any> {
-    const url = `${this.baseUrl}/chat/`;
+  
+  getUnreadMessagesCount(): Observable<any> {
+    const url = `${this.baseUrl}/unread-messages/`;
     const headers = this.getAuthHeaders();
     return this.http.get(url, { headers }).pipe(
       catchError((error) => {
-        console.error('Error fetching chats:', error);
-        return throwError(() => new Error('Failed to fetch chats.'));
+        console.error('Error fetching unread messages count:', error);
+        return throwError(() => new Error('Failed to fetch unread messages count.'));
       })
     );
   }

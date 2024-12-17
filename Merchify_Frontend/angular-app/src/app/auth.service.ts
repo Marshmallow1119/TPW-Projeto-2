@@ -21,13 +21,12 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private router: Router, // Inject Router
+    private router: Router,
     @Inject(PLATFORM_ID) private platformId: object
   ) {
     if (isPlatformBrowser(this.platformId)) {
       this.loadUserFromToken();
 
-      // Listen to router events to refresh token on navigation
       this.router.events.subscribe((event) => {
         if (event instanceof NavigationStart) {
           this.refreshTokenIfNecessary();
@@ -95,13 +94,20 @@ export class AuthService {
 
   private refreshTokenIfNecessary(): void {
     const token = localStorage.getItem('accessToken');
-    if (!token || this.isTokenExpired(token)) {
-      this.refreshToken().subscribe({
-        next: () => console.log('Token refreshed successfully'),
-        error: () => console.log('Failed to refresh token'),
-      });
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expirationTime = payload.exp * 1000;
+      const now = Date.now();
+  
+      if (expirationTime - now < 60 * 1000) {
+        this.refreshToken().subscribe({
+          next: () => console.log('Token refreshed successfully'),
+          error: () => console.log('Failed to refresh token'),
+        });
+      }
     }
   }
+  
 
   loadUserFromToken(): void {
     if (!isPlatformBrowser(this.platformId)) {
@@ -188,7 +194,7 @@ export class AuthService {
             email: response.email,
             phone: response.phone,
             country: response.country,
-            balance: 0 // Set the balance to 0 for new users
+            balance: 0 
           };
   
           this.userSubject.next(user); 
@@ -203,23 +209,30 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
+    if (localStorage.getItem('accessToken') === null) {
+      return false;
+    }
     const token = localStorage.getItem('accessToken');
     if (!token) {
       return false;
     }
-
     return !this.isTokenExpired(token);
   }
 
-  private isTokenExpired(token: string): boolean {
+  private decodeToken(token: string): any {
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp * 1000 < Date.now();
+      return JSON.parse(atob(token.split('.')[1]));
     } catch (e) {
-      console.error('Error checking token expiration:', e);
-      return true;
+      console.error('Invalid token:', e);
+      return null;
     }
   }
+  
+  private isTokenExpired(token: string): boolean {
+    const payload = this.decodeToken(token);
+    return payload ? payload.exp * 1000 < Date.now() : true;
+  }
+  
   getUserId(): number | null {
     const token = localStorage.getItem('accessToken');
     if (!token) {
@@ -227,8 +240,8 @@ export class AuthService {
     }
   
     try {
-      const payload = JSON.parse(atob(token.split('.')[1])); // Decodifica o payload do JWT
-      return payload.user_id || null; // Retorne o ID do usuário se existir no payload
+      const payload = JSON.parse(atob(token.split('.')[1])); 
+      return payload.user_id || null; 
     } catch (e) {
       console.error('Erro ao decodificar token:', e);
       return null;
@@ -236,25 +249,24 @@ export class AuthService {
   }
 
   updateUser(updatedUser: Partial<User>): void {
-    const currentUser = this.userSubject.value; // Obtem o usuário atual
-    if (!currentUser) return; // Se o usuário não estiver autenticado, não faz nada
+    const currentUser = this.userSubject.value;
+    if (!currentUser) return; 
   
-    // Atualiza apenas os campos modificados
     const newUser: User = { ...currentUser, ...updatedUser };
   
-    this.userSubject.next(newUser); // Notifica os observadores sobre a atualização
+    this.userSubject.next(newUser);
   }
 
   updateUserBalance(newBalance: number): void {
     const currentUser = this.userSubject.value;
     if (currentUser) {
-      currentUser.balance = newBalance; // Atualiza o saldo
-      this.userSubject.next(currentUser); // Emite a atualização para os componentes
+      currentUser.balance = newBalance; 
+      this.userSubject.next(currentUser); 
     }
   }
 
   getUserInfo(): Observable<User> {
-    const url = `${this.baseUrl}/user/`; // Endpoint URL
+    const url = `${this.baseUrl}/user/`;
     const accessToken = localStorage.getItem('accessToken');
   
     if (!accessToken) {

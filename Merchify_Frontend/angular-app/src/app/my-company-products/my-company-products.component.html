@@ -9,19 +9,16 @@
       </p>
     </div>
   
-    <!-- Botão Adicionar Produto -->
-    <button class="btn btn-dark mb-4 w-100" (click)="onAddProduct()">
+    <button class="btn btn-dark mb-4 w-100" [routerLink]="['/add/product']">
       Adicionar Produto
     </button>
   
-    <!-- Lista de Produtos -->
     <div class="row">
       <div
         class="col-6 col-md-4 col-lg-3 mb-4"
         *ngFor="let product of products"
       >
         <div class="product-card">
-          <!-- Link para detalhes do produto -->
           <a
             [routerLink]="['/product', product.id]"
             class="d-block text-decoration-none text-dark"
@@ -52,6 +49,8 @@
             <a
               [routerLink]="['/companies', company?.id, 'products', product.id, 'edit']"
               class="btn btn-sm btn-warning me-2"
+              style="background-color: rgb(230, 202, 47); color: black;"
+
             >
               <i class="fas fa-edit me-1" style="color: black;"></i>Editar
             </a>
