@@ -1,29 +1,73 @@
 <div class="container mt-4">
-    <h2>Chats com Empresas</h2>
-    <div *ngIf="chats.length > 0; else noChats">
-      <div class="list-group">
-        <a
-          *ngFor="let chat of chats"
-          class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-          [routerLink]="['/chat', chat.company.id]"
-        >
-          <div class="d-flex align-items-center">
-            <img
-              *ngIf="chat.company.image_url"
-              [src]="chat.company.image_url"
-              alt="{{ chat.company.name }}"
-              class="company-logo mr-3"
+  <!-- Header -->
+  <h2 *ngIf="user?.user_type === 'individual'; else companyHeader">
+    Chats com Empresas
+  </h2>
+  <ng-template #companyHeader>
+    <h2>Chats com Clientes</h2>
+  </ng-template>
+
+  <!-- Chat List for Individual Users (Show Companies Info) -->
+  <div *ngIf="user?.user_type === 'individual' && chats.length > 0; else noChatsWithCompanies">
+    <div class="list-group">
+      <a
+        *ngFor="let chat of chats"
+        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+        [routerLink]="['/chat', chat.company.id]"
+      >
+        <div class="d-flex align-items-center">
+          <img
+            *ngIf="chat.company.image_url"
+            [src]="chat.company.image_url"
+            alt="{{ chat.company.name }}"
+            class="company-logo mr-3"
             />
-            <div>
-              <h3 class="mb-0" style="padding-left: 20px;">{{ chat.company.name }}</h3>
-            </div>
+          <div>
+            <h3 class="mb-0" style="padding-left: 20px;">{{ chat.company.name }}</h3>
+            <p class="text-muted mb-0" *ngIf="chat.user_unread_messages > 0" style="margin-left: 17px;">
+              {{ chat.user_unread_messages }} mensagem(ns) não lida(s)
+            </p>
           </div>
-        </a>
-      </div>
+        </div>
+      </a>
     </div>
-  
-    <ng-template #noChats>
-      <p class="text-muted mt-3">Você não possui chats ativos no momento.</p>
-    </ng-template>
   </div>
-  
+
+  <ng-template #noChatsWithCompanies>
+    <p class="text-muted mt-3" *ngIf="user?.user_type === 'individual'">
+      Você não possui chats ativos com empresas no momento.
+    </p>
+  </ng-template>
+
+  <!-- Chat List for Company Users (Show Users Info) -->
+  <div *ngIf="user?.user_type === 'company' && chats.length > 0; else noChatsWithUsers">
+    <div class="list-group">
+      <a
+        *ngFor="let chat of chats"
+        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+        [routerLink]="['/chat', chat.user.id]"
+      >
+        <div class="d-flex align-items-center">
+          <img
+            *ngIf="chat.user.image"
+            [src]="'data:image/png;base64,' + chat.user.image"
+            alt="{{ chat.user.username }}"
+            class="user-logo mr-3"
+          />
+          <div>
+            <h3 class="mb-0" style="padding-left: 20px;">{{ chat.user.username }}</h3>
+            <p class="text-muted mb-0" *ngIf="chat.company_unread_messages > 0" style="margin-left: 17px;">
+              {{ chat.company_unread_messages }} mensagem(ns) não lida(s)
+            </p>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <ng-template #noChatsWithUsers>
+    <p class="text-muted mt-3" *ngIf="user?.user_type === 'company'">
+      Você não possui chats ativos com usuários no momento.
+    </p>
+  </ng-template>
+</div>

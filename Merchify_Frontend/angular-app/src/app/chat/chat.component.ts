@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { CompaniesService } from '../companhia.service';
 import { AuthService } from '../auth.service'; // Service to fetch user details
 import { User } from '../models/user';
+import { Message } from '../models/chat';
 
 @Component({
   selector: 'app-chat',
@@ -15,12 +16,13 @@ import { User } from '../models/user';
   standalone: true,
 })
 export class ChatComponent implements OnInit {
-  messages: any[] = [];
+  messages: Message[] = [];
   newMessage: string = '';
   currentReceiver: any = null; // Holds company or user details
   recipientId: number | undefined;
   userType: 'individual' | 'company' | 'admin' | undefined;
   isLoading: boolean = false;
+  currentTime: Date = new Date();
 
   constructor(
     private chatService: ChatService,
@@ -30,20 +32,25 @@ export class ChatComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.authService.getUserInfo().subscribe(
-      (user: User) => {
+    this.authService.getUserInfo().subscribe({
+      next: (user: User) => {
         this.userType = user.user_type as 'individual' | 'company' | 'admin';
         console.log('User type:', this.userType);
-
+  
         this.recipientId = +this.route.snapshot.paramMap.get('id')!;
         this.fetchReceiverDetails();
         this.fetchMessages();
+        console.log(this.messages);
       },
-      (error) => {
+      error: (error) => {
         console.error('Failed to fetch user info:', error);
-      }
-    );
+      },
+      complete: () => {
+        console.log('User info fetching completed');
+      },
+    });
   }
+  
 
   async fetchReceiverDetails(): Promise<void> {
     try {
@@ -62,38 +69,45 @@ export class ChatComponent implements OnInit {
 
   fetchMessages(): void {
     if (!this.recipientId || !this.userType) return;
-
+  
     this.isLoading = true;
     const fetchMethod =
       this.userType === 'individual'
         ? this.chatService.getMessagesWithCompany(this.recipientId)
         : this.chatService.getMessagesWithUser(this.recipientId);
-
-    fetchMethod.subscribe(
-      (response: any) => {
+  
+    fetchMethod.subscribe({
+      next: (response: any) => {
         this.messages = response.messages;
         this.isLoading = false;
       },
-      (error) => {
+      error: (error) => {
         console.error('Error fetching messages:', error);
         this.isLoading = false;
-      }
-    );
+      },
+      complete: () => {
+        console.log('Message fetching completed');
+      },
+    });
   }
+  
 
   sendMessage(): void {
     if (!this.newMessage.trim() || !this.recipientId) return;
-
+  
     if (this.userType === 'admin') {
       console.error('Admin users cannot send messages.');
       return;
     }
-    this.chatService.sendMessage(this.recipientId, this.newMessage, this.userType!).subscribe(
-      (response) => {
+  
+    this.chatService.sendMessage(this.recipientId, this.newMessage, this.userType!).subscribe({
+      next: (response) => {
         this.messages.push(response.message);
         this.newMessage = '';
       },
-      (error) => console.error('Error sending message:', error)
-    );
+      error: (error) => console.error('Error sending message:', error),
+      complete: () => console.log('Message sent successfully'),
+    });
   }
+  
 }

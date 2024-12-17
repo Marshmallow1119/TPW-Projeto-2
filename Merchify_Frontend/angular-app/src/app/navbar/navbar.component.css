@@ -106,7 +106,13 @@
     .list-group-item:hover {
       background-color: #f8f9fa;
     }
-    
+    .badge {
+      font-size: 0.8rem;
+      padding: 0.3em 0.6em;
+      border-radius: 50%;
+      color: white;
+      background-color: #dc3545; /* Bootstrap danger color */
+    }
 
 
     .loading-overlay {

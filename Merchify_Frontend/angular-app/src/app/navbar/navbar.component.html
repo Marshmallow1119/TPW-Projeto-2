@@ -223,6 +223,19 @@ style="padding: 0.25rem 0; min-height: 50px;">
                   'btn-outline-dark': theme !== 'christmas',
                   'btn-outline-light text-white': theme === 'christmas'
                 }">
+                <a *ngSwitchCase="'individual'" routerLink="/chat" class="btn btn-outline-dark me-2 position-relative">
+                  <i class="fa fa-message"></i>
+                  <!-- Unread Messages Badge -->
+                  <span
+                    *ngIf="unreadMessagesCount > 0"
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                    style="font-size: 0.8rem;"
+                  >
+                    {{ unreadMessagesCount }}
+                    <span class="visually-hidden">Unread messages</span>
+                  </span>
+                </a>
+                <a *ngSwitchCase="'company'" routerLink="/chat" class="btn btn-outline-dark me-2 position-relative">
                   <i class="fa fa-message"></i>
                 </a>
       
@@ -268,6 +281,7 @@ style="padding: 0.25rem 0; min-height: 50px;">
                     href="#"
                     id="themeDropdown"
                     role="button"
+                    *ngIf="user?.user_type === 'admin'"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                     [ngClass]="{
@@ -276,8 +290,8 @@ style="padding: 0.25rem 0; min-height: 50px;">
                       'text-black': theme === 'christmas'
                     }"
                     style="
-                      width: 50px; 
-                      height: 50px; 
+                      width: 40px; 
+                      height: 40px; 
                       border: 1px solid #ccc; 
                       padding: 0;
                       margin-right: 10px;"

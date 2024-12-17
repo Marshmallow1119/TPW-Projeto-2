@@ -1,7 +1,6 @@
 <div class="search-results-container">
     <h2 *ngIf="searchQuery">Results for "{{ searchQuery }}"</h2>
   
-    <!-- Loading Spinner -->
     <div *ngIf="isLoading">Loading...</div>
 
     <div *ngIf="!isLoading && artists.length === 0 && products.length === 0">

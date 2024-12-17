@@ -1,122 +1,190 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Product } from '../models/produto';
-import { ProductsService } from '../products.service';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CONFIG } from '../config';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ProductsService } from '../products.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-edit-product',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './edit-product.component.html',
   styleUrls: ['./edit-product.component.css'],
+  standalone: true,
+  imports: [FormsModule, ReactiveFormsModule, CommonModule]
 })
 export class EditProductComponent implements OnInit {
-  editForm: FormGroup;
-  productId: number;
-  companyId: number;
-  product: Product | null = null;
-  baseUrl: string = CONFIG.baseUrl;
+  productForm: FormGroup;
+  initialProductType: string = 'vinil';
+  productTypes = ['vinil', 'cd', 'clothing', 'accessory'];
+  productId: number = 0;
 
   constructor(
-    private route: ActivatedRoute,
-    private productsService: ProductsService,
-    private fb: FormBuilder,
-    private router: Router
+    private fb: FormBuilder, 
+    private productService: ProductsService, 
+    private route: ActivatedRoute
   ) {
-    this.editForm = this.fb.group({
-      name: ['', Validators.required],
-      description: ['', Validators.required],
-      price: [0, [Validators.required, Validators.min(0)]],
-      product_type: ['', Validators.required],
-      image: [null], // Campo para o arquivo (File)
+    this.productForm = this.fb.group({
+      productType: [this.initialProductType, { disabled: true }],
+      artist: [{ value: '', disabled: true }],
+      name: [''],
+      description: [''],
+      price: [''],
+      image: [''],
+      vinil: this.fb.group({
+        genre: [''],
+        lpSize: [''],
+        releaseDate: [''],
+        stock: [0]
+      }),
+      cd: this.fb.group({
+        genre: [''],
+        releaseDate: [''],
+        stock: [0]
+      }),
+      clothing: this.fb.group({
+        color: ['']
+      }),
+      accessory: this.fb.group({
+        material: [''],
+        color: [''],
+        stock: [0]
+      })
     });
-    
-
-    this.productId = 0;
-    this.companyId = 0;
   }
-
   ngOnInit(): void {
     this.productId = Number(this.route.snapshot.paramMap.get('product_id'));
-    this.companyId = Number(this.route.snapshot.paramMap.get('company_id'));
-    this.loadProduct(this.productId);
-    console.log('Product loaded:', this.product);
-  }
-
-
-  async loadProduct(productId: number): Promise<void> {
-
-    try {
-      this.product = await this.productsService.getProduct(productId);
-      if (this.product) {
-        this.editForm.patchValue({
-          name: this.product.name,
-          description: this.product.description,
-          price: this.product.price,
-          product_type: this.product.product_type,
-        });
-      }
-    }
-    catch (error) {
-      console.error('Erro ao carregar o produto:', error);
-    }
-  }
+    console.log('Product ID:', this.productId);
+    this.productService.getProduct(this.productId).then(product => {
+      console.log('Full Product:', product);
+      
+      this.initialProductType = product.product_type?.toLowerCase() ?? 'vinil';
+      this.updateFieldVisibility(this.initialProductType);
   
-
-  async onSubmit(): Promise<void> {
-    if (this.editForm.valid) {
-      const formData = new FormData();
-      formData.append('name', this.editForm.value.name);
-      formData.append('description', this.editForm.value.description);
-      formData.append('price', this.editForm.value.price);
-      formData.append('product_type', this.editForm.value.product_type);
-
-      if (this.editForm.value.image) {
-        formData.append('image', this.editForm.value.image); // Arquivo selecionado
-      }
-      try {
-        const response = await fetch(`${this.baseUrl}/product/${this.productId}/`, {
-          method: 'PUT',
-          body: formData,
-        });
-      
-        const responseBody = await response.text(); // Captura o corpo da resposta
-        console.log('Resposta do servidor:', responseBody); // Mostra a resposta no console
-      
-        if (!response.ok) {
-          throw new Error(`Erro ao atualizar o produto: ${response.statusText}`);
+      this.productForm.patchValue({
+        productType: this.initialProductType,
+        artist: product.artist?.name || '',
+        name: product.name || '',
+        description: product.description || '',
+        price: product.price || '',
+      });
+  
+      const specificDetails = product.specific_details;
+  
+      if (specificDetails) {
+        switch (this.initialProductType) {
+          case 'vinil':
+            this.productForm.get('vinil')?.patchValue({
+              genre: specificDetails.genre || '',
+              lpSize: specificDetails.lpSize || '',
+              releaseDate: specificDetails.releaseDate || '',
+              stock: specificDetails.stock || 0
+            });
+            break;
+  
+          case 'cd':
+            this.productForm.get('cd')?.patchValue({
+              genre: specificDetails.genre || '',
+              releaseDate: specificDetails.releaseDate || '',
+              stock: specificDetails.stock || 0
+            });
+            break;
+  
+          case 'clothing':
+            this.productForm.get('clothing')?.patchValue({
+              color: specificDetails.color || ''
+            });
+            break;
+  
+          case 'accessory':
+            this.productForm.get('accessory')?.patchValue({
+              material: specificDetails.material || '',
+              color: specificDetails.color || '',
+              stock: specificDetails.stock || 0
+            });
+            break;
         }
-      
-        alert('Produto atualizado com sucesso!');
-        this.router.navigate(['/companies', this.companyId, 'products']);
-      } catch (error) {
-        console.error('Erro ao atualizar o produto:', error);
-        alert('Houve um problema ao atualizar o produto. Verifica o console para mais detalhes.');
+      } else {
+        console.warn('No specific_details available');
       }
-      
-    } else {
-      alert('Por favor, preencha todos os campos obrigatórios.');
-    }
+    });
+  }
+  
+
+  updateFieldVisibility(productType: string): void {
+    const controls = ['vinil', 'cd', 'clothing', 'accessory'];
+    controls.forEach(control => {
+      const group = this.productForm.get(control);
+      if (group) {
+        if (control === productType) {
+          group.enable(); // Enable the relevant FormGroup
+        } else {
+          group.disable({ emitEvent: false }); // Disable and prevent emitting events for others
+        }
+      }
+    });
   }
   
   
-
-  onCancel(): void {
-    this.router.navigate(['/companies', this.companyId, 'products']);
+  onProductTypeChange(event: Event): void {
+    const selectedType = (event.target as HTMLSelectElement).value;
+    this.updateFieldVisibility(selectedType);
   }
 
-  onFileSelected(event: Event): void {
+  onImageChange(event: Event): void {
+    console.log('Event triggered'); // Debug: Check if method is called at all
+  
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      const file = input.files[0]; // Primeiro arquivo selecionado
-      this.editForm.patchValue({
-        image: file, // Atualiza o valor do campo 'image'
-      });
-      this.editForm.get('image')?.updateValueAndValidity(); // Validação
+      const file = input.files[0];
+  
+      if (!file.type.startsWith('image/')) {
+        alert('Please upload a valid image file.');
+        return;
+      }
+  
+      console.log('Selected File:', file); // Check the selected file
+      this.productForm.patchValue({ image: file });
+      this.productForm.get('image')?.updateValueAndValidity();
     }
   }
+  
+  onSubmit(): void {
+    if (this.productForm.valid) {
+      const formData = new FormData();
+  
+      // Append basic fields
+      formData.append('productType', this.productForm.get('productType')?.value);
+      formData.append('artist', this.productForm.get('artist')?.value);
+      formData.append('name', this.productForm.get('name')?.value);
+      formData.append('description', this.productForm.get('description')?.value);
+      formData.append('price', this.productForm.get('price')?.value);
+  
+      // Dynamically build specific_details JSON object
+      const productType = this.productForm.get('productType')?.value;
+      const specificDetails = this.productForm.get(productType)?.value; // Get the formGroup for the selected productType
+  
+      if (specificDetails) {
+        formData.append('specific_details', JSON.stringify(specificDetails));
+        console.log('Specific Details:', specificDetails);
+      }
+  
+      // Append the image if it exists
+      const image = this.productForm.get('image')?.value;
+      if (image) {
+        formData.append('image', image);
+      }
+  
+      // Send the form data
+      this.productService.editProduct(formData, this.productId).then(response => {
+        console.log('Product updated successfully:', response);
+        alert('Product updated successfully!');
+      }).catch(error => {
+        console.error('Error updating product:', error);
+        alert('Error updating product.');
+      });
+    } else {
+      alert('Form is invalid. Please check all required fields.');
+    }
+  }
+  
   
 }

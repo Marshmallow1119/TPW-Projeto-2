@@ -75,9 +75,11 @@ urlpatterns = [
     path('ws/process_payment/', views.process_payment, name='process_payment'),
     path('ws/apply_discount/', views.apply_discount, name='apply_discount'),
     path('ws/reviews/<int:product_id>/', views.reviews, name='get_reviews'),
-    path('ws/chat/company/<int:company_id>/messages/', views.get_chat_messages, name='get_chat_messages_company'),
+    path('ws/chats/individual/<int:user_id>/', views.get_chats_user, name='get_chat'),
+    path('ws/chats/company/<int:company_id>/', views.get_chats_company, name='get_chat'),
+    path('ws/chat/company/<int:company_id>/messages/', views.get_chat_messages_company, name='get_chat_messages_company'),
     path('ws/chat/company/<int:company_id>/send/', views.send_message, name='send_message_to_company'),
-    path('ws/chat/user/<int:user_id>/messages/', views.get_chat_messages, name='get_chat_messages_user'),
+    path('ws/chat/user/<int:user_id>/messages/', views.get_chat_messages_user, name='get_chat_messages_user'),
     path('ws/chat/user/<int:user_id>/send/', views.send_message, name='send_message_to_user'),
     path('ws/chat/', views.get_chat, name='get_chat'),
     path('ws/user/', views.get_user_info, name='get_user'),
@@ -86,6 +88,7 @@ urlpatterns = [
     path('ws/product/<int:product_id>/add-promotion/', views.add_promotion, name='add_promotion'),
     path('ws/products/<int:product_id>/stock/', views.update_product_stock, name='stock'),
     path('ws/product/<int:product_id>/cancel-promotion/', views.cancel_promotion, name='cancel_promotion'),
+    path('ws/unread-messages/', views.get_number_unread_messages, name='get_number_unread_messages'),
 ]   
 
 

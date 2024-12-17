@@ -25,6 +25,7 @@ import jwt
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils.timezone import now
 from django.contrib.auth import update_session_auth_hash
+from django.core.files.storage import default_storage
 
 
 
@@ -217,61 +218,149 @@ def profile(request):
         return Response({'error': 'Método não suportado.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def produtos(request):
-    produtos = Product.objects.all()
+    if request.method == 'GET':
+        produtos = Product.objects.all()
 
-    sort = request.GET.get('sort', 'featured')
-    if sort == 'priceAsc':
-        produtos = produtos.order_by('price')
-    elif sort == 'priceDesc':
-        produtos = produtos.order_by('-price')
+        sort = request.GET.get('sort', 'featured')
+        if sort == 'priceAsc':
+            produtos = produtos.order_by('price')
+        elif sort == 'priceDesc':
+            produtos = produtos.order_by('-price')
 
-    product_type = request.GET.get('type')
-    if product_type:
-        if product_type == 'Vinil':
-            produtos = produtos.filter(vinil__isnull=False)
-            genre = request.GET.get('genreVinyl')
-            if genre:
-                produtos = produtos.filter(vinil__genre=genre)
+        product_type = request.GET.get('type')
+        if product_type:
+            if product_type == 'Vinil':
+                produtos = produtos.filter(vinil__isnull=False)
+                genre = request.GET.get('genreVinyl')
+                if genre:
+                    produtos = produtos.filter(vinil__genre=genre)
 
-        elif product_type == 'CD':
-            produtos = produtos.filter(cd__isnull=False)
-            genre = request.GET.get('genreCD')
-            if genre:
-                produtos = produtos.filter(cd__genre=genre)
+            elif product_type == 'CD':
+                produtos = produtos.filter(cd__isnull=False)
+                genre = request.GET.get('genreCD')
+                if genre:
+                    produtos = produtos.filter(cd__genre=genre)
 
-        elif product_type == 'Clothing':
-            produtos = produtos.filter(clothing__isnull=False)
-            color = request.GET.get('colorClothing')
-            if color:
-                produtos = produtos.filter(clothing__color=color)
+            elif product_type == 'Clothing':
+                produtos = produtos.filter(clothing__isnull=False)
+                color = request.GET.get('colorClothing')
+                if color:
+                    produtos = produtos.filter(clothing__color=color)
 
-        elif product_type == 'Accessory':
-            produtos = produtos.filter(accessory__isnull=False)
-            color = request.GET.get('colorAccessory')
-            if color:
-                produtos = produtos.filter(accessory__color=color)
-            size = request.GET.get('size')
-            if size:
-                produtos = produtos.filter(accessory__size=size)
+            elif product_type == 'Accessory':
+                produtos = produtos.filter(accessory__isnull=False)
+                color = request.GET.get('colorAccessory')
+                if color:
+                    produtos = produtos.filter(accessory__color=color)
+                size = request.GET.get('size')
+                if size:
+                    produtos = produtos.filter(accessory__size=size)
 
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
-    if min_price:
+        min_price = request.GET.get('min_price')
+        max_price = request.GET.get('max_price')
+        if min_price:
+            try:
+                produtos = produtos.filter(price__gte=float(min_price))
+            except ValueError:
+                logger.debug("Invalid minimum price provided.")
+        if max_price:
+            try:
+                produtos = produtos.filter(price__lte=float(max_price))
+            except ValueError:
+                logger.debug("Invalid maximum price provided.")
+
+        serializer = ProductSerializer(produtos, many=True, context={'request': request})
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        if not (request.user.is_authenticated and (request.user.user_type == 'company' or request.user.user_type == 'admin')):
+            raise PermissionDenied("You do not have permission to add products.")
+
+        name = request.data.get('name')
+        description = request.data.get('description')
+        price = request.data.get('price')
+        product_type = request.data.get('productType')
+        artist_id = request.data.get('artist')
+        image_file = request.FILES.get('image')
+
+        if not all([name, description, price, product_type]):
+            return Response({"error": "Missing required fields."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Parse specific_details JSON string
+        specific_details = request.data.get('specific_details', '{}')
         try:
-            produtos = produtos.filter(price__gte=float(min_price))
-        except ValueError:
-            logger.debug("Invalid minimum price provided.")
-    if max_price:
-        try:
-            produtos = produtos.filter(price__lte=float(max_price))
-        except ValueError:
-            logger.debug("Invalid maximum price provided.")
+            specific_details = json.loads(specific_details)
+        except json.JSONDecodeError:
+            return Response({"error": "Invalid specific_details format."}, status=status.HTTP_400_BAD_REQUEST)
 
-    serializer = ProductSerializer(produtos, many=True, context={'request': request})
-    return Response(serializer.data)
+        # Create the product
+        artist_obj = get_object_or_404(Artist, id=artist_id)
+        product = Product.objects.create(
+            name=name,
+            description=description,
+            price=price,
+            artist=artist_obj,
+            company=request.user.company if request.user.user_type == 'company' else None,
+            image=image_file
+        )
 
+        # Handle specific product type details
+        if product_type == 'vinil':
+            Vinil.objects.create(
+                name=name,
+                description=description,
+                price=price,
+                category='Vinyl',
+                artist=artist_obj,
+                company=request.user.company if request.user.user_type == 'company' else None,
+                image=image_file,
+                genre=specific_details.get('genre'),
+                lpSize=specific_details.get('lpSize'),
+                releaseDate=specific_details.get('releaseDate'),
+                stock=specific_details.get('stock', 0)
+            )
+        elif product_type == 'cd':
+            CD.objects.create(
+                name=name,
+                description=description,
+                category='CD',
+                price=price,
+                artist=artist_obj,
+                company=request.user.company if request.user.user_type == 'company' else None,
+                image=image_file,
+                genre=specific_details.get('genre'),
+                releaseDate=specific_details.get('releaseDate'),
+                stock=specific_details.get('stock', 0)
+            )
+        elif product_type == 'clothing':
+            Clothing.objects.create(
+                name=name,
+                description=description,
+                category='Clothing',
+                price=price,
+                artist=artist_obj,
+                company=request.user.company if request.user.user_type == 'company' else None,
+                image=image_file,
+                color=specific_details.get('color')
+            )
+        elif product_type == 'accessory':
+            Accessory.objects.create(
+                name=name,
+                description=description,
+                price=price,
+                category='Accessory',
+                artist=artist_obj,
+                company=request.user.company if request.user.user_type == 'company' else None,
+                image=image_file,
+                material=specific_details.get('material'),
+                color=specific_details.get('color'),
+                size=specific_details.get('size'),
+                stock=specific_details.get('stock', 0)
+            )
+
+        product_serializer = ProductSerializer(product, context={'request': request})
+        return Response(product_serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['POST'])
@@ -401,6 +490,76 @@ def productDetails(request, identifier):
         product = get_object_or_404(Product, id=identifier)
         product.delete()
         return Response({'message': 'Produto excluído com sucesso!'})
+
+    elif request.method == 'PUT':
+        if not (request.user.is_authenticated and (request.user.user_type == 'admin' or request.user.user_type == 'company')):
+            raise PermissionDenied("You do not have permission to update this product.")
+
+        product = get_object_or_404(Product, id=identifier)
+
+        product.name = request.data.get('name', product.name)
+        product.description = request.data.get('description', product.description)
+        product.price = request.data.get('price', product.price)
+
+        if 'image' in request.FILES:
+            image_file = request.FILES['image']
+            print(image_file)
+            if product.image:
+                print(product.image.path)
+                default_storage.delete(product.image.path)  
+            product.image = image_file  # Save new image
+
+        specific_details_json = request.data.get('specific_details', '{}')  # Get as JSON string
+        try:
+            specific_details = json.loads(specific_details_json)  # Parse JSON
+        except json.JSONDecodeError:
+            return Response({"error": "Invalid JSON for specific_details"}, status=status.HTTP_400_BAD_REQUEST)
+
+        product_type = product.category.lower()  # Assuming category holds the product type like 'vinil'
+
+
+        if product_type == 'vinyl':
+            print(specific_details)
+            productUpdated = Vinil.objects.filter(id=identifier).update(
+                genre=specific_details.get('genre', product.vinil.genre),
+                lpSize=specific_details.get('lpSize', product.vinil.lpSize),
+                releaseDate=specific_details.get('releaseDate', product.vinil.releaseDate),
+                stock=specific_details.get('stock', product.vinil.stock)
+            )
+
+        elif product_type == 'cd':
+            productUpdated = CD.objects.filter(id=identifier).update(
+                name= request.data.get('name', product.name),
+                description= request.data.get('description', product.description),
+                price= request.data.get('price', product.price),
+                genre=specific_details.get('genre', product.cd.genre),
+                releaseDate=specific_details.get('releaseDate', product.cd.releaseDate),
+                stock=specific_details.get('stock', product.cd.stock)
+            )
+
+        elif product_type == 'clothing':
+            productUpdated = Clothing.objects.filter(id=identifier).update(
+                name = request.data.get('name', product.name),
+                description = request.data.get('description', product.description),
+                price = request.data.get('price', product.price),
+                color=specific_details.get('color', product.clothing.color)
+            )
+        elif product_type == 'accessory':
+            productUpdated = Accessory.objects.filter(id=identifier).update(
+                name = request.data.get('name', product.name),
+                description = request.data.get('description', product.description),
+                price = request.data.get('price', product.price),
+                material=specific_details.get('material', product.accessory.material),
+                color=specific_details.get('color', product.accessory.color),
+                size=specific_details.get('size', product.accessory.size),
+                stock=specific_details.get('stock', product.accessory.stock)
+            )
+        product.save()
+
+        # Serialize and return updated product
+        updated_product = ProductSerializer(product, context={'request': request})
+        return Response(updated_product.data, status=status.HTTP_200_OK)
+
 
 
 
@@ -1419,16 +1578,45 @@ def reviews(request, product_id):
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-def get_chat_messages(request, company_id):
+def get_chat_messages_company(request, company_id):
     if request.user.user_type != 'individual':
         return JsonResponse({'error': 'Only individual users can access chat messages.'}, status=403)
 
     company = get_object_or_404(Company, id=company_id)
 
-    # Fetch or create the chat
     chat = Chat.objects.filter(user=request.user, company=company).first()
+
     if not chat:
         chat = Chat.objects.create(user=request.user, company=company)
+
+    chat.last_user_timestamp = now()
+    chat.save()
+    messages = chat.messages.order_by('date').values(
+        'id',
+        'text',
+        'date',
+        'is_from_company',
+        'sender__username'
+    )
+
+    return JsonResponse({'messages': list(messages)}, status=200)
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def get_chat_messages_user(request, user_id):
+    if request.user.user_type != 'company':
+        return JsonResponse({'error': 'Only company users can access chat messages.'}, status=403)
+
+    user = get_object_or_404(User, id=user_id, user_type='individual')
+
+    chat = Chat.objects.filter(user=user, company=request.user.company).first()
+    
+    if not chat:
+        chat = Chat.objects.create(user=user, company=request.user.company)
+
+    chat.last_company_timestamp = now()
+    chat.save()
 
     messages = chat.messages.order_by('date').values(
         'id',
@@ -1462,7 +1650,6 @@ def send_message(request, company_id=None, user_id=None):
         company = get_object_or_404(Company, id=company_id)
 
         chat, created = Chat.objects.get_or_create(user=request.user, company=company)
-        chat.unread_messages_company += 1
 
         is_from_company = False
 
@@ -1477,7 +1664,6 @@ def send_message(request, company_id=None, user_id=None):
         user = get_object_or_404(User, id=user_id, user_type='individual')
 
         chat = Chat.objects.filter(user=user, company=company).first()
-        chat.unread_messages_user += 1
         if not chat:
             return JsonResponse({'error': 'Chat not found for this user and company.'}, status=404)
 
@@ -1653,7 +1839,7 @@ def update_product_stock(request, product_id):
 
 @api_view(['GET'])
 def get_all_unread_messages(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or request.user.user_type not in ['company', 'individual']:
         raise PermissionDenied
 
     total_unread_messages = 0
@@ -1678,3 +1864,38 @@ def get_all_unread_messages(request):
             ).count()
             total_unread_messages += unread_messages
     return JsonResponse({'total_unread_messages': total_unread_messages})
+
+@api_view(['GET'])
+def get_chats_user(request, company_id=None, user_id=None):
+
+    user = get_object_or_404(User, id=user_id, user_type='individual')
+    chats = Chat.objects.filter(user=user)
+    chats = ChatSerializer(chats, many=True, context={'request': request}).data
+    return JsonResponse({"chats": chats})
+    
+
+@api_view(['GET'])
+def get_chats_company(request, company_id=None):
+    company = get_object_or_404(Company, id=company_id)
+    chats = Chat.objects.filter(company=company)
+    chats = ChatSerializer(chats, many=True, context={'request': request}).data
+    return JsonResponse({"chats": chats})
+
+
+#Fiz esta só para não ter que retornar as informações todas
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def get_number_unread_messages(request):
+    user = request.user
+    if user.user_type == 'company':
+        chats = Chat.objects.filter(company=user.company)
+        unread_count = 0
+        for chat in chats:
+            unread_count += chat.messages.filter(is_from_company=False, date__gt=chat.last_company_timestamp).count()
+    elif user.user_type == 'individual':
+        chats = Chat.objects.filter(user=user)
+        unread_count = 0
+        for chat in chats:
+            unread_count += chat.messages.filter(is_from_company=True, date__gt=chat.last_user_timestamp).count()
+    return JsonResponse({'unread_count': unread_count})

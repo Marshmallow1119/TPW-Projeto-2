@@ -1,0 +1,138 @@
+<div class="container mt-5" style="margin-bottom: 60px">
+    <h2 class="text-center mb-4">Adicionar Novo Produto</h2>
+    <div class="card shadow-sm p-4">
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+        <!-- Product Type and Artist -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="productType" class="form-label">Tipo de Produto</label>
+            <select 
+              class="form-select" 
+              formControlName="productType" 
+              id="productType" 
+              (change)="onProductTypeChange($event)">
+              <option *ngFor="let type of productTypes" [value]="type">{{ type | titlecase }}</option>
+            </select>
+            <div *ngIf="productForm.get('productType')?.touched && productForm.get('productType')?.invalid" class="text-danger">
+              Tipo de Produto é obrigatório.
+            </div>
+          </div>
+  
+          <div class="col-md-6">
+            <label for="artist" class="form-label">Artista</label>
+            <select class="form-select" formControlName="artist" id="artist">
+              <option *ngFor="let artist of artists" [value]="artist.id">{{ artist.name }}</option>
+            </select>
+            <div *ngIf="productForm.get('artist')?.touched && productForm.get('artist')?.invalid" class="text-danger">
+              Artista é obrigatório.
+            </div>
+          </div>
+        </div>
+  
+        <!-- Product Name and Price -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="name" class="form-label">Nome do Produto</label>
+            <input type="text" class="form-control" formControlName="name" />
+            <div *ngIf="productForm.get('name')?.touched && productForm.get('name')?.invalid" class="text-danger">
+              Nome do Produto é obrigatório.
+            </div>
+          </div>
+  
+          <div class="col-md-6">
+            <label for="price" class="form-label">Preço (€)</label>
+            <input type="text" class="form-control" formControlName="price" />
+            <div *ngIf="productForm.get('price')?.touched && productForm.get('price')?.invalid" class="text-danger">
+              Preço é obrigatório e deve ser numérico.
+            </div>
+          </div>
+        </div>
+  
+        <!-- Description and Image -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="description" class="form-label">Descrição</label>
+            <textarea class="form-control" formControlName="description"></textarea>
+            <div *ngIf="productForm.get('description')?.touched && productForm.get('description')?.invalid" class="text-danger">
+              Descrição é obrigatória.
+            </div>
+          </div>
+  
+          <div class="col-md-6">
+            <label for="image" class="form-label">Imagem do Produto</label>
+            <input 
+              type="file" 
+              class="form-control" 
+              id="image" 
+              (change)="onImageChange($event)" />
+            <div *ngIf="productForm.get('image')?.touched && productForm.get('image')?.invalid" class="text-danger">
+              Imagem é obrigatória.
+            </div>
+          </div>
+        </div>
+  
+        <!-- Dynamic Product Type Details -->
+        <div *ngIf="productForm.value.productType === 'vinil'" formGroupName="vinil">
+          <h5>Detalhes do Vinil</h5>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="genre" class="form-label">Gênero</label>
+              <input type="text" class="form-control" formControlName="genre" />
+            </div>
+            <div class="col-md-4">
+              <label for="lpSize" class="form-label">Tamanho do LP</label>
+              <input type="text" class="form-control" formControlName="lpSize" />
+            </div>
+            <div class="col-md-4">
+              <label for="releaseDate" class="form-label">Data de Lançamento</label>
+              <input type="date" class="form-control" formControlName="releaseDate" />
+            </div>
+          </div>
+        </div>
+  
+        <div *ngIf="productForm.value.productType === 'cd'" formGroupName="cd">
+          <h5>Detalhes do CD</h5>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="genre" class="form-label">Gênero</label>
+              <input type="text" class="form-control" formControlName="genre" />
+            </div>
+            <div class="col-md-6">
+              <label for="releaseDate" class="form-label">Data de Lançamento</label>
+              <input type="date" class="form-control" formControlName="releaseDate" />
+            </div>
+          </div>
+        </div>
+  
+        <div *ngIf="productForm.value.productType === 'clothing'" formGroupName="clothing">
+          <h5>Detalhes da Roupa</h5>
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <label for="color" class="form-label">Cor</label>
+              <input type="text" class="form-control" formControlName="color" />
+            </div>
+          </div>
+        </div>
+  
+        <div *ngIf="productForm.value.productType === 'accessory'" formGroupName="accessory">
+          <h5>Detalhes de Acessório</h5>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="material" class="form-label">Material</label>
+              <input type="text" class="form-control" formControlName="material" />
+            </div>
+            <div class="col-md-6">
+              <label for="color" class="form-label">Cor</label>
+              <input type="text" class="form-control" formControlName="color" />
+            </div>
+          </div>
+        </div>
+  
+        <!-- Submit Buttons -->
+        <div class="d-flex justify-content-center mt-4">
+            <button type="submit" style="width: 100%" class="btn btn-success me-2">Guardar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  

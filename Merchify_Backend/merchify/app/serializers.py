@@ -310,10 +310,17 @@ class ChatSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(read_only=True)
     last_user_timestamp = serializers.DateTimeField(read_only=True)
     last_company_timestamp = serializers.DateTimeField(read_only=True)
-
+    user_unread_messages = serializers.SerializerMethodField()
+    company_unread_messages = serializers.SerializerMethodField()
     class Meta:
         model = Chat
-        fields = ['id', 'user', 'company', 'created_at', 'last_user_timestamp', 'last_company_timestamp']
+        fields = ['id', 'user', 'company', 'created_at', 'last_user_timestamp', 'last_company_timestamp', 'user_unread_messages', 'company_unread_messages']
+
+    def get_user_unread_messages(self, obj):
+        return obj.get_user_unread_messages()
+    
+    def get_company_unread_messages(self, obj):
+        return obj.get_company_unread_messages()
 
 
 class MessageSerializer(serializers.ModelSerializer):

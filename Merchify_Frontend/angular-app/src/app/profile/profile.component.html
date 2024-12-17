@@ -65,19 +65,17 @@
 
                       <!-- Botões de Ação -->
 <div class="mt-5 text-end">
-    <!-- Exibe os botões normais apenas se os campos de senha não estiverem visíveis -->
     <ng-container *ngIf="!showPasswordFields; else passwordActions">
         <button type="button" class="btn btn-primary me-3" (click)="toggleEdit()">
             {{ editing ? 'Cancelar' : 'Editar' }}
         </button>
-        <button *ngIf="editing" type="button" class="btn btn-success me-3" (click)="saveChanges()">Salvar</button>
+        <button *ngIf="editing" type="button" class="btn btn-success me-3" (click)="saveChanges()">Guardar</button>
         <button type="button" class="btn btn-danger me-3" (click)="deleteAccount()">Deletar Conta</button>
         <button type="button" class="btn btn-secondary" (click)="togglePasswordChange()">Alterar Senha</button>
     </ng-container>
 
-    <!-- Botões para alteração de senha -->
     <ng-template #passwordActions>
-        <button type="button" class="btn btn-primary me-3" (click)="changePassword()">Salvar Nova Senha</button>
+        <button type="button" class="btn btn-primary me-3" (click)="changePassword()">Guardar Nova Senha</button>
         <button type="button" class="btn btn-secondary" (click)="cancelPasswordChange()">Cancelar</button>
     </ng-template>
 </div>

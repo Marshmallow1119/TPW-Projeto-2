@@ -45,11 +45,11 @@ export class ProductsService {
 
   async deleteProduct(id: number): Promise<void> {
     try {
-      await fetch(`${this.baseUrl}/product/${id}/delete/`, {
+      await fetch(`${this.baseUrl}/product/${id}/`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });      
     }
@@ -58,19 +58,33 @@ export class ProductsService {
     }
   }
 
-  async editProduct(product: Product): Promise<void> {
+  async editProduct(formData: FormData, productId: number): Promise<any> {
     try {
-      await fetch(`${this.baseUrl}/product/${product.id}/`, {
+      const response = await fetch(`${this.baseUrl}/product/${productId}/`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          // Do NOT set 'Content-Type'; fetch will handle it automatically.
         },
-        body: JSON.stringify(product),
+        body: formData,
       });
+  
+      // Check if the response is successful
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Server Error:', errorData);
+        throw new Error(`Failed to update product: ${response.statusText}`);
+      }
+  
+      const result = await response.json(); // Parse and return response data
+      console.log('Product updated successfully:', result);
+      return result;
     } catch (error) {
       console.error('Error editing product:', error);
+      throw error;
     }
   }
+  
 
   async getFilters(): Promise<any> {
     try {
@@ -91,13 +105,13 @@ export class ProductsService {
     }
   }
 
-  async addProduct(product: Product, imageFile: File): Promise<void> {
+  async addProduct(formData: FormData,): Promise<void> {
     try {
-      const formData = new FormData();
-      formData.append('product', JSON.stringify(product));
-      formData.append('image', imageFile);
       const response = await fetch(`${this.baseUrl}/products/`, {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
         body: formData,
       });
       if (!response.ok) {
