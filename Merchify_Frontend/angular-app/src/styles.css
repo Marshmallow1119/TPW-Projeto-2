@@ -8,6 +8,11 @@
     --text-color: #ffffff;
   }
   
+  /* Adiciona o fundo #343a40 à seção de registro no modo dark */
+body.dark-theme .content {
+  background-color: #343a40 !important;
+}
+
   body {
     background-color: var(--background-color);
     color: var(--text-color);

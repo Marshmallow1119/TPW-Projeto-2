@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service'; 
 import { CommonModule } from '@angular/common';
 
@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
-  imports: [ CommonModule, ReactiveFormsModule ]
+  imports: [ CommonModule, ReactiveFormsModule, RouterModule ]
 })
 export class RegisterComponent {
   registerForm: FormGroup;
@@ -39,7 +39,7 @@ export class RegisterComponent {
       username: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       address: [''],
-      phone: ['', [Validators.pattern('^[0-9]+$')]],
+      phone: ['', [Validators.pattern('^[9|2][0-9]{8}$')]],
       country: ['', [Validators.required]],
       password1: ['', [Validators.required, Validators.minLength(6)]],
       password2: ['', [Validators.required]],
@@ -57,8 +57,8 @@ export class RegisterComponent {
 
     Object.entries(this.registerForm.value).forEach(([key, value]) => {
       if (key === 'image' && value instanceof File) {
-        formData.append(key, value);
-      } else {
+        formData.append(key, value); 
+      } else if (value !== null) {
         formData.append(key, value as string);
       }
     });

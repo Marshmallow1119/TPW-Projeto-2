@@ -592,19 +592,99 @@ def search(request):
 
 @api_view(['POST'])
 def register_view(request):
-   serializer = RegisterSerializer(data=request.data)
-   print(request.data)
-   if serializer.is_valid():
-       user = serializer.save()
-       refresh = RefreshToken.for_user(user)
-       return Response({
-           'message': 'User registered successfully!',
-           'access': str(refresh.access_token),
-           'refresh': str(refresh),
-           'username': user.username,
-           'id': user.id,
-       }, status=status.HTTP_201_CREATED)
-   return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # Extrai os dados do corpo da requisição
+    data = request.data
+
+    print(data)
+    # Validação manual dos campos
+    errors = {}
+
+    if 'first_name' not in data or not data['first_name']:
+        errors['first_name'] = 'First name is required.'
+
+    print(data['first_name'])
+
+    if 'last_name' not in data or not data['last_name']:
+        errors['last_name'] = 'Last name is required.'
+
+    print(data['last_name'])
+    if 'username' not in data or not data['username']:
+        errors['username'] = 'Username is required.'
+
+    print(data['username'])
+
+    if 'email' not in data or not data['email']:
+        errors['email'] = 'Email is required.'
+
+    print(data['email'])
+    if 'phone' not in data or not data['phone']:
+        errors['phone'] = 'Phone number is required.'
+
+    print(data['phone'])
+    if 'country' not in data or not data['country']:
+        errors['country'] = 'Country is required.'
+
+    print(data['country'])
+    if 'password1' not in data or not data['password1']:
+        errors['password1'] = 'Password is required.'
+
+    print(data['password1'])
+    if 'password2' not in data or not data['password2']:
+        errors['password2'] = 'Confirm password is required.'
+    
+    print(data['password2'])
+
+    if data.get('password1') != data.get('password2'):
+        errors['password2'] = "Passwords do not match."
+
+    phone_pattern = r'^[9|2][0-9]{8}$'
+    if not re.match(phone_pattern, data.get('phone', '')):
+        errors['phone'] = 'Enter a valid phone number starting with 9 or 2 and having 9 digits.'
+
+    if errors:
+        return Response({'errors': errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = User.objects.create_user(
+            username=data['username'],
+            email=data['email'],
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            password=data['password1'],  # Senha já validada
+            phone=data['phone'],
+            country=data['country'],
+        )
+
+        print("user", user)
+
+        if 'image' in data and data['image']:
+            user.image = data['image']
+
+        print("imagem", user.image)
+        
+        user.save()
+
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            'message': 'User registered successfully!',
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'username': user.username,
+            'id': user.id,
+        }, status=status.HTTP_201_CREATED)
+
+    except IntegrityError as e:
+        if 'app_user.phone' in str(e):
+            return Response({'errors': {'phone': ['Este número de telefone já está em uso.']}},
+                            status=status.HTTP_400_BAD_REQUEST)
+        elif 'app_user.email' in str(e):
+            return Response({'errors': {'email': ['Este e-mail já está em uso.']}},
+                            status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'errors': {'non_field_errors': ['Erro ao criar o usuário. Tente novamente.']}},
+                             status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
