@@ -49,7 +49,7 @@ Neste primeiro projeto desenvolvemos uma aplicação web usando a framework Djan
 - Ver os produtos e os artistas que foram colocados como favoritos
 - Ver produtos e os seus detalhes
 - Ver os produtos de um determinado artista
-- Ver/ atualizar/ apagar dados do perfile
+- Ver/ atualizar/ apagar dados do perfil
 - Ver encomendas e os seus detalhes
 - Comprar um produto
 - Adicionar um avaliação a um produto
@@ -62,8 +62,8 @@ Neste primeiro projeto desenvolvemos uma aplicação web usando a framework Djan
 
 - O mesmo que o utilizador sem login
 - Ver o número de compras de um utilizador
-- Adicionar Companhias
-- Banir Companhias
+- Adicionar Empresas
+- Banir Empresas
 - Adicionar Produtos
 - Editar Produtos
 - Adicionar Stock a um Produto

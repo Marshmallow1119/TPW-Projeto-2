@@ -1439,20 +1439,19 @@ def admin_product_delete(request, product_id):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def delete_review(request, review_id):
-    if not request.user.is_superuser:
-        raise PermissionDenied
+    print("DEBUG: Review ID recebido no pedido ->", review_id)  # Verifica o ID da review
+    print("DEBUG: Utilizador autenticado ->", request.user)  # Verifica quem está autenticado
+    print("DEBUG: Tipo de utilizador ->", request.user.user_type)  # Verifica o tipo de utilizador
+
     review = get_object_or_404(Review, id=review_id)
     product = review.product
     company = product.company
 
     if request.user.user_type == 'admin' or (request.user.user_type == 'company' and request.user.company == company):
         review.delete()
-        messages.success(request, "Avaliação removida com sucesso.")
-        return redirect('company_product_detail', company_id=company.id, product_id=product.id)
+        return Response({"message": "Avaliação removida com sucesso."}, status=status.HTTP_204_NO_CONTENT)
     else:
-        messages.error(request, "Apenas administradores ou o proprietário da companhia podem remover avaliações.")
-        return redirect('company_product_detail', company_id=company.id, product_id=product.id)
-
+        raise PermissionDenied("Apenas administradores ou o proprietário da companhia podem remover avaliações.")
 
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])

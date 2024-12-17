@@ -47,4 +47,30 @@ export class ReviewsService {
     }
   }
 
+    // Apagar uma review por ID
+    async deleteReview(reviewId: number): Promise<void> {
+      const url = `${this.baseUrl}/reviews/${reviewId}/`;
+      try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(url, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+    
+        if (!response.ok) {
+          const errorResponse = await response.text();
+          console.error('Server Response:', errorResponse);
+          throw new Error(`Failed to delete review: ${response.statusText}`);
+        }
+    
+        console.log('Review deleted successfully');
+      } catch (error) {
+        console.error('Error deleting review:', error);
+        throw error;
+      }
+    }
+      
+
 }

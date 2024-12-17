@@ -147,6 +147,20 @@ export class ProductDetailsComponent implements OnInit {
   
   }
 
+  onDeleteReview(reviewId: number): void {
+    if (confirm('Tens a certeza que queres apagar esta review?')) {
+      this.reviewService.deleteReview(reviewId)
+        .then(() => {
+          alert('Review apagada com sucesso!');
+          // Atualizar a lista de reviews ou redirecionar
+        })
+        .catch(error => {
+          console.error('Erro ao apagar a review:', error);
+          alert('Não foi possível apagar a review. Tenta novamente mais tarde.');
+        });
+    }
+  }
+
   async addToCart(): Promise<void> {
     if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/login']);
