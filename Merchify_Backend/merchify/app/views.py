@@ -91,6 +91,10 @@ def balance(request):
         if serializer.is_valid():
             amount = serializer.validated_data['amount']
 
+            if Decimal(amount) <= 0:
+                return Response({'error': 'Amount must be greater than zero.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
             if request.method == 'POST':
                 user.balance += Decimal(amount)
                 user.save()
@@ -101,8 +105,14 @@ def balance(request):
                 })
 
             elif request.method == 'PUT':
+
                 if user.balance < Decimal(amount):
                     return Response({'error': 'Insufficient balance.'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                if user.balance - Decimal(amount) < 0:
+                    return Response({'error': 'Insufficient balance, cannot deduct more than the available balance.'}, 
+                                    status=status.HTTP_400_BAD_REQUEST)
+
 
                 user.balance -= Decimal(amount)
                 user.save()

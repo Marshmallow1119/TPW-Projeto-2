@@ -8,7 +8,6 @@
     --text-color: #ffffff;
   }
   
-  /* Adiciona o fundo #343a40 à seção de registro no modo dark */
 body.dark-theme .content {
   background-color: #343a40 !important;
 }
@@ -32,6 +31,11 @@ body.dark-theme .content {
   .dark-theme .nav-link {
     color: #ffffff !important;
   }
+  body.dark-theme .text-muted {
+    color: var(--dark-text) !important;
+  }
+
+
 .sidebar-filter {
     background-color: #f8f9fa;
     color: #343a40; 
@@ -48,7 +52,26 @@ body.dark-theme .content {
     color: #f8f9fa !important; 
     border: 1px solid #343a40;
   }
+
+  body.dark-theme .col-md-4.summary,
+  body.dark-theme .col-md-8.cart {
+  background-color: #343a40 !important; /* Fundo escuro */
+  color: #f8f9fa !important; /* Texto claro */
+}
   
+/* Botão branco com texto preto no modo escuro */
+body.dark-theme .btn-secondary {
+  background-color: #ffffff !important; /* Fundo branco */
+  color: #000000 !important; /* Texto preto */
+  border: 1px solid #343a40; /* Borda escura */
+}
+
+body.dark-theme .btn-secondary:hover {
+  background-color: #f8f9fa !important; /* Fundo levemente cinza ao passar o mouse */
+  color: #343a40 !important; /* Texto escuro ao passar o mouse */
+}
+
+
   .dark-theme .form-control::placeholder {
     color: #adb5bd;
   }
@@ -69,6 +92,10 @@ body.dark-theme .content {
     color: #f8f9fa !important;
   }
 
+  body.dark-theme .text-primary {
+    color: #ffffff !important; /* Texto branco */
+    font-weight: bold !important; /* Texto em negrito */
+  }
 
   .dark-theme .logo{
     filter: brightness(0) invert(1) !important;
