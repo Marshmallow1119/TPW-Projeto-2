@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap, catchError, throwError } from 'rxjs';
 import { User } from './models/user';
 import { isPlatformBrowser } from '@angular/common';
-import { Router, NavigationStart } from '@angular/router'; // Import Router and NavigationStart
+import { Router, NavigationStart } from '@angular/router';
 import { CONFIG } from './config';
 
 @Injectable({

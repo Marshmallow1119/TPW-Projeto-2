@@ -47,7 +47,6 @@ export class ReviewsService {
     }
   }
 
-    // Apagar uma review por ID
     async deleteReview(reviewId: number): Promise<void> {
       const url = `${this.baseUrl}/reviews/${reviewId}/delete/`;
       try {

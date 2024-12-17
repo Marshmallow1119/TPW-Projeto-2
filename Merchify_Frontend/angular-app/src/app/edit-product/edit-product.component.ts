@@ -72,7 +72,7 @@ export class EditProductComponent implements OnInit {
       });
 
       if (product.image_url) {
-        this.imagePreview = product.image_url; // Assuming imageUrl contains the current image path
+        this.imagePreview = product.image_url; 
       }
   
       const specificDetails = product.specific_details;
@@ -126,6 +126,7 @@ export class EditProductComponent implements OnInit {
           group.enable(); 
         } else {
           group.disable({ emitEvent: false }); 
+          group.disable({ emitEvent: false }); 
         }
       }
     });
@@ -168,8 +169,7 @@ export class EditProductComponent implements OnInit {
       formData.append('price', this.productForm.get('price')?.value);
   
       const productType = this.productForm.get('productType')?.value;
-      const specificDetails = this.productForm.get(productType)?.value; // Get the formGroup for the selected productType
-  
+      const specificDetails = this.productForm.get(productType)?.value; 
       if (specificDetails) {
         formData.append('specific_details', JSON.stringify(specificDetails));
         console.log('Specific Details:', specificDetails);
@@ -180,7 +180,6 @@ export class EditProductComponent implements OnInit {
         formData.append('image', image);
       }
   
-      // Send the form data
       this.productService.editProduct(formData, this.productId).then(response => {
         console.log('Product updated successfully:', response);
         alert('Produto atualizado com sucesso!');

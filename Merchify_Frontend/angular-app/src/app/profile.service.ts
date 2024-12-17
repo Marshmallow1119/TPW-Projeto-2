@@ -6,7 +6,7 @@ import { Observable, from } from 'rxjs';
   providedIn: 'root',
 })
 export class ProfileService {
-  private baseUrl: string = CONFIG.baseUrl; // Configuração da URL base
+  private baseUrl: string = CONFIG.baseUrl;
 
   constructor() {}
 
@@ -76,7 +76,7 @@ export class ProfileService {
       const response = await fetch(`${this.baseUrl}/account/profile`, {
         method: 'PUT',
         headers: {
-          Authorization: `Bearer ${token}`, // NÃO defina o Content-Type manualmente
+          Authorization: `Bearer ${token}`, 
         },
         body: data,
       });

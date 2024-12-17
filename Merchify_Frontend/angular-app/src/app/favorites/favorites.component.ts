@@ -11,7 +11,7 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./favorites.component.css']
 })
 export class FavoritesComponent implements OnInit {
-  category: string = 'products'; // Categoria inicial
+  category: string = 'products';
   favoriteProducts: any[] = [];
   favoriteArtists: any[] = [];
   favoriteCompanies: any[] = [];
@@ -23,11 +23,9 @@ export class FavoritesComponent implements OnInit {
   }
   
 
-  // Alterna entre categorias
   switchCategory(category: string): void {
     this.category = category;
 
-    // Chama a função correspondente à categoria
     if (category === 'products') {
       this.loadProducts();
     } else if (category === 'artists') {
@@ -37,7 +35,6 @@ export class FavoritesComponent implements OnInit {
     }
   }
 
-  // Funções para carregar favoritos
   async loadProducts(): Promise<void> {
     this.favoriteProducts = await this.favoritesService.getFavorites('products');
     console.log('Produtos favoritos:', this.favoriteProducts);

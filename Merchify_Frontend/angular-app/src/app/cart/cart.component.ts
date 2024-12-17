@@ -13,13 +13,13 @@ import { Cart } from '../models/cart';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './cart.component.html',
-  styleUrls: ['./cart.component.css'] // Corrigido de styleUrl para styleUrls
+  styleUrls: ['./cart.component.css']  
   })
 export class CartComponent implements OnInit {
   cart: Cart | null = null;
   cartItems: any[] = [];
   cartTotal: number = 0;
-  user: User | null = null; // Armazena o usuário autenticado
+  user: User | null = null;
 
   constructor(private cartService: CartService, private router: Router, private authService: AuthService) {}
 
@@ -47,6 +47,9 @@ export class CartComponent implements OnInit {
             date: new Date(), 
             items: [], 
             total: 0
+            date: new Date(), 
+            items: [], 
+            total: 0
           },
           product: {
             id: item.product.id,
@@ -71,8 +74,8 @@ export class CartComponent implements OnInit {
               stock: item.product.specific_details.stock,
               imageBase64: item.product.specific_details.image_base64,
             },
-            is_on_promotion: item.product.is_on_promotion || false, // Verifica promoção
-            old_price: item.product.old_price || null, // Preço antigo
+            is_on_promotion: item.product.is_on_promotion || false, 
+            old_price: item.product.old_price || null,
           },
           quantity: item.quantity,
           size: item.size,
@@ -90,7 +93,6 @@ export class CartComponent implements OnInit {
         console.log('Cart:', this.cart);
         console.log('CartItems:', this.cartItems);
   
-        // Calcula o total do carrinho
         this.calculateTotal();
       } else {
         console.error('Erro: Resposta do carrinho inválida.', response);

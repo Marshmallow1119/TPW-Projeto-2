@@ -73,6 +73,7 @@ export class ProfileComponent implements OnInit {
   
     if (this.uploadedImage) {
       formData.append('image', this.uploadedImage); 
+      formData.append('image', this.uploadedImage); 
     }
   
     try {

@@ -12,7 +12,6 @@ export class CompaniesService {
 
   constructor(private router: Router) {}
 
-  // Fetch all companies
   async getCompanies(): Promise<Company[]> {
     const url = `${this.baseUrl}/companhias/`;
     try {
@@ -28,7 +27,6 @@ export class CompaniesService {
     }
   }
 
-  // Toggle favorite for a company
   async toggleFavorite(companyId: number): Promise<{ favorited: boolean }> {
     try {
       const response = await fetch(

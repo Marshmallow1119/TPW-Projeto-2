@@ -4,7 +4,7 @@ import { ChatService } from '../chat.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CompaniesService } from '../companhia.service';
-import { AuthService } from '../auth.service'; // Service to fetch user details
+import { AuthService } from '../auth.service'; 
 import { User } from '../models/user';
 import { Message } from '../models/chat';
 import { ProfileService } from '../profile.service';
@@ -19,7 +19,7 @@ import { ProfileService } from '../profile.service';
 export class ChatComponent implements OnInit {
   messages: Message[] = [];
   newMessage: string = '';
-  currentReceiver: any = null; // Holds company or user details
+  currentReceiver: any = null; 
   recipientId: number | undefined;
   userType: 'individual' | 'company' | 'admin' | undefined;
   isLoading: boolean = false;
@@ -57,7 +57,6 @@ export class ChatComponent implements OnInit {
   async fetchReceiverDetails(): Promise<void> {
     try {
       if (this.userType === 'individual' && this.recipientId) {
-        // Fetch company details
         this.currentReceiver = await this.companyService.getCompany(this.recipientId);
         console.log('Current Receiver (Company):', this.currentReceiver);
         this.currentReceiver.image = this.currentReceiver.image

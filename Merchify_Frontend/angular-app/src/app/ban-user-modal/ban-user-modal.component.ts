@@ -10,7 +10,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 export class BanUserModalComponent {
   @Input() isModalOpen = false; 
   @Input() selectedUserId: number | null = null; 
-  @Input() actionType: 'ban' | 'unban' = 'ban'; // New input to determine action type
+  @Input() actionType: 'ban' | 'unban' = 'ban'; 
 
   @Output() closeModalEvent = new EventEmitter<void>(); 
   @Output() confirmActionEvent = new EventEmitter<number>();

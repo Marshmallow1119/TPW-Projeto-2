@@ -16,7 +16,7 @@ import { Product } from '../models/produto';
 })
 export class FiltroComponent implements OnInit {
   @Output() filtersChanged = new EventEmitter<any>();
-  @Input() colors: string[] = []; // Added Input property
+  @Input() colors: string[] = []; 
   @Input() genres: string[] = [];
   @Input() showArtistFilter: boolean = true;
   @Input() sizes: string[] = [];
@@ -107,6 +107,7 @@ export class FiltroComponent implements OnInit {
   }
 
   selectArtist(artist: Artist): void {
+    this.selectedArtist = artist.id.toString();
     this.selectedArtist = artist.id.toString();
     this.selectedArtistName = artist.name;
     this.filters.artist = artist.id.toString(); 

@@ -15,8 +15,7 @@ import { BanUserModalComponent } from "../ban-user-modal/ban-user-modal.componen
 export class AdminUsersTableComponent {
   users: User[] = [];
   selectedUserId: number | null = null;
-  actionType: 'ban' | 'unban' = 'ban'; // Determines modal behavior
-
+  actionType: 'ban' | 'unban' = 'ban';
   constructor(private usersService: UsersService) {}
 
   async ngOnInit(): Promise<void> {
