@@ -10,6 +10,7 @@ export interface User {
     email: string; 
     phone: string;
     country: string; 
+    banned?: boolean;
     image?: string; 
     company?: {
       id: number;

@@ -1,8 +1,9 @@
 <app-ban-user-modal
   [isModalOpen]="selectedUserId !== null"
   [selectedUserId]="selectedUserId"
+  [actionType]="actionType"
   (closeModalEvent)="closeBanUserModal()"
-  (confirmActionEvent)="onConfirmBan($event)"
+  (confirmActionEvent)="actionType === 'ban' ? onConfirmBan($event) : onConfirmUnban($event)"
 ></app-ban-user-modal>
 
 <div *ngIf="users?.length; else noUsers">
@@ -35,8 +36,19 @@
         <td>{{ user.country }}</td>
         <td>{{ user.balance | currency: 'EUR' }}</td>
         <td class="text-center">
-          <button class="btn btn-danger btn-sm" (click)="openBanUserModal(user.id)">
+          <button
+            *ngIf="!user.banned"
+            class="btn btn-danger btn-sm"
+            (click)="openBanUserModal(user.id)"
+          >
             <i class="fas fa-ban"></i> Banir Utilizador
+          </button>
+          <button
+            *ngIf="user.banned"
+            class="btn btn-success btn-sm"
+            (click)="openUnbanUserModal(user.id)"
+          >
+            <i class="fas fa-user-check"></i> Desbanir Utilizador
           </button>
         </td>
       </tr>

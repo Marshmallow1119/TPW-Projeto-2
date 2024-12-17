@@ -1,171 +1,187 @@
 <div *ngIf="product" class="container my-5">
-    <!-- Product Header -->
-    <div class="row product-container">
-      <div class="col-md-6 d-flex justify-content-center">
-        <img [src]="product.image_url" [alt]="product.name" class="product-img" />
-      </div>
-  
-      <div class="col-md-6">
-        <div class="d-flex justify-content-between align-items-center">
-          <h1 class="display-6">{{ product.name }}</h1>
-          <p>Este produto foi visto {{ product.count }} vezes</p>
-        </div>
-        <div class="d-flex align-items-center">
-          <div *ngIf="product.is_on_promotion" class="d-flex align-items-center">
-            <h3 class="text-muted me-2" style="text-decoration: line-through;">
-              {{ product.old_price | currency: 'EUR' }}
-            </h3>
-            <h3 class="text-danger fw-bold me-2">
-              {{ product.price | currency: 'EUR' }}
-            </h3>
-            <span class="badge bg-warning text-dark badge-large">Promoção</span>
-          </div>
-          <div *ngIf="!product.is_on_promotion">
-            <h3 class="text-success">{{ product.price | currency: 'EUR' }}</h3>
-          </div>
-        </div>        
-        <p class="lead">{{ product.description }}</p>
-  
-        <!-- Product Details -->
-        <h5>Detalhes do Produto</h5>
-        <table class="table table-bordered">
-          <tbody>
-            <tr><th>Categoria</th><td>{{ product.category }}</td></tr>
-            <tr><th>Artista</th><td>{{ product.artist.name }}</td></tr>
-            <tr><th>Empresa</th><td>{{ product.company.name }}</td></tr>
-            <tr><th>Data de Adição</th><td>{{ product.addedProduct | date }}</td></tr>
-  
-            <!-- Specific details for product types -->
-            <ng-container *ngIf="product.product_type === 'Vinil'">
-              <tr><th>Gênero</th><td>{{ product.specific_details.genre }}</td></tr>
-              <tr><th>Tamanho do LP</th><td>{{ product.specific_details.lpSize }}</td></tr>
-              <tr><th>Data de Lançamento</th><td>{{ product.addedProduct | date }}</td></tr>
-              <tr><th>Stock</th><td>{{ product.stock }}</td></tr>
-            </ng-container>
-  
-            <ng-container *ngIf="product.product_type === 'CD'">
-              <tr><th>Gênero</th><td>{{ product.specific_details.genre }}</td></tr>
-              <tr><th>Data de Lançamento</th><td>{{ product.addedProduct | date}}</td></tr>
-              <tr><th>Stock</th><td>{{ product.stock }}</td></tr>
-            </ng-container>
-  
-            <ng-container *ngIf="product.product_type === 'Clothing'">
-              <tr><th>Cor</th><td>{{ product.specific_details.color }}</td></tr>
-            </ng-container>
-  
-            <ng-container *ngIf="product.product_type === 'Accessory'">
-              <tr><th>Material</th><td>{{ product.specific_details.material }}</td></tr>
-              <tr><th>Cor</th><td>{{ product.specific_details.color }}</td></tr>
-              <tr><th>Tamanho</th><td>{{ product.specific_details.size }}</td></tr>
-              <tr><th>Stock</th><td>{{ product.specific_details.stock }}</td></tr>
-            </ng-container>
-          </tbody>
-        </table>
-  
-        <!-- Size Selector (if Clothing) -->
-        <div *ngIf="product.product_type === 'Clothing'" class="mb-3">
-          <label class="form-label fw-bold">Tamanho</label>
-          <div class="size-selector">
-            <button
-              *ngFor="let size of sizes"
-              [class.btn-success]="selectedSize === size.id"
-              [class.btn-dark]="selectedSize !== size.id"
-              (click)="selectSize(size.id)"
-              class="btn btn-dark m-1"
-            >
-            {{ size.size }} - {{ size.stock }} Unidades Disponíveis            </button>
-          </div>
-        </div>
-  
-        <!-- Add to Cart -->
-        <div class="mb-3">
-          <label for="quantity" class="form-label">Quantidade</label>
-          <input
-            type="number"
-            id="quantity"
-            [(ngModel)]="quantity"
-            class="form-control"
-            min="1"
-          />
-        </div>
-        <button class="btn btn-dark w-100" (click)="addToCart()">Adicionar ao carrinho</button>
-      </div>
+  <!-- Product Header -->
+  <div class="row product-container">
+    <div class="col-md-6 d-flex justify-content-center">
+      <img [src]="product.image_url" [alt]="product.name" class="product-img" />
     </div>
-              <!-- Chat with the Company -->
-      <div class="chat-section mt-5">
-        <div class="alert alert-success">
-          <h5>Está com dúvidas em relação ao produto?</h5>
-          <p>Converse diretamente com a empresa para tirar suas dúvidas sobre este produto.</p>
-          <a
-            [routerLink]="'/chat/' + product.company.id"
-            class="btn btn-success"
-          >
-            Converse com a Empresa
-          </a>
-        </div>
-      </div>
-    <!-- Reviews Section -->
-    <div class="reviews mt-5">
-      <h5>Classificação Média:</h5>
-      <div class="d-flex align-items-center mb-3">
-        <div *ngIf="isNumeric(averageRating); else noRating" class="star-rating">
-          <span
-            *ngFor="let star of [1, 2, 3, 4, 5]"
-            class="star"
-            [class.selected]="star <= averageRating"
-            >★</span
-          >
-          <span>({{ averageRating | number: '1.1-1' }})</span>
-        </div>
-        <ng-template #noRating>
-          <span>{{ averageRating }}</span>
-        </ng-template>
-      </div>
-  
-      <!-- Submit Review -->
-      <div *ngIf="user?.user_type === 'individual'" class="card p-3 mb-4">
-        <h6>Dê sua Avaliação:</h6>
-        <div class="star-rating mb-3">
-          <span
-            *ngFor="let star of [1, 2, 3, 4, 5]"
-            class="star"
-            (click)="userRating = star"
-            [class.selected]="star <= userRating"
-            >★</span
-          >
-        </div>
-        <textarea
-          [(ngModel)]="reviewText"
-          class="form-control"
-          rows="3"
-          placeholder="Escreva uma avaliação (opcional)"
-        ></textarea>
-        <button class="btn btn-dark mt-3" (click)="submitReview(userRating, reviewText)">
-            Enviar Avaliação
-          </button>
-      </div>
-  
-      <!-- Display Reviews -->
-      <div *ngFor="let review of reviews" class="card p-3 mb-3">
-        <div class="d-flex justify-content-between align-items-center">
-          <h6>{{ review.user.username }} <small>{{ review.date | date }}</small></h6>
-          <div class="star-rating">
-            <span
-              *ngFor="let star of [1, 2, 3, 4, 5]"
-              class="star"
-              [class.selected]="star <= (review?.rating || 0)"
-              >★</span
-            >
-          </div>
-          
-          <button *ngIf="user?.user_type === 'admin' || user?.user_type === 'company'" (click)="onDeleteReview(review.id ?? 0)">Apagar
 
-            <i class="fa fa-trash"></i> 
-          </button>
-          
-        </div>
-        <p>{{ review.text }}</p>
+    <div class="col-md-6">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1 class="display-6">{{ product.name }}</h1>
+        <p>Este produto foi visto {{ product.count }} vezes</p>
       </div>
+      <div class="d-flex align-items-center">
+        <div *ngIf="product.is_on_promotion" class="d-flex align-items-center">
+          <h3 class="text-muted me-2" style="text-decoration: line-through;">
+            {{ product.old_price | currency: 'EUR' }}
+          </h3>
+          <h3 class="text-danger fw-bold me-2">
+            {{ product.price | currency: 'EUR' }}
+          </h3>
+          <span class="badge bg-warning text-dark badge-large">Promoção</span>
+        </div>
+        <div *ngIf="!product.is_on_promotion">
+          <h3 class="text-success">{{ product.price | currency: 'EUR' }}</h3>
+        </div>
+      </div>
+      <p class="lead">{{ product.description }}</p>
+
+      <!-- Product Details -->
+      <h5>Detalhes do Produto</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <th>Categoria</th>
+            <td>{{ product.category }}</td>
+          </tr>
+          <tr>
+            <th>Artista</th>
+            <td>{{ product.artist }}</td>
+          </tr>
+          <tr>
+            <th>Empresa</th>
+            <td>{{ product.company.name }}</td>
+          </tr>
+          <tr>
+            <th>Data de Adição</th>
+            <td>{{ product.addedProduct | date }}</td>
+          </tr>
+
+          <!-- Specific details for product types -->
+          <ng-container *ngIf="product.product_type === 'Vinil'">
+            <tr>
+              <th>Gênero</th>
+              <td>{{ product.specific_details.genre }}</td>
+            </tr>
+            <tr>
+              <th>Tamanho do LP</th>
+              <td>{{ product.specific_details.lpSize }}</td>
+            </tr>
+            <tr>
+              <th>Data de Lançamento</th>
+              <td>{{ product.addedProduct | date }}</td>
+            </tr>
+            <tr>
+              <th>Stock</th>
+              <td>{{ product.stock }}</td>
+            </tr>
+          </ng-container>
+
+          <ng-container *ngIf="product.product_type === 'CD'">
+            <tr>
+              <th>Gênero</th>
+              <td>{{ product.specific_details.genre }}</td>
+            </tr>
+            <tr>
+              <th>Data de Lançamento</th>
+              <td>{{ product.addedProduct | date}}</td>
+            </tr>
+            <tr>
+              <th>Stock</th>
+              <td>{{ product.stock }}</td>
+            </tr>
+          </ng-container>
+
+          <ng-container *ngIf="product.product_type === 'Clothing'">
+            <tr>
+              <th>Cor</th>
+              <td>{{ product.specific_details.color }}</td>
+            </tr>
+          </ng-container>
+
+          <ng-container *ngIf="product.product_type === 'Accessory'">
+            <tr>
+              <th>Material</th>
+              <td>{{ product.specific_details.material }}</td>
+            </tr>
+            <tr>
+              <th>Cor</th>
+              <td>{{ product.specific_details.color }}</td>
+            </tr>
+            <tr>
+              <th>Tamanho</th>
+              <td>{{ product.specific_details.size }}</td>
+            </tr>
+            <tr>
+              <th>Stock</th>
+              <td>{{ product.specific_details.stock }}</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+
+      <!-- Size Selector (if Clothing) -->
+      <div *ngIf="product.product_type === 'Clothing'" class="mb-3">
+        <label class="form-label fw-bold">Tamanho</label>
+        <div class="size-selector">
+          <button *ngFor="let size of sizes" [class.btn-success]="selectedSize === size.id"
+            [class.btn-dark]="selectedSize !== size.id" (click)="selectSize(size.id)" class="btn btn-dark m-1">
+            {{ size.size }} - {{ size.stock }} Unidades Disponíveis </button>
+        </div>
+      </div>
+
+      <!-- Add to Cart -->
+      <div class="mb-3">
+        <label for="quantity" class="form-label">Quantidade</label>
+        <input type="number" id="quantity" [(ngModel)]="quantity" class="form-control" min="1" />
+      </div>
+      <button class="btn btn-dark w-100" (click)="addToCart()">Adicionar ao carrinho</button>
     </div>
   </div>
-  
+  <!-- Chat with the Company -->
+  <div class="chat-section mt-5">
+    <div class="alert alert-success">
+      <h5>Está com dúvidas em relação ao produto?</h5>
+      <p>Converse diretamente com a empresa para tirar suas dúvidas sobre este produto.</p>
+      <a [routerLink]="'/chat/' + product.company.id" class="btn btn-success">
+        Converse com a Empresa
+      </a>
+    </div>
+  </div>
+  <!-- Reviews Section -->
+  <div class="reviews mt-5">
+    <h5>Classificação Média:</h5>
+    <div class="d-flex align-items-center mb-3">
+      <div *ngIf="isNumeric(averageRating); else noRating" class="star-rating">
+        <span *ngFor="let star of [1, 2, 3, 4, 5]" class="star" [class.selected]="star <= averageRating">★</span>
+        <span>({{ averageRating | number: '1.1-1' }})</span>
+      </div>
+      <ng-template #noRating>
+        <span>{{ averageRating }}</span>
+      </ng-template>
+    </div>
+
+    <!-- Submit Review -->
+    <div *ngIf="user?.user_type === 'individual'" class="card p-3 mb-4">
+      <h6>Dê sua Avaliação:</h6>
+      <div class="star-rating mb-3">
+        <span *ngFor="let star of [1, 2, 3, 4, 5]" class="star" (click)="userRating = star"
+          [class.selected]="star <= userRating">★</span>
+      </div>
+      <textarea [(ngModel)]="reviewText" class="form-control" rows="3"
+        placeholder="Escreva uma avaliação (opcional)"></textarea>
+      <button class="btn btn-dark mt-3" (click)="submitReview(userRating, reviewText)">
+        Enviar Avaliação
+      </button>
+    </div>
+
+    <!-- Display Reviews -->
+    <div *ngFor="let review of reviews" class="card p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h6>{{ review.user.username }} <small>{{ review.date | date }}</small></h6>
+        <div class="star-rating">
+          <span *ngFor="let star of [1, 2, 3, 4, 5]" class="star"
+            [class.selected]="star <= (review?.rating || 0)">★</span>
+        </div>
+
+        <button *ngIf="user?.user_type === 'admin' || user?.user_type === 'company'"
+          class="btn btn-danger btn-sm d-flex align-items-center gap-1" (click)="onDeleteReview(review.id ?? 0)">
+          <i class="fa fa-trash me-1"></i> Apagar
+        </button>
+
+
+      </div>
+      <p>{{ review.text }}</p>
+    </div>
+  </div>
+</div>
