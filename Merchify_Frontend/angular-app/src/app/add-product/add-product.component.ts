@@ -7,6 +7,7 @@ import { ArtistsService } from '../artists.service';
 import { Artist } from '../models/artista';
 import { CompaniesService } from '../companhia.service';
 import { AuthService } from '../auth.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-add-product',
@@ -28,7 +29,8 @@ export class AddProductComponent implements OnInit {
     private router: Router,
     private artistsService: ArtistsService,
     private companiesService: CompaniesService,
-    private authService: AuthService
+    private authService: AuthService,
+    private location: Location
   ) {
     this.productForm = this.fb.group({
       productType: ['vinil', Validators.required],
@@ -155,7 +157,7 @@ export class AddProductComponent implements OnInit {
       this.productService.addProduct(formData).then(response => {
         console.log('Product added successfully:', response);
         alert('Product added successfully!');
-        this.router.navigate(['/products']);
+        this.location.back();
       }).catch(error => {
         console.error('Error adding product:', error);
         alert('Failed to add product.');
