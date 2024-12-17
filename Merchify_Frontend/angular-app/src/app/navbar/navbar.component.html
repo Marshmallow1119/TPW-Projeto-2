@@ -42,25 +42,10 @@ style="padding: 0.25rem 0; min-height: 50px;">
         <li *ngIf="user?.user_type === 'admin'" class="nav-item">
           <a class="nav-link" [routerLink]="'/admin-home'" routerLinkActive="active" [ngClass]="{ 'text-white': theme === 'christmas' }">Dashboard</a>
         </li>
+        <li *ngIf="user?.user_type === 'company'" class="nav-item">
+          <a class="nav-link"  [routerLink]="['/my-company-products', user.company.id]"   routerLinkActive="active" [ngClass]="{ 'text-white': theme === 'christmas' }">Os meus Produtos</a>
+        </li>
       </ul>
-
-      <!-- Search and Theme Button -->
-      <div class="search-login-container ms-auto d-flex">
-        <!-- Guest Login Section -->
-        <ng-template #loginSection>
-          <div class="login-button-container">
-            <a class="btn btn-outline-dark" [ngClass]="{
-              'btn-outline-dark': theme !== 'christmas',
-              'btn-outline-light': theme === 'christmas'
-            }" (click)="handleLogin()">
-              <i class="fa fa-user"></i> Login
-            </a>
-          </div>
-        </ng-template>
-        <ng-container *ngIf="!user">
-          <ng-container *ngTemplateOutlet="loginSection"></ng-container>
-        </ng-container>
-      </div>
 
       <!-- User Options -->
       <div *ngIf="user" class="ms-auto d-flex align-items-center">
@@ -210,6 +195,24 @@ style="padding: 0.25rem 0; min-height: 50px;">
         </a>
       </div>
     </div>
+          <!-- Search and Theme Button -->
+          <div class="search-login-container ms-auto d-flex">
+            <!-- Guest Login Section -->
+            <ng-template #loginSection>
+              <div class="login-button-container">
+                <a class="btn btn-outline-dark" [ngClass]="{
+                  'btn-outline-dark': theme !== 'christmas',
+                  'btn-outline-light': theme === 'christmas'
+                }" (click)="handleLogin()">
+                  <i class="fa fa-user"></i> Login
+                </a>
+              </div>
+            </ng-template>
+            <ng-container *ngIf="!user">
+              <ng-container *ngTemplateOutlet="loginSection"></ng-container>
+            </ng-container>
+          </div>
+    
     <app-theme-button></app-theme-button>
 
   </div>

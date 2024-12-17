@@ -41,21 +41,8 @@ export class AuthService {
         if (!response.access || !response.refresh) {
           throw new Error('Missing tokens in the response');
         }
-
-        const user: User = {
-          id: response.id || 0,
-          username,
-          firstname: response.firstname,
-          lastname: response.lastname,
-          user_type: response.user_type,
-          address: response.address,
-          email: response.email,
-          phone: response.phone,
-          country: response.country,
-          number_of_purchases: response.number_of_purchases || 0,
-          balance: response.balance || 0,
-        };
-
+        console.log(response);
+        let user: User = response.user;
         this.userSubject.next(user);
         localStorage.setItem('accessToken', response.access);
         localStorage.setItem('refreshToken', response.refresh);

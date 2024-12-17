@@ -81,12 +81,22 @@ export class ProductsPageComponent implements OnInit {
   
 
   applyFilters(filters: any): void {
-    console.log('Applying filters:', filters);
   
     this.filteredProducts = this.products.filter((product) => {
-      console.log('Checking product:', product);
   
       const matchesType = !filters.type || product.product_type === filters.type;
+
+      let matchesSale = true;
+      if (filters.onSale && product.is_on_promotion) {
+        matchesSale =  true;
+      }
+      else if (!filters.onSale && !product.is_on_promotion) {
+        matchesSale =  true;
+      }
+      else {
+        matchesSale =  false;
+      }
+        
   
       const matchesPrice =
         (!filters.min_price || product.price >= filters.min_price) &&
@@ -104,28 +114,18 @@ export class ProductsPageComponent implements OnInit {
         (!filters.colorAccessory ||
           (product.product_type === 'Accessory' && product.specific_details?.color === filters.colorAccessory));
   
-      const matchesSize =
+        const matchesSize =
         !filters.size ||
-        (product.product_type === 'Accessory' && product.specific_details?.size === filters.size) ||
         (product.product_type === 'Clothing' &&
-          product.specific_details?.sizes?.some((size: any) => size === filters.size));
-
+          product.stock_size?.some((sizeObj: any) => sizeObj.size === filters.size));
+        console.log(product.stock_size);
         console.log(product.artist.id);
         console.log(filters.artist);
       const matchesArtist =
         !filters.artist || product.artist.id.toString() === filters.artist; 
+
   
-      // Log matching criteria for debugging
-      console.log(`Product: ${product.name}`, {
-        matchesType,
-        matchesPrice,
-        matchesGenre,
-        matchesColor,
-        matchesSize,
-        matchesArtist,
-      });
-  
-      return matchesType && matchesPrice && matchesGenre && matchesColor && matchesSize && matchesArtist;
+      return matchesType && matchesPrice && matchesGenre && matchesColor && matchesSize && matchesArtist && matchesSale;
     });
   
     console.log('Filtered products:', this.filteredProducts);

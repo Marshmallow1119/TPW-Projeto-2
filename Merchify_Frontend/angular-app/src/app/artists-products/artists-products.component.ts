@@ -70,13 +70,55 @@ export class ArtistsProductsComponent implements OnInit {
   }
 
   onFiltersApplied(filters: any): void {
-    console.log('Filtros aplicados:', filters); 
+  
     this.filteredProducts = this.products.filter((product) => {
-      if (filters.genreVinyl && product.genre !== filters.genreVinyl) return false;
-      if (filters.colorClothing && product.color !== filters.colorClothing) return false;
-      if (filters.min_price && product.price < filters.min_price) return false;
-      if (filters.max_price && product.price > filters.max_price) return false;
-      return true;
+  
+      const matchesType = !filters.type || product.product_type === filters.type;
+
+      let matchesSale = true;
+      if (filters.onSale && product.is_on_promotion) {
+        matchesSale =  true;
+      }
+      else if (!filters.onSale && !product.is_on_promotion) {
+        matchesSale =  true;
+      }
+      else {
+        matchesSale =  false;
+      }
+        
+  
+      const matchesPrice =
+        (!filters.min_price || product.price >= filters.min_price) &&
+        (!filters.max_price || product.price <= filters.max_price);
+  
+      const matchesGenre =
+        (!filters.genreVinyl ||
+          (product.product_type === 'Vinil' && product.specific_details?.genre === filters.genreVinyl)) &&
+        (!filters.genreCD ||
+          (product.product_type === 'CD' && product.specific_details?.genre === filters.genreCD));
+  
+      const matchesColor =
+        (!filters.colorClothing ||
+          (product.product_type === 'Clothing' && product.specific_details?.color === filters.colorClothing)) &&
+        (!filters.colorAccessory ||
+          (product.product_type === 'Accessory' && product.specific_details?.color === filters.colorAccessory));
+  
+      const matchesSize =
+        !filters.size ||
+        (product.product_type === 'Accessory' && product.specific_details?.size === filters.size) ||
+        (product.product_type === 'Clothing' &&
+          product.specific_details?.sizes?.some((size: any) => size === filters.size));
+
+        console.log(product.artist.id);
+        console.log(filters.artist);
+      const matchesArtist =
+        !filters.artist || product.artist.id.toString() === filters.artist; 
+
+  
+      return matchesType && matchesPrice && matchesGenre && matchesColor && matchesSize && matchesArtist && matchesSale;
     });
+  
+    console.log('Filtered products:', this.filteredProducts);
   }
+
 }
