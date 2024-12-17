@@ -545,8 +545,7 @@ def productDetails(request, identifier):
                 stock=specific_details.get('stock', product.accessory.stock)
             )
         product.save()
-
-        # Serialize and return updated product
+        
         updated_product = ProductSerializer(product, context={'request': request})
         return Response(updated_product.data, status=status.HTTP_200_OK)
 
@@ -558,7 +557,8 @@ def search(request):
     query = request.GET.get('search', '').strip()
 
     if query:
-        products = Product.objects.filter(Q(name__icontains=query) | Q(artist__name__icontains=query)).exclude(name__isnull=True).exclude(name='')
+        print(query)
+        products = Product.objects.filter(Q(name__icontains=query)).exclude(name='')
         artists = Artist.objects.filter(name__icontains=query).exclude(name__isnull=True).exclude(name='')
     else:
         products = Product.objects.none()
@@ -571,29 +571,12 @@ def search(request):
         favorited_artist_ids = []
         favorited_product_ids = []
 
-    artist_results = [
-        {
-            'id': artist.id,
-            'name': artist.name,
-            'is_favorited': artist.id in favorited_artist_ids,
-            'image': artist.image.url if artist.image else None
-        }
-        for artist in artists
-    ]
-
-    product_results = [
-        {
-            'id': product.id,
-            'name': product.name,
-            'artist_name': product.artist.name if product.artist else None,
-            'is_favorited': product.id in favorited_product_ids,
-            'image': product.image.url if product.image else None
-        }
-        for product in products
-    ]
+    artists_results = ArtistSerializer(artists, many=True, context={'request': request}).data
+    product_results = ProductSerializer(products, many=True, context={'request': request}).data
+    print(product_results)
     return Response({
         'products': product_results,
-        'artists': artist_results,
+        'artists': artists_results,
         'query': query,
     })
 

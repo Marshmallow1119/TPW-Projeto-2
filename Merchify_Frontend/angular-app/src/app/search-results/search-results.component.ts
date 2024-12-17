@@ -6,6 +6,7 @@ import { RouterLink, RouterModule } from '@angular/router';
 import { ArtistsCardComponent } from '../artists-card/artists-card.component';
 import { ProductsListComponent } from '../products-list/products-list.component';
 import { ProductCardComponent } from '../product-card/product-card.component';
+import { Product } from '../models/produto';
 
 @Component({
   selector: 'app-search-results',
@@ -16,7 +17,7 @@ import { ProductCardComponent } from '../product-card/product-card.component';
 export class SearchResultsComponent implements OnInit {
   searchQuery: string = '';
   artists: any[] = [];
-  products: any[] = [];
+  products: Product[] = [];
   isLoading: boolean = false;
 
   constructor(
@@ -40,6 +41,7 @@ export class SearchResultsComponent implements OnInit {
       this.artists = results.artists;
       console.log('Artists:', this.artists); 
       this.products = results.products;
+      console.log('Products:', this.products);
     } catch (error) {
       console.error('Error fetching search results:', error);
     } finally {
