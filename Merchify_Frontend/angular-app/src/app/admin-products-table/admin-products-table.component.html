@@ -48,23 +48,28 @@
             <div *ngIf="isVinil(product)">
               <strong>Genre:</strong> {{ product.specific_details.genre }} <br />
               <strong>LP Size:</strong> {{ product.specific_details.lpSize }} <br />
-              <strong>Release Date:</strong> {{ product.specific_details.releaseDate }}
+              <strong>Release Date:</strong> {{ product.specific_details.releaseDate }} <br/>
+              <strong>Stock:  </strong> {{product.specific_details.stock}}
             </div>
             <div *ngIf="isCD(product)">
-              <strong>Genre:</strong> {{ product.genre }} <br />
-              <strong>Release Date:</strong> {{ product.releaseDate }}
+              <strong>Genre:</strong> {{ product.specific_details.genre }} <br />
+              <strong>Release Date:</strong> {{ product.specific_details.releaseDate }}
+              <strong>Stock:  </strong> {{product.specific_details.stock}}
             </div>
             <div *ngIf="isClothing(product)">
               <strong>Color:</strong> {{ product.specific_details.color }} <br />
-              <strong>Sizes:</strong>
-              <span *ngFor="let size of product.sizes; let i = index">
-                {{ size.size }}<span *ngIf="i < product.sizes.length - 1">, </span>
-              </span>
+              <strong>Sizes & Stock:</strong>
+              <ul class="list-unstyled mb-0">
+                <li *ngFor="let stock of product.stock_size">
+                  <strong>{{ stock.size }}</strong>: {{ stock.stock }} in stock
+                </li>
+              </ul>
             </div>
             <div *ngIf="isAccessory(product)">
               <strong>Material:</strong> {{ product.specific_details.material }} <br />
               <strong>Color:</strong> {{ product.specific_details.color }} <br />
-              <strong>Size:</strong> {{ product.specific_details.size }}
+              <strong>Size:</strong> {{ product.specific_details.size }} <br />
+              <strong>Stock: </strong> {{product.specific_details.stock}} 
             </div>
           </td>
           <td class="text-center">

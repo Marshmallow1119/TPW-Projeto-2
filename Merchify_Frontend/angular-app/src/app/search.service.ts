@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { base64toBlob } from './utils'; // Adjust the path to your utility functions
-import { Product } from './models/produto'; // Adjust the path to your models
-import { Artist } from './models/artista'; // Adjust the path to your models
+import { Product } from './models/produto'; 
+import { Artist } from './models/artista';
 import { CONFIG } from './config';
 
 @Injectable({
@@ -27,17 +26,10 @@ export class SearchService {
   
       const data = await response.json();
       console.log('Fetched Search Results:', data); // Debug log
+        console.log('Fetched Search Results:', data); // Debug log
+      const artists: Artist[] = (data.artists || [])
   
-      const artists: Artist[] = (data.artists || []).map((artist: any) => ({
-        ...artist,
-        image_url: `http://localhost:8000${artist.image}`, // Prepend base URL
-      }));
-  
-      const products: Product[] = (data.products || []).map((product: any) => ({
-        ...product,
-        image_url: `http://localhost:8000${product.image}`, // Prepend base URL
-      }));
-  
+      const products: Product[] = (data.products || [])
       return { artists, products };
     } catch (error) {
       console.error('Error fetching search results:', error);

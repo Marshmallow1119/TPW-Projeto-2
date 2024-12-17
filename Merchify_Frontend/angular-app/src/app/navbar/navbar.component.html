@@ -68,23 +68,6 @@ style="padding: 0.25rem 0; min-height: 50px;">
           Bem-Vindo(a), {{ user.username }}
         </div>
         
-        <!-- Search Form -->
-        <form class="d-flex align-items-center me-3" (submit)="onSearch()">
-          <input
-            class="form-control search-input"
-            type="text"
-            placeholder="Pesquisar"
-            [(ngModel)]="searchQuery"
-            name="search"
-            (keyup)="onKeyUp()"
-          />
-          <button class="btn btn-outline-dark" type="submit" [ngClass]="{
-            'btn-outline-dark': theme !== 'christmas',
-            'btn-outline-light': theme === 'christmas'
-          }">
-            <i class="fa fa-search"></i>
-          </button>
-        </form>
 
         <!-- User Actions -->
         <ng-container [ngSwitch]="user.user_type">
@@ -282,8 +265,25 @@ style="padding: 0.25rem 0; min-height: 50px;">
         </a>
       </div>
     </div>
-          <!-- Search and Theme Button -->
-          <div class="search-login-container ms-auto d-flex">
+
+        <!-- Search Form -->
+        <form class="d-flex align-items-center me-3" (submit)="onSearch()">
+          <input
+            class="form-control search-input"
+            type="text"
+            placeholder="Pesquisar"
+            [(ngModel)]="searchQuery"
+            name="search"
+            (keyup)="onKeyUp()"
+          />
+          <button class="btn btn-outline-dark" type="submit" [ngClass]="{
+            'btn-outline-dark': theme !== 'christmas',
+            'btn-outline-light': theme === 'christmas'
+          }">
+            <i class="fa fa-search"></i>
+          </button>
+        </form>
+    <div class="search-login-container ms-auto d-flex">
             <!-- Guest Login Section -->
             <ng-template #loginSection>
               <div class="login-button-container">

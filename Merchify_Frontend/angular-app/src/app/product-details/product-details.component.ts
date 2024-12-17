@@ -8,6 +8,7 @@ import { AuthService } from '../auth.service';
 import { User } from '../models/user';
 import { Review } from '../models/review';
 import { ReviewsService } from '../reviews.service';
+import { Product } from '../models/produto';
 
 @Component({
   selector: 'app-product-details',
@@ -17,7 +18,7 @@ import { ReviewsService } from '../reviews.service';
   styleUrls: ['./product-details.component.css'],
 })
 export class ProductDetailsComponent implements OnInit {
-  product: any = null;
+  product: Product | null = null;
   sizes: any[] = [];
   selectedSize: number | null = null;
   averageRating: number = 0;
@@ -50,43 +51,25 @@ export class ProductDetailsComponent implements OnInit {
     this.authService.user$.subscribe((user) => {
       this.user = user;
     });
-    this.loadProductDetails(productId);
   }
 
   private async loadProductDetails(productId: number): Promise<void> {
+    console.log('Loading product details:', productId); // Debug log
     this.loading = true;
     this.errorMessage = '';
+  
     try {
       const response = await this.productDetailsService.getProductDetails(productId);
-  
       console.log('Raw Product details:', response);
   
-      // Map the response to the `Product` interface
-      this.product = {
-        id: response.id,
-        name: response.name,
-        description: response.description || 'Descrição não disponível.',
-        price: response.price,
-        image_url: response.image_url,
-        artist: response.artist.name,
-        company: response.company,
-        category: response.category,
-        addedProduct: new Date(response.addedProduct), // Convert to Date object
-        count: response.count,
-        average_rating: response.average_rating || 0,
-        product_type: response.product_type,
-        stock: response.stock || 0,
-        specific_details: response.specific_details || null,
-        is_on_promotion: response.is_on_promotion,
-        old_price: response.old_price,
-      };
-  
-      if (this.product.product_type === 'Clothing') {
+      this.product = response;
+
+      if (this.product && this.product.product_type === 'Clothing') {
         this.sizes = this.product.specific_details.sizes || [];
       } else {
         this.sizes = [];
       }
-
+  
     } catch (error) {
       console.error('Error loading product details:', error);
       this.errorMessage = 'Erro ao carregar os detalhes do produto. Tente novamente mais tarde.';
@@ -94,6 +77,7 @@ export class ProductDetailsComponent implements OnInit {
       this.loading = false;
     }
   }
+  
   
 
   selectSize(sizeId: number): void {
@@ -116,6 +100,11 @@ export class ProductDetailsComponent implements OnInit {
       return;
     }
 
+    if (!this.product) {
+      alert('Produto não encontrado.');
+      return;
+    }
+
     const review: Review = {
       user: this.user,
       product: this.product,
@@ -124,26 +113,28 @@ export class ProductDetailsComponent implements OnInit {
       date: new Date(),
     };
 
-    this.reviewService.addReview(review, this.product.id)
-    .then((response) => {
-      if (response.status === 'success') { 
-        this.reviews.push(review);
-        this.reviewText = '';
-        this.userRating = 0;
-  
-        if (review.rating !== undefined) {
-          this.averageRating =
-            (this.averageRating * (this.reviews.length - 1) + review.rating) / this.reviews.length;
+    if (this.product) {
+      this.reviewService.addReview(review, this.product.id)
+      .then((response) => {
+        if (response.status === 'success') { 
+          this.reviews.push(review);
+          this.reviewText = '';
+          this.userRating = 0;
+    
+          if (review.rating !== undefined) {
+            this.averageRating =
+              (this.averageRating * (this.reviews.length - 1) + review.rating) / this.reviews.length;
+          }
+        } else {
+          console.error('Failed to add review:', response.message || 'Unknown error');
+          alert('Failed to add review: ' + (response.message || 'Unknown error'));
         }
-      } else {
-        console.error('Failed to add review:', response.message || 'Unknown error');
-        alert('Failed to add review: ' + (response.message || 'Unknown error'));
-      }
-    })
-    .catch((error) => {
-      console.error('Error adding review:', error);
-      alert('An unexpected error occurred while adding the review.');
-    });
+      })
+      .catch((error) => {
+        console.error('Error adding review:', error);
+        alert('An unexpected error occurred while adding the review.');
+      });
+    }
   
   }
 
@@ -167,7 +158,7 @@ export class ProductDetailsComponent implements OnInit {
       return;
     }
 
-    if (this.product.product_type === 'Clothing' && !this.selectedSize) {
+    if (this.product && this.product.product_type === 'Clothing' && !this.selectedSize) {
       alert('Por favor, selecione um tamanho.');
       return;
     }
@@ -188,7 +179,10 @@ export class ProductDetailsComponent implements OnInit {
         throw new Error('Usuário não autenticado.');
       }
 
-      const productId = this.product.id;
+      const productId = this.product?.id;
+      if (!productId) {
+        throw new Error('Produto não encontrado.');
+      }
       console.log('Adicionando ao carrinho:', { userId, productId, data });
 
       const response = await this.cartService.addToCart(userId, productId, data);
