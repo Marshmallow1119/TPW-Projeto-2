@@ -9,9 +9,9 @@ import { CommonModule } from '@angular/common';
   styleUrl: './theme-button.component.css'
 })
 export class ThemeButtonComponent implements OnInit {
-  constructor(public themeService: ThemeService) {} // Inject the ThemeService
+  constructor(public themeService: ThemeService) {} 
   toggleTheme(): void {
-    this.themeService.toggleTheme(); // Call the ThemeService toggle method
+    this.themeService.toggleTheme(); 
   }
 
   ngOnInit(): void {

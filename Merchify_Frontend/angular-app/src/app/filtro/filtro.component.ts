@@ -16,7 +16,7 @@ import { Product } from '../models/produto';
 })
 export class FiltroComponent implements OnInit {
   @Output() filtersChanged = new EventEmitter<any>();
-  @Input() colors: string[] = []; // Added Input property
+  @Input() colors: string[] = []; 
   @Input() genres: string[] = [];
   @Input() showArtistFilter: boolean = true;
   @Input() sizes: string[] = [];
@@ -24,8 +24,8 @@ export class FiltroComponent implements OnInit {
 
 
   artists: Artist[] = [];
-  selectedArtist: string = ''; // To store the selected artist ID
-  selectedArtistName: string = ''; // Store the selected artist's name
+  selectedArtist: string = ''; 
+  selectedArtistName: string = ''; 
 
   productTypes = [
     { value: 'Vinil', label: 'Vinil' },
@@ -79,7 +79,7 @@ export class FiltroComponent implements OnInit {
   }
 
   onArtistChange(): void {
-    this.filters.artist = this.selectedArtist; // Update the selected artist in filters
+    this.filters.artist = this.selectedArtist;
     this.emitFilterChanges();
   }
 
@@ -107,9 +107,9 @@ export class FiltroComponent implements OnInit {
   }
 
   selectArtist(artist: Artist): void {
-    this.selectedArtist = artist.id.toString(); // Convert to string
+    this.selectedArtist = artist.id.toString();
     this.selectedArtistName = artist.name;
-    this.filters.artist = artist.id.toString(); // Convert to string
+    this.filters.artist = artist.id.toString();
     this.emitFilterChanges();
   }
   

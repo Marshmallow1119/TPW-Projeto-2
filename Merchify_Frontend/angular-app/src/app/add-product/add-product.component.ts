@@ -78,7 +78,6 @@ export class AddProductComponent implements OnInit {
         this.isAdmin = user?.user_type === 'admin';
         console.log('isAdmin:', this.isAdmin);
 
-        // Fetch companies only if the user is admin
         if (this.isAdmin) {
           this.loadCompanies();
         }
@@ -89,7 +88,6 @@ export class AddProductComponent implements OnInit {
     });
   }
 
-  // Separate method to fetch companies
   private loadCompanies(): void {
     this.companiesService.getCompanies()
       .then(companies => {
@@ -106,10 +104,10 @@ export class AddProductComponent implements OnInit {
       const group = this.productForm.get(control);
       if (group) {
         if (control === productType) {
-          group.enable(); // Enable the selected group
+          group.enable();
         } else {
-          group.reset(); // Reset the group to empty values
-          group.disable(); // Disable other groups
+          group.reset(); 
+          group.disable();  
         }
       }
     });
@@ -171,7 +169,7 @@ export class AddProductComponent implements OnInit {
       });
     } else {
       alert('Please fill out all required fields.');
-      this.debugFormErrors(this.productForm); // Call the debug method
+      this.debugFormErrors(this.productForm);
       this.productForm.markAllAsTouched();
     }
   }
@@ -181,7 +179,7 @@ export class AddProductComponent implements OnInit {
       const currentPath = path ? `${path}.${key}` : key;
   
       if (control instanceof FormGroup) {
-        this.debugFormErrors(control, currentPath); // Recursively debug nested form groups
+        this.debugFormErrors(control, currentPath); 
       } else if (control?.invalid) {
         console.error(`Invalid Field: ${currentPath}`, {
           value: control.value,

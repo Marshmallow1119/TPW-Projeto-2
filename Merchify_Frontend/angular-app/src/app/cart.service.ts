@@ -68,7 +68,7 @@ export class CartService {
   }
 
   async updateCartItem(userId: number, itemId: number, data: any): Promise<any> {
-    const token = await this.getToken(); // Obtém o token para autenticação
+    const token = await this.getToken(); 
     try {
       const response = await fetch(`${this.baseUrl}/cart/${userId}/item/${itemId}/`, {
         method: 'PUT',
@@ -77,7 +77,7 @@ export class CartService {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data), // Envia a nova quantidade no corpo da requisição
+        body: JSON.stringify(data), 
       });
   
       if (!response.ok) {
@@ -85,7 +85,7 @@ export class CartService {
         throw new Error(`Erro HTTP ${response.status}: ${errorText}`);
       }
   
-      return await response.json(); // Retorna a resposta do backend
+      return await response.json(); 
     } catch (error) {
       console.error('Erro ao atualizar item do carrinho:', error);
       throw error;
@@ -94,7 +94,7 @@ export class CartService {
   
 
   async removeCartItem(userId: number, itemId: number): Promise<any> {
-    const token = await this.getToken(); // Obtém o token para autenticação
+    const token = await this.getToken(); 
     try {
       const response = await fetch(`${this.baseUrl}/cart/${userId}/item/${itemId}/`, {
         method: 'DELETE',

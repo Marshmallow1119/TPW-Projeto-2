@@ -11,7 +11,6 @@ export class ProductsService {
 
   constructor(private router:Router) { }
 
-  //getProduct
   async getProduct(id: number): Promise<Product> {
     try {
       const response = await fetch(`${this.baseUrl}/product/${id}`);
@@ -26,7 +25,6 @@ export class ProductsService {
   }
 
 
-  //getProducts
   async getProducts(): Promise<Product[]> {
     try {
       const response = await fetch(`${this.baseUrl}/products/`);
@@ -64,19 +62,17 @@ export class ProductsService {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-          // Do NOT set 'Content-Type'; fetch will handle it automatically.
         },
         body: formData,
       });
   
-      // Check if the response is successful
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Server Error:', errorData);
         throw new Error(`Failed to update product: ${response.statusText}`);
       }
   
-      const result = await response.json(); // Parse and return response data
+      const result = await response.json(); 
       return result;
     } catch (error) {
       console.error('Error editing product:', error);

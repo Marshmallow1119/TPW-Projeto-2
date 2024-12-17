@@ -26,7 +26,7 @@ export class ProfileComponent implements OnInit {
     new_password: '',
     confirm_new_password: '',
   }; 
-  uploadedImage: File | null = null; // Armazena a imagem carregada
+  uploadedImage: File | null = null;
 
 
   constructor(private authService: AuthService, private profileService: ProfileService) {}
@@ -72,11 +72,11 @@ export class ProfileComponent implements OnInit {
     formData.append('country', this.user.country || '');
   
     if (this.uploadedImage) {
-      formData.append('image', this.uploadedImage); // Adicionar a imagem
+      formData.append('image', this.uploadedImage); 
     }
   
     try {
-      await this.profileService.updateProfile(formData); // Enviar FormData
+      await this.profileService.updateProfile(formData);
       alert('Perfil atualizado com sucesso!');
       await this.loadProfile();
       this.editing = false;

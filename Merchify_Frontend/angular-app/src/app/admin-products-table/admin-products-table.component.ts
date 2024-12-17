@@ -38,7 +38,6 @@ export class AdminProductsTableComponent implements OnInit {
     }
   }
 
-  // Type guards for different product types
   isVinil(product: Product): product is Vinil {
     return product.product_type === 'Vinil';
   }
@@ -55,7 +54,6 @@ export class AdminProductsTableComponent implements OnInit {
     return product.product_type === 'Accessory';
   }
 
-  // Handle delete logic
   deleteProduct(id: number): void {
     this.productService.deleteProduct(id);
     this.products = this.products.filter((product) => product.id !== id);

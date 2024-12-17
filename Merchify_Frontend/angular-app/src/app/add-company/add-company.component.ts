@@ -94,7 +94,7 @@ export class AddCompanyComponent implements OnInit {
     });
   
     try {
-      const response = await this.companyService.addCompany(formData); // Await service call
+      const response = await this.companyService.addCompany(formData); 
       this.messages = [{ type: 'success', text: response.message }];
       this.router.navigate(['/admin-home']);
     } catch (error) {

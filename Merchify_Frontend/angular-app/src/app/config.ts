@@ -40,7 +40,6 @@ function determineEnvironment(): AppConfig {
       return PYTHONANYWHERE_CONFIG;
     }
 
-    // Detect Vercel-hosted domains
     if (hostname.includes('vercel.app')) {
       console.log('Using Vercel config');
       return VERCEL_CONFIG;
@@ -48,5 +47,5 @@ function determineEnvironment(): AppConfig {
   }
 
   console.log('Using PythonAnywhere config by default');
-  return PYTHONANYWHERE_CONFIG; // Fallback configuration
+  return PYTHONANYWHERE_CONFIG;
 }
