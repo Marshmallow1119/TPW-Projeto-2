@@ -4,6 +4,9 @@ import { RouterModule } from '@angular/router';
 import { Company } from '../models/company';
 import { Router } from '@angular/router';
 import { FavoritesService } from '../favorites.service';
+import { User } from '../models/user';
+import { AuthService } from '../auth.service';
+
 
 @Component({
   selector: 'app-companhias-card',
@@ -13,11 +16,23 @@ import { FavoritesService } from '../favorites.service';
   styleUrls: ['./companhias-card.component.css']
 })
 export class CompanhiasCardComponent {
-  constructor(private favoriteService: FavoritesService, private router: Router) {}
   @Input() company!: Company;
   @Input() isAuthenticated!: boolean;
-  @Input() userType!: string;
+  @Input() user: User | null = null;  
+  @Input() userType: string = '';
+  isAuthenticaded: boolean = false;
   
+
+  constructor(private favoriteService: FavoritesService, private router: Router,private authService: AuthService) {
+    this.authService.user$.subscribe((user) => {
+      this.user = user;
+      if (this.authService.isAuthenticated()) {
+        this.isAuthenticaded = true;
+        this.userType = user?.user_type || '';
+      }
+    });
+    console.log('user-cards:', this.user);
+  }
 
   toggleFavorite(event: Event): void {
     event.preventDefault(); 

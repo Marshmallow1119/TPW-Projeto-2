@@ -5,6 +5,9 @@ import { CompaniesService } from '../companhia.service';
 import { Company } from '../models/company';
 import { CompanhiasCardComponent } from '../companhias-card/companhias-card.component';
 import { FavoritesService } from '../favorites.service';
+import { User } from '../models/user';
+import { AuthService } from '../auth.service';
+
 
 interface FavoriteCompany {
   id: number;
@@ -22,19 +25,26 @@ interface FavoriteCompany {
 export class CompaniesPageComponent implements OnInit {
   companies: Company[] = [];
   isAuthenticated: boolean = false; 
-  userType: string = 'individual'; 
+  user: User | null = null;
+  userType: string = ''; 
 
-  constructor(private companiesService: CompaniesService, private favoriteService: FavoritesService) {}
+
+  constructor(private companiesService: CompaniesService, private favoriteService: FavoritesService, private authService: AuthService) {
+    this.authService.user$.subscribe((user) => {
+      this.user = user;
+      this.isAuthenticated = this.authService.isAuthenticated();
+      this.userType = user?.user_type || '';
+    });
+  }
 
   async ngOnInit(): Promise<void> {
     try {
       this.companies = await this.companiesService.getCompanies();
       let favoriteCompanies: FavoriteCompany[] = await this.favoriteService.getFavorites("company");
-      console.log('Companhias favoritos:', favoriteCompanies);
       for (let company of this.companies) {
         company.is_favorited = favoriteCompanies.some(favoriteCompanies => favoriteCompanies.company.id === company.id);
       }
-      console.log('Companhias carregados:', this.companies);
+      console.log('user:', this.user);
     } catch (error) {
       console.error('Error fetching Companhias:', error);
     }

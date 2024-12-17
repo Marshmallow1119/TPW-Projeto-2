@@ -8,7 +8,7 @@
 
   <!-- Favorite Icon -->
   <i
-    *ngIf="user?.is_authenticated && user?.user_type === 'individual'"
+    *ngIf="!isAuthenticaded || user?.user_type === 'individual'"
     class="fa fa-heart favorite-icon"
     [ngClass]="{ filled: product.is_favorited }"
     (click)="toggleFavorite($event,product.id)">

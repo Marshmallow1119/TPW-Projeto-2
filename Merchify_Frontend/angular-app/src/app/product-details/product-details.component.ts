@@ -143,7 +143,7 @@ export class ProductDetailsComponent implements OnInit {
       this.reviewService.deleteReview(reviewId)
         .then(() => {
           alert('Review apagada com sucesso!');
-          // Atualizar a lista de reviews ou redirecionar
+          this.reviews = this.reviews.filter((review) => review.id !== reviewId);
         })
         .catch(error => {
           console.error('Erro ao apagar a review:', error);

@@ -7,6 +7,8 @@ import { ActivatedRoute } from '@angular/router';
 import { Product } from '../models/produto';
 import { filter } from 'rxjs';
 import { Company } from '../models/company';
+import { User } from '../models/user';
+import { AuthService } from '../auth.service';
 
 @Component({
   standalone: true,
@@ -18,17 +20,24 @@ import { Company } from '../models/company';
 export class CompanyProductsComponent implements OnInit {
   company: any;
   products: Product[] = [];
-  filteredProducts: Product[] = []; // For filtered product list
-  isAuthenticated: boolean = false; // Placeholder, set based on actual authentication logic
-  user: any = null; // Placeholder for user object
+  filteredProducts: Product[] = []; 
+  isAuthenticated: boolean = false; 
+  user: User | null = null; 
+  userType: string = '';
 
   constructor(
     private route: ActivatedRoute,
-    private produtosCompanhiaService: ProdutosCompanhiaService
+    private produtosCompanhiaService: ProdutosCompanhiaService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.loadCompaniesAndProducts();
+    this.authService.user$.subscribe((user) => {
+      this.user = user;
+      this.isAuthenticated = this.authService.isAuthenticated();
+      this.userType = user?.user_type || '';
+    });
   }
 
   async loadCompaniesAndProducts(): Promise<void> {

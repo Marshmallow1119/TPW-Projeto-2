@@ -3,7 +3,6 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterModule } from '@angular/router';
 import { ProductsListComponent } from '../products-list/products-list.component';
-import { ProductsService } from '../products.service';
 import { Product } from '../models/produto';
 import { HomeService } from '../home.service';
 import { ArtistsListComponent } from '../artists-list/artists-list.component';
