@@ -5,6 +5,9 @@
   </div>
 
   <!-- Products Table -->
+  <button class="btn btn-dark mb-4 w-100" [routerLink]="['/add/product']">
+    Adicionar Produto
+  </button>
   <div *ngIf="products.length > 0; else noProducts">
     <table class="table table-bordered table-hover">
       <thead class="thead-light">

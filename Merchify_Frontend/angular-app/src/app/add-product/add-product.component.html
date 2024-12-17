@@ -17,7 +17,8 @@
               Tipo de Produto é obrigatório.
             </div>
           </div>
-  
+
+
           <div class="col-md-6">
             <label for="artist" class="form-label">Artista</label>
             <select class="form-select" formControlName="artist" id="artist">
@@ -29,6 +30,17 @@
           </div>
         </div>
   
+        <div *ngIf="isAdmin" class="row mb-3">
+          <div class="col-md-12">
+            <label for="company" class="form-label">Companhia</label>
+            <select class="form-select" formControlName="company" id="company">
+              <option *ngFor="let company of companies" [value]="company.id">{{ company.name }}</option>
+            </select>
+            <div *ngIf="productForm.get('company')?.touched && productForm.get('company')?.invalid" class="text-danger">
+              Companhia é obrigatória.
+            </div>
+          </div>
+        </div>
         <!-- Product Name and Price -->
         <div class="row mb-3">
           <div class="col-md-6">
