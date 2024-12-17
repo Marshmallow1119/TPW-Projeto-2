@@ -54,9 +54,7 @@
             "development": {
               "optimization": false,
               "sourceMap": true,
-              "namedChunks": true,
-              "vendorChunk": true,
-              "buildOptimizer": false
+              "namedChunks": true
             }
           },
           "defaultConfiguration": "production"
