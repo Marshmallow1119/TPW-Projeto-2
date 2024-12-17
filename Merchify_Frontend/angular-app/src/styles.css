@@ -19,7 +19,6 @@
     padding-left: 0px;
   }
 
-
   .dark-theme .navbar {
     background-color: #343a40 !important; 
     height: 80px;
@@ -64,6 +63,7 @@
   .dark-theme p {
     color: #f8f9fa !important;
   }
+
 
   .dark-theme .logo{
     filter: brightness(0) invert(1) !important;
@@ -198,7 +198,10 @@
     background-color: #343a40 !important;
   }
 
-
+  .dark-theme .border-dark {
+    border: 1px solid #ffffff !important;
+  }
+  
 
 
   body.dark-theme input:focus {
@@ -268,3 +271,6 @@
 
 
 
+  .dark-theme .theme-button{
+    color: #ffffff !important;
+  }
