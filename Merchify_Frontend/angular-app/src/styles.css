@@ -14,9 +14,9 @@
     transition: background-color 0.3s, color 0.3s;
   }
   
-  .fa-paint-brush {
-    color: #000000 !important;
-    padding-left: 10px;
+  .dark-theme .fa-paint-brush {
+    color: #ffffff !important;
+    padding-left: 0px;
   }
 
 

@@ -149,7 +149,7 @@ style="padding: 0.25rem 0; min-height: 50px;">
 
           <li class="nav-item dropdown" style="list-style-type: none; margin: 0; padding: 0;">
             <a
-              class="nav-link dropdown-toggle d-flex align-items-center justify-content-center rounded-circle bg-light"
+              class="nav-link dropdown-toggle d-flex align-items-center justify-content-center rounded-circle bg-light brush_circle"
               *ngSwitchCase="'admin'"
               href="#"
               id="themeDropdown"
@@ -164,7 +164,7 @@ style="padding: 0.25rem 0; min-height: 50px;">
               style="
                 width: 40px; 
                 height: 40px; 
-                border: 1px solid #ccc; 
+                border: 1px solid #000000; 
                 padding: 0;
                 margin-right: 10px;"
             >
@@ -172,7 +172,7 @@ style="padding: 0.25rem 0; min-height: 50px;">
             </a>
             <ul class="dropdown-menu dropdown-menu-end shadow-sm rounded" aria-labelledby="themeDropdown">
               <li>
-                <a class="dropdown-item d-flex align-items-center" (click)="changeTheme('default')" [ngClass]="{
+                <a class="dropdown-item d-flex align-items-center " (click)="changeTheme('default')" [ngClass]="{
                   'hover-default': theme === 'default',
                   'hover-dark': theme === 'dark',
                   'hover-christmas': theme === 'christmas'

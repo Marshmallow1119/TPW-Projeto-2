@@ -1,6 +1,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Agu+Display&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Agu+Display&family=Chicle&family=Modak&display=swap" rel="stylesheet">
+
 
 <div style="margin: 0; padding: 0;">
   <div 
@@ -49,10 +50,8 @@
     </button>
   </div>
 
-  <div *ngIf="theme === 'christmas'" class="christmas-theme">
-    <img src="assets/back3.jpg" alt="Fundo de Natal" class="background-image" />
-  
-    <h1 class="title">🎄 Merry Christmas! 🎅</h1>
+  <div *ngIf="theme === 'christmas'" class="christmas-theme">  
+    <h1 class="title">Merry Christmas!</h1>
     <div class="countdown-container">
       <countdown [config]="{ leftTime: getTimeUntilChristmas(), format: 'd:HH:mm:ss' }"></countdown>
     </div>
