@@ -279,6 +279,7 @@ class LoginSerializer(serializers.Serializer):
 class RegisterSerializer(serializers.ModelSerializer):
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
+    image = serializers.ImageField(required=False)
 
     class Meta:
         model = User

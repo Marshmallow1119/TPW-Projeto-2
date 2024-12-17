@@ -11,6 +11,7 @@ import { AuthService } from '../auth.service';
 import { ProfileService } from '../profile.service';
 import { ThemeService } from '../theme.service';
 import { CountdownModule } from 'ngx-countdown';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -56,6 +57,13 @@ export class HomeComponent {
     private profileService: ProfileService,
     private themeService: ThemeService
   ) {
+    this.themeService.theme$.pipe(
+      switchMap((theme) => {
+        console.log('NavbarComponent received theme:', theme);
+        this.theme = theme;
+        return this.loadHomeData(); 
+      })
+    ).subscribe();
     this.themeService.theme$.subscribe((theme) => {
       console.log('NavbarComponent received theme:', theme);
       this.theme = theme;
