@@ -15,12 +15,12 @@ import { BanUserModalComponent } from "../ban-user-modal/ban-user-modal.componen
 export class AdminUsersTableComponent {
   users: User[] = [];
   selectedUserId: number | null = null;
+  actionType: 'ban' | 'unban' = 'ban'; // Determines modal behavior
 
   constructor(private usersService: UsersService) {}
 
   async ngOnInit(): Promise<void> {
     await this.fetchUsers();
-    console.log('Users:', this.users);
   }
 
   async fetchUsers(): Promise<void> {
@@ -33,6 +33,12 @@ export class AdminUsersTableComponent {
 
   openBanUserModal(userId: number): void {
     this.selectedUserId = userId;
+    this.actionType = 'ban';
+  }
+
+  openUnbanUserModal(userId: number): void {
+    this.selectedUserId = userId;
+    this.actionType = 'unban';
   }
 
   closeBanUserModal(): void {
@@ -40,12 +46,26 @@ export class AdminUsersTableComponent {
   }
 
   async onConfirmBan(userId: number): Promise<void> {
-    console.log('Banning user with ID:', userId);
     try {
       await this.usersService.banUser(userId);
-      this.users = this.users.filter(user => user.id !== userId); // Update UI
+      this.users = this.users.map(user =>
+        user.id === userId ? { ...user, banned: true } : user
+      );
     } catch (error) {
       console.error('Error banning user:', error);
+    } finally {
+      this.closeBanUserModal();
+    }
+  }
+
+  async onConfirmUnban(userId: number): Promise<void> {
+    try {
+      await this.usersService.banUser(userId);
+      this.users = this.users.map(user =>
+        user.id === userId ? { ...user, banned: false } : user
+      );
+    } catch (error) {
+      console.error('Error unbanning user:', error);
     } finally {
       this.closeBanUserModal();
     }

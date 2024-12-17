@@ -611,7 +611,10 @@ def register_view(request):
 @permission_classes([IsAuthenticated])
 def ban_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
-    user.banned = True
+    if user.banned:
+        user.banned = False
+    else:
+        user.banned = True
     user.save()
     return JsonResponse({'message': 'User banned successfully!'})
 
@@ -628,7 +631,6 @@ def login(request):
             if hasattr(user, 'banned') and user.banned:  # Check if user is banned
                 raise PermissionDenied({"error": "Your account has been banned. Please contact support."})
             
-            # Generate tokens and return success response
             user_data = UserSerializer(user).data
             refresh = RefreshToken.for_user(user)
             return Response({
