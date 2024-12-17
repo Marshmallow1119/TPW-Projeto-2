@@ -182,12 +182,13 @@ export class AuthService {
         if (response.access && response.refresh) {
           localStorage.setItem('accessToken', response.access);
           localStorage.setItem('refreshToken', response.refresh);
-          
-          const user: User = response.user;
-  
-          this.userSubject.next(user); 
-          console.log('User registered and logged in:', user);
         }
+                  
+        const user: User = response.user;
+  
+        this.userSubject.next(user); 
+        console.log(response)
+        console.log('User registered and logged in:', user);
       }),
       catchError((error) => {
         console.error('Registration failed:', error);

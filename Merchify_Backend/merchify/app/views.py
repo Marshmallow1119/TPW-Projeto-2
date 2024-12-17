@@ -539,11 +539,9 @@ def produtos(request):
 
 @api_view(['POST'])
 def register_view(request):
-    # Extrai os dados do corpo da requisição
     data = request.data
 
     print(data)
-    # Validação manual dos campos
     errors = {}
 
     if 'first_name' not in data or not data['first_name']:
@@ -597,18 +595,15 @@ def register_view(request):
             email=data['email'],
             first_name=data['first_name'],
             last_name=data['last_name'],
-            password=data['password1'],  # Senha já validada
+            password=data['password1'], 
             phone=data['phone'],
             country=data['country'],
-            user_type='individual'  # Garantir que o tipo de usuário seja sempre "individual"
+            user_type='individual'
         )
-
-        print("user na view", user.user_type)
 
         if 'image' in data and data['image']:
             user.image = data['image']
 
-        print("imagem", user.image)
         
         user.save()
 
@@ -617,6 +612,7 @@ def register_view(request):
         return Response({
             'message': 'User registered successfully!',
             'access': str(refresh.access_token),
+            'user': UserSerializer(user).data,
             'refresh': str(refresh),
             'username': user.username,
             'id': user.id,
@@ -656,7 +652,8 @@ def login(request):
         user = authenticate(username=username, password=password)
         
         if user is not None:
-            if hasattr(user, 'banned') and user.banned:  # Check if user is banned
+            if hasattr(user, 'banned') and user.banned: 
+                print("aaa")
                 raise PermissionDenied({"error": "Your account has been banned. Please contact support."})
             
             user_data = UserSerializer(user).data
@@ -667,10 +664,8 @@ def login(request):
                 'user': user_data
             }, status=status.HTTP_200_OK)
         
-        # Invalid credentials
         return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
 
-    # Invalid request data
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
