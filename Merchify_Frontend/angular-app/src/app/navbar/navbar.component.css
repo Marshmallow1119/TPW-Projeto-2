@@ -24,6 +24,8 @@
     font-weight: bold; 
     color: #000; 
   }
+
+
   
   
   .search-login-container {
@@ -181,7 +183,6 @@
       background-color: transparent !important; /* Garante fundo transparente */
     }
 
-    
     .text-black {
       color: #000000 !important;
     }
