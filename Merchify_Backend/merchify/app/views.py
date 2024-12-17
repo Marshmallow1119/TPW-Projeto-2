@@ -611,7 +611,7 @@ def register_view(request):
 @permission_classes([IsAuthenticated])
 def ban_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
-    user.is_banned = True
+    user.banned = True
     user.save()
     return JsonResponse({'message': 'User banned successfully!'})
 
@@ -624,13 +624,11 @@ def login(request):
         password = serializer.validated_data['password']
         user = authenticate(username=username, password=password)
         
-        if user:
-            if user.banned: 
-                return Response(
-                    {"error": "Your account has been banned. Please contact support."}, 
-                    status=status.HTTP_403_FORBIDDEN
-                )
+        if user is not None:
+            if hasattr(user, 'banned') and user.banned:  # Check if user is banned
+                raise PermissionDenied({"error": "Your account has been banned. Please contact support."})
             
+            # Generate tokens and return success response
             user_data = UserSerializer(user).data
             refresh = RefreshToken.for_user(user)
             return Response({
@@ -639,7 +637,10 @@ def login(request):
                 'user': user_data
             }, status=status.HTTP_200_OK)
         
-        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)    
+        # Invalid credentials
+        return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
+
+    # Invalid request data
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
