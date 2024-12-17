@@ -52,6 +52,8 @@ export class ThemeService {
     this.currentTheme.next(theme); // Notify subscribers
     // Apply the theme to the body
     if (isPlatformBrowser(this.platformId)) {
+      //quero que verifique primeiro o dark-theme e depois o theme
+      
       document.body.className = ''; // Clear existing theme classes
       document.body.classList.add(`theme-${theme}`); // Add new theme class
       localStorage.setItem('theme', theme); // Save theme in localStorage
