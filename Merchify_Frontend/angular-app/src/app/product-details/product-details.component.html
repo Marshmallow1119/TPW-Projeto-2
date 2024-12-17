@@ -8,7 +8,7 @@
       <div class="col-md-6">
         <div class="d-flex justify-content-between align-items-center">
           <h1 class="display-6">{{ product.name }}</h1>
-          <p class="text-muted">Este produto foi visto {{ product.count }} vezes</p>
+          <p>Este produto foi visto {{ product.count }} vezes</p>
         </div>
         <p class="text-muted">{{ product.artist?.name }}</p>
         <div class="d-flex align-items-center">
@@ -158,6 +158,11 @@
               >★</span
             >
           </div>
+          <button (click)="onDeleteReview(review.id ?? 0)">Apagar
+
+            <i class="fa fa-trash"></i> 
+          </button>
+          
         </div>
         <p>{{ review.text }}</p>
       </div>

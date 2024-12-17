@@ -57,52 +57,59 @@
   
           <!-- Botões de Ações -->
           <!-- Botões de Ações -->
-<div class="d-flex flex-column gap-2 mt-2">
-  <!-- Primeira Linha de Botões -->
-  <div class="d-flex justify-content-center align-items-center gap-2">
-    <button
-      class="btn btn-sm btn-success w-100"
-      (click)="openStockModal(product)"
-    >
-      <i class="fas fa-plus me-1" style="color: black;"></i> Stock
-    </button>
-
-    <a
-      [routerLink]="['/companies', company?.id, 'products', product.id, 'edit']"
-      class="btn btn-sm btn-warning w-100"
-      style="background-color: rgb(243, 150, 29); color: white;"
-    >
-      <i class="fas fa-edit me-1" style="color: black;"></i> Editar
-    </a>
-
-    <button
-      *ngIf="!product.is_on_promotion"
-      class="btn btn-sm btn-warning w-100"
-      (click)="openPromotionModal(product)"
-    >
-      <i class="fas fa-percent"></i> Promoção
-    </button>
-
-    <button
-      *ngIf="product.is_on_promotion"
-      class="btn btn-sm btn-danger w-100"
-      (click)="confirmCancelPromotion(product)"
-    >
-      <i class="fas fa-times-circle"></i> Cancel
-    </button>
-  </div>
-
-  <!-- Botão Eliminar em Linha Separada -->
-  <div class="d-flex justify-content-center">
-    <button
-      class="btn btn-sm btn-danger w-100"
-      (click)="onDeleteProduct(product.id)"
-    >
-      <i class="bi bi-trash"></i> Eliminar
-    </button>
-  </div>
-</div>
-
+          <div class="d-flex flex-column gap-2 mt-2">
+            <div class="row g-2  mb-3" >
+              <!-- Stock Button -->
+              <div class="col-6 d-flex justify-content-center">
+                <button
+                  class="btn btn-sm btn-success w-100"
+                  (click)="openStockModal(product)"
+                >
+                  <i class="fas fa-plus me-1" style="color: black;"></i> Stock
+                </button>
+              </div>
+          
+              <!-- Editar Button -->
+              <div class="col-6 d-flex justify-content-center">
+                <a
+                  [routerLink]="['/companies', company?.id, 'products', product.id, 'edit']"
+                  class="btn btn-sm btn-warning w-100"
+                  style="background-color: rgb(243, 150, 29); color: white;"
+                >
+                  <i class="fas fa-edit me-1" style="color: black;"></i> Editar
+                </a>
+              </div>
+          
+              <!-- Promoção Button -->
+              <div class="col-6 d-flex justify-content-center">
+                <button
+                  *ngIf="!product.is_on_promotion"
+                  class="btn btn-sm btn-warning w-100"
+                  (click)="openPromotionModal(product)"
+                >
+                  <i class="fas fa-percent"></i> Promoção
+                </button>
+                <button
+                  *ngIf="product.is_on_promotion"
+                  class="btn btn-sm btn-danger w-100"
+                  (click)="confirmCancelPromotion(product)"
+                >
+                  <i class="fas fa-times-circle"></i> Cancel
+                </button>
+              </div>
+          
+              <!-- Eliminar Button -->
+              <div class="col-6 d-flex justify-content-center">
+                <button
+                  class="btn btn-sm btn-danger w-100"
+                  (click)="onDeleteProduct(product.id)"
+                >
+                  <i class="fa fa-trash"></i> Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+          
         </div>
       </div>
     </div>

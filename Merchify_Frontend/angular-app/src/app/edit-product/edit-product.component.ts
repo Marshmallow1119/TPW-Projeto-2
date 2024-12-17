@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ProductsService } from '../products.service';
 import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-edit-product',
@@ -20,7 +21,8 @@ export class EditProductComponent implements OnInit {
   constructor(
     private fb: FormBuilder, 
     private productService: ProductsService, 
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private location: Location
   ) {
     this.productForm = this.fb.group({
       productType: [this.initialProductType, { disabled: true }],
@@ -50,6 +52,7 @@ export class EditProductComponent implements OnInit {
       })
     });
   }
+
   ngOnInit(): void {
     this.productId = Number(this.route.snapshot.paramMap.get('product_id'));
     console.log('Product ID:', this.productId);
@@ -176,7 +179,8 @@ export class EditProductComponent implements OnInit {
       // Send the form data
       this.productService.editProduct(formData, this.productId).then(response => {
         console.log('Product updated successfully:', response);
-        alert('Product updated successfully!');
+        alert('Produto atualizado com sucesso!');
+        this.location.back();
       }).catch(error => {
         console.error('Error updating product:', error);
         alert('Error updating product.');
