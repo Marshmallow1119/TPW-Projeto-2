@@ -1417,7 +1417,7 @@ def admin_product_delete(request, product_id):
     return redirect('admin_home')
 
 @api_view(['DELETE'])
-
+@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def delete_review(request, review_id):
     print("DEBUG: Review ID recebido no pedido ->", review_id)  # Verifica o ID da review
