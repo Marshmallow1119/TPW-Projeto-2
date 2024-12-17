@@ -158,6 +158,8 @@ export class NavbarComponent implements OnInit {
     localStorage.setItem('redirectUrl', this.router.url);
     this.router.navigate(['/login']);
   }
+  
+  
 
 
   changeTheme(theme: string): void {
