@@ -158,7 +158,7 @@
             >
           </div>
           
-          <button *ngIf="user?.user_type === 'admin'" (click)="onDeleteReview(review.id ?? 0)">Apagar
+          <button *ngIf="user?.user_type === 'admin' || user?.user_type === 'company'" (click)="onDeleteReview(review.id ?? 0)">Apagar
 
             <i class="fa fa-trash"></i> 
           </button>

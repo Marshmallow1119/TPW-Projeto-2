@@ -49,13 +49,13 @@ export class ReviewsService {
 
     // Apagar uma review por ID
     async deleteReview(reviewId: number): Promise<void> {
-      const url = `${this.baseUrl}/reviews/${reviewId}/`;
+      const url = `${this.baseUrl}/reviews/${reviewId}/delete/`;
       try {
-        const token = localStorage.getItem('accessToken');
         const response = await fetch(url, {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
           },
         });
     

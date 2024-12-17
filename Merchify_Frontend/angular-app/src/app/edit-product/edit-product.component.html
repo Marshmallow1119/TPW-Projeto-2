@@ -28,21 +28,31 @@
         <input type="text" class="form-control" formControlName="name" />
       </div>
 
-      <!-- Product Description -->
       <div class="mb-3">
-        <label for="description" class="form-label">Descrição</label>
-        <textarea class="form-control" formControlName="description"></textarea>
+        <label for="price" class="form-label">Preço (€)</label>
+        <input type="text" class="form-control" formControlName="price" />
       </div>
 
-      <!-- Price and Image -->
       <div class="row mb-3">
+        
         <div class="col-md-6">
-          <label for="price" class="form-label">Preço (€)</label>
-          <input type="text" class="form-control" formControlName="price" />
+          <label for="description" class="form-label">Descrição</label>
+          <textarea class="form-control" formControlName="description" style="height: 200px;"></textarea>
         </div>
 
         <div class="col-md-6">
           <label for="image" class="form-label">Imagem do Produto</label>
+          <!-- Preview Image -->
+          <div class="mb-2">
+            <img 
+              *ngIf="imagePreview" 
+              [src]="imagePreview" 
+              alt="Imagem atual" 
+              class="img-thumbnail" 
+              style="max-height: 200px; width: auto;"
+            />
+          </div>
+          <!-- File Input -->
           <input 
             type="file" 
             class="form-control" 
@@ -50,6 +60,7 @@
             (change)="onImageChange($event)"
           />
         </div>
+        
       </div>
 
       <!-- Vinyl Details -->

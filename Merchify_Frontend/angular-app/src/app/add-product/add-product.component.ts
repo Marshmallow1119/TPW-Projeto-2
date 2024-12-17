@@ -15,12 +15,14 @@ import { Location } from '@angular/common';
   styleUrls: ['./add-product.component.css'],
   standalone: true,
   imports: [FormsModule, ReactiveFormsModule, CommonModule]
+
 })
 export class AddProductComponent implements OnInit {
   productForm: FormGroup;
   productTypes = ['vinil', 'cd', 'clothing', 'accessory'];
   artists: Artist[] = [];
   companies: any[] = [];
+  imagePreview: string | null = null;
   isAdmin: boolean = false;
 
   constructor(
@@ -128,8 +130,15 @@ export class AddProductComponent implements OnInit {
         alert('Please upload a valid image file.');
         return;
       }
+
       this.productForm.patchValue({ image: file });
       this.productForm.get('image')?.updateValueAndValidity();
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(file);
     }
   }
 
