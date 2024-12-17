@@ -149,8 +149,6 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        
-        
     ),
 
 }
@@ -167,7 +165,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # Adjust access token timeout
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Adjust access token timeout
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    # Adjust refresh token timeout
     'ROTATE_REFRESH_TOKENS': True,                 # Automatically rotate refresh tokens upon use
     'BLACKLIST_AFTER_ROTATION': True,              # Blacklist rotated tokens

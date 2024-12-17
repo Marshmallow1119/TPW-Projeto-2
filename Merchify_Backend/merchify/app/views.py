@@ -1538,46 +1538,6 @@ def delete_review(request, review_id):
     else:
         raise PermissionDenied("Apenas administradores ou o proprietário da companhia podem remover avaliações.")
 
-@api_view(['POST'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def add_company(request):
-    if request.method == 'POST':
-        company_form = CompanyForm(request.POST, request.FILES)
-        user_form = UserForm(request.POST)
-
-        if company_form.is_valid() and user_form.is_valid():
-            with transaction.atomic():
-                company = company_form.save()
-
-                user = user_form.save(commit=False)
-                user.user_type = 'company'
-                user.firstname = 'Company'
-                user.lastname = company.name
-                user.email = company.email
-                user.phone = company.phone
-                user.address = company.address
-                user.company = company
-                user.set_password(user_form.cleaned_data['password'])
-                user.save()
-                group = Group.objects.get(name='company')
-                user.groups.add(group)
-                user.save()
-
-                messages.success(request, 'Company and associated user have been created successfully.')
-                return redirect('admin_home')
-        else:
-            messages.error(request, 'Please correct the errors below.')
-
-    else:
-        company_form = CompanyForm()
-        user_form = UserForm()
-
-    return render(request, 'add_company.html', {
-        'company_form': company_form,
-        'user_form': user_form,
-    })
-
 @api_view(['GET'])
 def get_filters(request):
     try:

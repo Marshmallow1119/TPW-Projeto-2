@@ -124,7 +124,6 @@ export class CompanyProductsComponent implements OnInit {
       const matchesArtist =
         !filters.artist || product.artist.id.toString() === filters.artist; 
   
-      // Log matching criteria for debugging
       console.log(`Product: ${product.name}`, {
         matchesType,
         matchesPrice,

@@ -32,8 +32,6 @@ export class HomeComponent {
   userType: string = ''; 
   theme: string = 'default'; 
   
-
-
   slides = [
     {
       name: 'Olivia Rodrigo',
@@ -106,14 +104,13 @@ export class HomeComponent {
   }
   getTimeUntilChristmas(): number {
     const now = new Date();
-    const christmas = new Date(now.getFullYear(), 11, 25); // 25 de Dezembro
+    const christmas = new Date(now.getFullYear(), 11, 25); 
 
-    // Se já passou o Natal deste ano, conte até o próximo ano
     if (now > christmas) {
       christmas.setFullYear(now.getFullYear() + 1);
     }
 
-    return Math.floor((christmas.getTime() - now.getTime()) / 1000); // Retorna o tempo em segundos
+    return Math.floor((christmas.getTime() - now.getTime()) / 1000);
   }
 }
 
