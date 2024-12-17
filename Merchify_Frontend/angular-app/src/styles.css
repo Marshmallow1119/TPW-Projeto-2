@@ -125,20 +125,20 @@ body.dark-theme .content {
   }
   
   body.dark-theme a.btn {
-    border-color: #ffffff; /* White border for button links */
-    color: #ffffff; /* White text color for button links */
+    border-color: #ffffff; 
+    color: #ffffff; 
   }
   
   body.dark-theme a .fa, 
   body.dark-theme a .bi {
-    color: #ffffff; /* White color for icons inside links */
+    color: #ffffff; 
   }
   
   body.dark-theme .navbar {
-    background-color: #222222; /* Dark background for navbar */
+    background-color: #222222; 
   }
   body.dark-theme span{
-    color: #ffffff; /* White text color for navbar links */
+    color: #ffffff !important; /* White text color for navbar links */
     border-color: #ffffff;
   }
   body.dark-theme span:hover{
@@ -292,3 +292,30 @@ body.dark-theme .content {
     margin-bottom: 0.5rem;
     color: #fff !important;
   }
+
+  body.dark-theme .message-content {
+    color: #343a40 !important;
+  }
+
+  body .message-timestamp  {
+    color: #343a40 !important;
+  }
+
+  body.dark-theme .modal-container {
+    background-color: #343a40 !important;
+  }
+
+  body.dark-theme .cart {
+    background-color: #343a40 !important;
+    color: #fff !important;
+  }
+
+  body.dark-theme .summary {
+    background-color: #343a40 !important;
+    color: #fff !important;
+  }
+
+  body.dark-theme .text-muted {
+    color: #fff !important;
+  }
+

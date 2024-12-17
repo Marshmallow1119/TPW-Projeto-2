@@ -47,7 +47,7 @@ export class PaymentPageService {
 }
 
   
-async submitPayment(paymentData: { payment_method: string; shipping_address: string; discountApplied: boolean }): Promise<any> {
+async submitPayment(paymentData: { payment_method: string; shipping_address: string; discountApplied: boolean, discountValue: any}): Promise<any> {
   const token = await this.getToken();
 
   try {

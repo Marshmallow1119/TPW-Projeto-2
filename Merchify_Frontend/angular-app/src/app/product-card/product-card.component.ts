@@ -31,13 +31,11 @@ export class ProductCardComponent {
   }
   
   addToCart(product: Product): void {
-    console.log('Add to cart:', product);
   }
 
   toggleFavorite(event: Event, productId: number): void {
     event.preventDefault();
     event.stopPropagation(); 
-    console.log('user', this.user);
     if (!this.authService.isAuthenticated) {
       this.router.navigate(['/login']);
       return;

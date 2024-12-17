@@ -127,9 +127,7 @@ export class ProductsPageComponent implements OnInit {
         !filters.size ||
         (product.product_type === 'Clothing' &&
           product.stock_size?.some((sizeObj: any) => sizeObj.size === filters.size));
-        console.log(product.stock_size);
-        console.log(product.artist.id);
-        console.log(filters.artist);
+
       const matchesArtist =
         !filters.artist || product.artist.id.toString() === filters.artist; 
 
@@ -137,7 +135,6 @@ export class ProductsPageComponent implements OnInit {
       return matchesType && matchesPrice && matchesGenre && matchesColor && matchesSize && matchesArtist && matchesSale;
     });
   
-    console.log('Filtered products:', this.filteredProducts);
   }
 
 }

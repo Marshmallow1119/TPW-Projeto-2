@@ -44,7 +44,6 @@ export class BalanceService {
     const token = await this.getToken();
 
     try {
-      console.log('Updating balance:', amount);
       const response = await fetch(`${this.baseUrl}/balance/`, {
         method: 'PUT',
         credentials: 'include',
@@ -74,7 +73,6 @@ export class BalanceService {
     const token = await this.getToken();
 
     try {
-      console.log('Add balance:', amount);
       const response = await fetch(`${this.baseUrl}/balance/`, {
         method: 'POST',
         credentials: 'include',

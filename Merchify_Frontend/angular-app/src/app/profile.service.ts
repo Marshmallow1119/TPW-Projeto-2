@@ -19,7 +19,6 @@ export class ProfileService {
       if (!token) {
         throw new Error('Token de autenticação não encontrado.');
       }
-      console.log("entrou no serviço")
       const response = await fetch(`${this.baseUrl}/account/profile`, {
         method: 'GET',
         credentials: 'include',
@@ -40,6 +39,34 @@ export class ProfileService {
       throw error;
     }
   }
+
+  async getUserImage(id : number): Promise<any> {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('Token de autenticação não encontrado.');
+      }
+      const response = await fetch(`${this.baseUrl}/user/${id}/image/`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao carregar o perfil.');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Erro em getProfile:', error);
+      throw error;
+    }
+  }
+
 
   async updateProfile(data: FormData): Promise<any> {
     try {

@@ -1,0 +1,21 @@
+{
+    "version": 2,
+    "public": true,
+    "builds": [
+      {
+        "src": "dist/angular-app/browser/**",
+        "use": "@vercel/static"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*\\.js|.*\\.css|.*\\.json|.*\\.ico|.*\\.png|.*\\.jpg|.*\\.svg|.*\\.jpeg|.*\\.gif|.*\\.webp|.*\\.woff|.*\\.woff2|.*\\.ttf|.*\\.eot)",
+        "dest": "/dist/angular-app/browser/$1"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/dist/angular-app/browser/index.html"
+      }
+    ]
+  }
+  

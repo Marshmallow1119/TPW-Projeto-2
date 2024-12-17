@@ -60,13 +60,11 @@ export class HomeComponent implements OnInit {
   ) {
     this.themeService.theme$.pipe(
       switchMap((theme) => {
-        console.log('NavbarComponent received theme:', theme);
         this.theme = theme;
         return this.loadHomeData(); 
       })
     ).subscribe();
     this.themeService.theme$.subscribe((theme) => {
-      console.log('NavbarComponent received theme:', theme);
       this.theme = theme;
     });
     this.authService.user$.subscribe((user) => {
@@ -88,7 +86,6 @@ export class HomeComponent implements OnInit {
       Promise.all(productPromises)
         .then((products) => {
           this.recentlySeenProducts = products;
-          console.log('Recently Seen Products:', this.recentlySeenProducts);
         })
         .catch((error) => {
           console.error('Failed to fetch recently seen products:', error);

@@ -7,6 +7,7 @@ import { CompaniesService } from '../companhia.service';
 import { AuthService } from '../auth.service'; // Service to fetch user details
 import { User } from '../models/user';
 import { Message } from '../models/chat';
+import { ProfileService } from '../profile.service';
 
 @Component({
   selector: 'app-chat',
@@ -29,6 +30,7 @@ export class ChatComponent implements OnInit {
     private route: ActivatedRoute,
     private authService: AuthService,
     private companyService: CompaniesService,
+    private profileService: ProfileService
   ) {}
 
   ngOnInit(): void {
@@ -58,8 +60,9 @@ export class ChatComponent implements OnInit {
         // Fetch company details
         this.currentReceiver = await this.companyService.getCompany(this.recipientId);
         console.log('Current Receiver (Company):', this.currentReceiver);
-        this.currentReceiver.image
+        this.currentReceiver.image = this.currentReceiver.image
       } else if (this.userType === 'company' && this.recipientId) {
+        this.currentReceiver = await this.profileService.getUserImage(this.recipientId);
         console.log('Current Receiver (User):', this.currentReceiver);
       }
     } catch (error) {

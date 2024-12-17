@@ -50,21 +50,18 @@ export class PaymentPageComponent implements OnInit {
 
   async loadCart(userId: number) {
     try {
-      console.log('userId:', userId);
   
-      // Chamada ao serviço para obter o carrinho
       const response = await this.cartService.getCart(userId);
-  
-      // Verifica se os dados foram retornados corretamente
+      // eu vou ignorar que isto foi feito assim e não a usar os models e serializers :(
       if (response && response.cart_items) {
         this.cartItems = response.cart_items.map((item: any) => ({
           id: item.id,
           cart: { 
             id: item.cart, 
             user: this.user as User, 
-            date: new Date(), // Ajuste conforme necessário
-            items: [], // Será populado depois
-            total: 0 // Será calculado
+            date: new Date(), 
+            items: [], 
+            total: 0 
           },
           product: {
             id: item.product.id,
@@ -124,7 +121,6 @@ export class PaymentPageComponent implements OnInit {
 
   calculateFinalTotal() {
     this.finalTotal = this.cartTotal + this.shippingCost - (this.discountValue || 0);
-    console.log('Final total:', this.finalTotal);
   }
 
   async applyDiscount() {
@@ -146,12 +142,10 @@ export class PaymentPageComponent implements OnInit {
 
   async removeCartItem(itemId: number) {
     
-    console.log('Cart Item ID being passed:', itemId);
     try {
       await this.cartService.removeCartItem(this.user?.id || 0, itemId);
       this.cartItems = this.cartItems.filter((item) => item.cartItemId !== itemId);
-      await this.loadCart(this.user?.id || 0); // Reload the cart
-      console.log('Cart reloaded:', this.cartItems);
+      await this.loadCart(this.user?.id || 0); 
       this.calculateTotal();
       this.calculateFinalTotal();
     } catch (error) {
@@ -161,9 +155,9 @@ export class PaymentPageComponent implements OnInit {
 
   getImageSrc(imageBase64: string | null): string {
     if (!imageBase64) {
-      return 'assets/images/default-product.png'; // Caminho para uma imagem padrão
+      return 'assets/images/default-product.png'; 
     }
-    return `data:image/jpeg;base64,${imageBase64}`; // Adicione o prefixo correto
+    return `data:image/jpeg;base64,${imageBase64}`; 
   }
 
   async submitPayment() {
@@ -176,16 +170,15 @@ export class PaymentPageComponent implements OnInit {
       payment_method: this.paymentMethod,
       shipping_address: this.shippingAddress,
       discountApplied: this.discountApplied,
+      discountValue: this.discountValue,
     };
   
     const loader = document.getElementById('loading-indicator');
-    if (loader) loader.style.display = 'block'; // Show the loader
+    if (loader) loader.style.display = 'block'; 
   
     try {
       const result = await this.paymentService.submitPayment(paymentData);
       alert('Pagamento processado com sucesso!');
-      //atualizar o balance utilizando o serviço de balanceService
-      console.log('Novo saldo:', result.new_balance);
       this.authService.updateUserBalance(result.new_balance);
 
       this.router.navigate(['/']); 

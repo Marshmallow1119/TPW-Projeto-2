@@ -46,10 +46,8 @@ export class ProfileComponent implements OnInit {
 
       this.user = data.user;
 
-      console.log("user", this.user)
       this.purchases = data.purchases;
       this.numberOfPurchases = data.number_of_purchases;
-      console.log(this.numberOfPurchases)
 
 
     } catch (error) {
@@ -116,7 +114,6 @@ export class ProfileComponent implements OnInit {
   onImageSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      console.log('Imagem selecionada:', file);
       this.uploadedImage = file; 
     }
   }

@@ -47,13 +47,9 @@ export class AuthService {
         const user: User = response.user;
         this.userSubject.next(user);
 
-        console.log('User logged in:', user);
-
       if (user.user_type === 'admin') {
-        console.log('User is admin, redirecting to admin home');
         this.router.navigate(['/admin-home']);
       } else {
-        console.log('User is not admin, redirecting to home');
         const redirectUrl = localStorage.getItem('redirectUrl') || '/';
         this.router.navigate([redirectUrl]);
         localStorage.removeItem('redirectUrl');
@@ -121,32 +117,18 @@ export class AuthService {
 
     this.http.post(this.validateTokenUrl,  { token }).subscribe({
       next: (response: any) => {
-        const user: User = {
-          id: response.id || 0,
-          username: response.username,
-          user_type: response.user_type,
-          number_of_purchases: response.number_of_purchases || 0,
-          firstname: response.firstname,
-          lastname: response.lastname,
-          address: response.address,
-          email: response.email,
-          phone: response.phone,
-          country: response.country,
-          balance: response.balance || 0,
-        };
+        const user: User = response.user;
 
         this.userSubject.next(user);
       },
       error: (error) => {
         if (error.status === 401) {
-          console.log('Access token expired, attempting to refresh');
           this.refreshToken().subscribe({
             next: () => {
-              console.log('Token refreshed successfully');
               this.loadUserFromToken();
             },
             error: () => {
-              console.log('Token refresh failed');
+              this.logout();
             },
           });
         } else {
@@ -177,7 +159,6 @@ export class AuthService {
   register(formData: FormData): Observable<any> {
     return this.http.post(this.registerUrl, formData).pipe(
       tap((response: any) => {
-        console.log('Register response:', response);
   
         if (response.access && response.refresh) {
           localStorage.setItem('accessToken', response.access);
@@ -187,8 +168,6 @@ export class AuthService {
         const user: User = response.user;
   
         this.userSubject.next(user); 
-        console.log(response)
-        console.log('User registered and logged in:', user);
       }),
       catchError((error) => {
         console.error('Registration failed:', error);
@@ -267,7 +246,6 @@ export class AuthService {
   
     return this.http.get<User>(url, { headers }).pipe(
       tap((user) => {
-        console.log('User info:', user);
         this.userSubject.next(user);
       }),
       catchError((error) => {

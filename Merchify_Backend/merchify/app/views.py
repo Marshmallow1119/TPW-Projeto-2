@@ -1,3 +1,4 @@
+import base64
 from decimal import Decimal
 import json
 import logging
@@ -223,7 +224,6 @@ def profile(request):
 @permission_classes([IsAuthenticated])
 def delete_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    print(product)
     product.delete()
     return Response({"Deleted with sucess"})
 
@@ -357,63 +357,53 @@ def productDetails(request, identifier):
         if not (request.user.is_authenticated and (request.user.user_type == 'admin' or request.user.user_type == 'company')):
             raise PermissionDenied("You do not have permission to update this product.")
 
-        product = get_object_or_404(Product, id=identifier)
-
-        product.name = request.data.get('name', product.name)
-        product.description = request.data.get('description', product.description)
-        product.price = request.data.get('price', product.price)
-
-        if 'image' in request.FILES:
-            image_file = request.FILES['image']
-            product.image = image_file 
 
         specific_details_json = request.data.get('specific_details', '{}')  
         try:
             specific_details = json.loads(specific_details_json) 
         except json.JSONDecodeError:
             return Response({"error": "Invalid JSON for specific_details"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        product = get_object_or_404(Product, id=identifier)
+
+        product.name = request.data.get('name', product.name)
+        product.description = request.data.get('description', product.description)
+        product.price = request.data.get('price', product.price)
 
         product_type = product.category.lower() 
 
 
         if product_type == 'vinyl':
-            print(specific_details)
             productUpdated = Vinil.objects.filter(id=identifier).update(
                 genre=specific_details.get('genre', product.vinil.genre),
                 lpSize=specific_details.get('lpSize', product.vinil.lpSize),
                 releaseDate=specific_details.get('releaseDate', product.vinil.releaseDate),
-                stock=specific_details.get('stock', product.vinil.stock)
             )
 
         elif product_type == 'cd':
             productUpdated = CD.objects.filter(id=identifier).update(
-                name= request.data.get('name', product.name),
-                description= request.data.get('description', product.description),
-                price= request.data.get('price', product.price),
                 genre=specific_details.get('genre', product.cd.genre),
                 releaseDate=specific_details.get('releaseDate', product.cd.releaseDate),
-                stock=specific_details.get('stock', product.cd.stock)
             )
 
         elif product_type == 'clothing':
             productUpdated = Clothing.objects.filter(id=identifier).update(
-                name = request.data.get('name', product.name),
-                description = request.data.get('description', product.description),
                 price = request.data.get('price', product.price),
                 color=specific_details.get('color', product.clothing.color)
             )
         elif product_type == 'accessory':
             productUpdated = Accessory.objects.filter(id=identifier).update(
-                name = request.data.get('name', product.name),
-                description = request.data.get('description', product.description),
-                price = request.data.get('price', product.price),
                 material=specific_details.get('material', product.accessory.material),
                 color=specific_details.get('color', product.accessory.color),
-                size=specific_details.get('size', product.accessory.size),
-                stock=specific_details.get('stock', product.accessory.stock)
             )
+
+ 
+        if 'image' in request.FILES:
+            image_file = request.FILES['image']
+            product.image = image_file 
+
         product.save()
-        
+
         updated_product = ProductSerializer(product, context={'request': request})
         return Response(updated_product.data, status=status.HTTP_200_OK)
 
@@ -423,9 +413,8 @@ def productDetails(request, identifier):
 @api_view(['GET'])
 def search(request):
     query = request.GET.get('search', '').strip()
-
+    
     if query:
-        print(query)
         products = Product.objects.filter(Q(name__icontains=query)).exclude(name='')
         artists = Artist.objects.filter(name__icontains=query).exclude(name__isnull=True).exclude(name='')
     else:
@@ -434,7 +423,6 @@ def search(request):
 
     artists_results = ArtistSerializer(artists, many=True, context={'request': request}).data
     product_results = ProductSerializer(products, many=True, context={'request': request}).data
-    print(product_results)
     return Response({
         'products': product_results,
         'artists': artists_results,
@@ -547,38 +535,29 @@ def register_view(request):
     if 'first_name' not in data or not data['first_name']:
         errors['first_name'] = 'First name is required.'
 
-    print(data['first_name'])
 
     if 'last_name' not in data or not data['last_name']:
         errors['last_name'] = 'Last name is required.'
 
-    print(data['last_name'])
     if 'username' not in data or not data['username']:
         errors['username'] = 'Username is required.'
 
-    print(data['username'])
 
     if 'email' not in data or not data['email']:
         errors['email'] = 'Email is required.'
 
-    print(data['email'])
     if 'phone' not in data or not data['phone']:
         errors['phone'] = 'Phone number is required.'
 
-    print(data['phone'])
     if 'country' not in data or not data['country']:
         errors['country'] = 'Country is required.'
 
-    print(data['country'])
     if 'password1' not in data or not data['password1']:
         errors['password1'] = 'Password is required.'
 
-    print(data['password1'])
     if 'password2' not in data or not data['password2']:
         errors['password2'] = 'Confirm password is required.'
     
-    print(data['password2'])
-
     if data.get('password1') != data.get('password2'):
         errors['password2'] = "Passwords do not match."
 
@@ -654,7 +633,7 @@ def login(request):
         if user is not None:
             if hasattr(user, 'banned') and user.banned: 
                 print("aaa")
-                raise PermissionDenied({"error": "Your account has been banned. Please contact support."})
+                return Response({"error": "User is banned."}, status=status.HTTP_403_FORBIDDEN)
             
             user_data = UserSerializer(user).data
             refresh = RefreshToken.for_user(user)
@@ -681,10 +660,7 @@ def validate_token(request):
         user = User.objects.get(id=payload['user_id'])
         
         return Response({
-            "id": user.id,
-            "username": user.username,
-            "user_type": user.user_type,
-            "number_of_purchases": user.number_of_purchases
+            "user": UserSerializer(user).data,
         })
     
     except jwt.ExpiredSignatureError:
@@ -960,7 +936,7 @@ def favorites(request, category):
         return Response(serializer.data)
     elif category == 'company':
         favorites = FavoriteCompany.objects.filter(user=user)
-        serializer = FavoriteCompanySerializer(favorites, many=True)
+        serializer = FavoriteCompanySerializer(favorites, many=True, context={'request': request})
         return Response(serializer.data)
     return Response({'error': 'Invalid category'}, status=400)
 
@@ -1162,7 +1138,7 @@ def remove_from_favorites(request, product_id):
         return JsonResponse({"success": False, "message": "Product not found."}, status=404)
 
 @api_view(['DELETE'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def remove_from_favorites_artist(request, artist_id):
     try:
@@ -1176,7 +1152,7 @@ def remove_from_favorites_artist(request, artist_id):
 
 
 @api_view(['DELETE'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def remove_from_favorites_company(request, company_id):
     try:
@@ -1200,7 +1176,7 @@ def apply_discount(request):
         return Response({"success": False, "message": "Código de desconto não fornecido."}, status=status.HTTP_400_BAD_REQUEST)
 
     if discount_code == 'primeiracompra':
-        if not Purchase.objects.filter(user=user).exists():  # Checking if this is the user's first purchase
+        if not Purchase.objects.filter(user=user).exists():
             return Response(
                 {"success": True, "discount_value": 10.0, "message": "Código de desconto válido!"},
                 status=status.HTTP_200_OK
@@ -1234,7 +1210,7 @@ def process_payment(request):
             raise ValidationError("Por favor, preencha todos os campos obrigatórios.")
 
         total = cart.total
-        discount_value = request.session.get('discount_value', 0) if discount_applied else 0
+        discount_value = request.data.get('discountValue', 0) if discount_applied else 0
         total -= discount_value
 
         shipping_cost = calculate_shipping_cost(cart)
@@ -1242,7 +1218,6 @@ def process_payment(request):
 
 
         with transaction.atomic():
-
 
 
             user.balance -= Decimal(final_total)
@@ -1375,6 +1350,8 @@ def company_product_detail(request, company_id, product_id):
 def edit_product(request, product_id):
     if not (request.user.user_type == 'admin' or request.user.user_type == 'company'):
         raise PermissionDenied
+    if (request.user.user_type == 'company' and request.user.company != Product.objects.get(id=product_id).company):
+        raise PermissionDenied("Você não tem permissão para editar este produto.")
     product = get_object_or_404(Product, id=product_id)
 
     initial_product_type = product.get_product_type().lower()
@@ -1444,7 +1421,7 @@ def get_users(request):
     return Response(serialized_users.data)
 
 @api_view(['DELETE'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def delete_user(request, user_id):
     if not request.user.is_superuser:
@@ -1454,7 +1431,7 @@ def delete_user(request, user_id):
     return redirect('admin_home')
 
 @api_view(['DELETE'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def admin_product_delete(request, product_id):
     if not request.user.is_superuser:
@@ -1467,9 +1444,7 @@ def admin_product_delete(request, product_id):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def delete_review(request, review_id):
-    print("DEBUG: Review ID recebido no pedido ->", review_id) 
-    print("DEBUG: Utilizador autenticado ->", request.user)  
-    print("DEBUG: Tipo de utilizador ->", request.user.user_type) 
+
     review = get_object_or_404(Review, id=review_id)
     product = review.product
     company = product.company
@@ -1797,7 +1772,6 @@ def update_product_stock(request, product_id):
 
             stock_value = request.data[0]['stock']
 
-            # Handle stock update based on product type
             if product_type == 'Vinil':
                 vinil = product.vinil
                 vinil.stock = stock_value
@@ -1811,7 +1785,6 @@ def update_product_stock(request, product_id):
                 accessory.stock = stock_value
                 accessory.save()
             else:
-                # If stock is a direct field of the Product model
                 product.stock = stock_value
                 product.save()
 
@@ -1820,7 +1793,6 @@ def update_product_stock(request, product_id):
     except Product.DoesNotExist:
         return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        print("Error:", str(e))
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
@@ -1885,3 +1857,11 @@ def get_number_unread_messages(request):
         for chat in chats:
             unread_count += chat.messages.filter(is_from_company=True, date__gt=chat.last_user_timestamp).count()
     return JsonResponse({'unread_count': unread_count})
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def get_user_image(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    image = request.build_absolute_uri(user.image.url) if user.image else None
+    return JsonResponse({'image_url': image})

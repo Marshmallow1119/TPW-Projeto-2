@@ -65,7 +65,6 @@ export class ReviewsService {
           throw new Error(`Failed to delete review: ${response.statusText}`);
         }
     
-        console.log('Review deleted successfully');
       } catch (error) {
         console.error('Error deleting review:', error);
         throw error;
