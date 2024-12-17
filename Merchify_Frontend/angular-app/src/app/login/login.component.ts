@@ -23,23 +23,23 @@ export class LoginComponent {
   onSubmit() {
     this.authService.login(this.username, this.password).subscribe({
       next: (response: any) => {
-        this.errorMessage = null; 
+        this.errorMessage = null;
         localStorage.setItem('accessToken', response.access);
         localStorage.setItem('refreshToken', response.refresh);
-        console.log('User type:', response.user_type);
-        if ((localStorage.getItem('redirectUrl')) && (response.user_type === 'individual')) {
+        console.log('User type:', response.user.user_type);
+  
+        if (localStorage.getItem('redirectUrl') && response.user.user_type === 'individual') {
           const redirectUrl = localStorage.getItem('redirectUrl');
           localStorage.removeItem('redirectUrl');
           this.router.navigate([redirectUrl]);
           return;
         }
-        console.log(response.user);
+  
         switch (response.user.user_type) {
           case 'individual':
             this.router.navigate(['/']);
             break;
           case 'company':
-            console.log(response)
             this.router.navigate(['/my-company-products/' + response.user.company.id]);
             break;
           case 'admin':
@@ -51,9 +51,13 @@ export class LoginComponent {
         }
       },
       error: (err) => {
-        this.errorMessage =
-          err.error?.error || 'Login failed. Please try again.';
+        if (err.status === 403) {
+          this.errorMessage = 'Your account has been banned. Please contact support.';
+        } else {
+          this.errorMessage = err.error?.error || 'Login failed. Please try again.';
+        }
       },
     });
   }
+  
 }

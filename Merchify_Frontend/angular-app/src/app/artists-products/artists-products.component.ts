@@ -31,6 +31,13 @@ export class ArtistsProductsComponent implements OnInit {
     this.loadArtistAndProducts();
   }
 
+
+  dropdownOpen: boolean = false;
+
+  toggleDropdown(): void {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
   async loadArtistAndProducts(): Promise<void> {
     const artistName = this.route.snapshot.paramMap.get('artistName') || '';
     try {
@@ -52,14 +59,18 @@ export class ArtistsProductsComponent implements OnInit {
 
   sortProducts(order: string): void {
     console.log('Sorting by:', order); // Debug log
+  
     if (order === 'priceAsc') {
-      this.filteredProducts.sort((a, b) => a.price - b.price);
+      this.filteredProducts = [...this.filteredProducts].sort((a, b) => a.price - b.price);
     } else if (order === 'priceDesc') {
-      this.filteredProducts.sort((a, b) => b.price - a.price);
+      this.filteredProducts = [...this.filteredProducts].sort((a, b) => b.price - a.price);
     } else if (order === 'featured') {
-      this.filteredProducts = [...this.products];
+      this.filteredProducts = this.filteredProducts.sort((a, b) => {
+        return (b.is_on_promotion ? 1 : 0) - (a.is_on_promotion ? 1 : 0);
+      });
     }
   }
+  
 
   onFavoriteToggled(productId: number): void {
     const product = this.products.find((p) => p.id === productId);

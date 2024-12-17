@@ -25,22 +25,23 @@
       <div class="col-md-9">
         <div class="d-flex justify-content-between align-items-center mb-3 ordenar-por-container">
           <p>{{ filteredProducts.length }} produtos</p>
-          <div class="dropdown ordenar-dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
+          <div class="dropdown ordenar-dropdown" [ngClass]="{ show: dropdownOpen }">
+            <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              (click)="toggleDropdown()"
+              aria-expanded="false"
+              id="dropdownMenuButton"
+            >
               Ordenar por:
             </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <li>
-                <button class="dropdown-item" (click)="sortProducts('featured')">Em destaque</button>
-              </li>
-              <li>
-                <button class="dropdown-item" (click)="sortProducts('priceAsc')">Preço (ascendente)</button>
-              </li>
-              <li>
-                <button class="dropdown-item" (click)="sortProducts('priceDesc')">Preço (descendente)</button>
-              </li>
-            </ul>
+            <div class="dropdown-menu" [ngClass]="{ show: dropdownOpen }" aria-labelledby="dropdownMenuButton">
+              <button class="dropdown-item" (click)="sortProducts('featured')">Em destaque</button>
+              <button class="dropdown-item" (click)="sortProducts('priceAsc')">Preço (ascendente)</button>
+              <button class="dropdown-item" (click)="sortProducts('priceDesc')">Preço (descendente)</button>
+            </div>
           </div>
+          
         </div>
 
         <div class="row">
