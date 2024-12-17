@@ -308,5 +308,16 @@ style="padding: 0.25rem 0; min-height: 50px;">
 </nav>
 
 <div *ngIf="isLoading" class="loading-overlay">
-  <img src="assets/loading.gif" alt="Loading..." class="loading-gif" />
+  <img
+    *ngIf="loadingTheme === 'christmas'"
+    src="assets/loading.gif"
+    alt="Carregando..."
+    class="loading-gif"
+  />
+  <img
+    *ngIf="loadingTheme === 'default'"
+    src="assets/default2.gif"
+    alt="Carregando..."
+    class="loading-gif-logo"
+  />
 </div>

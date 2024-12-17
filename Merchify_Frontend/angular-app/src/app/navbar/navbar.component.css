@@ -133,6 +133,10 @@
       width: 100px; 
       height: auto;
     }
+    .loading-gif-logo{
+      width: 250px; 
+      height: auto;
+    }
     
     .navbar-christmas {
       background-color: #570000 !important; /* Vermelho */

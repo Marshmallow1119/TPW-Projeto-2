@@ -29,6 +29,7 @@ export class NavbarComponent implements OnInit {
   unreadMessagesCount: number = 0;
   dataLoaded: boolean = false;
   theme: string = 'default';
+  loadingTheme: string = 'default';
 
   constructor(
     private authService: AuthService,
@@ -166,8 +167,10 @@ export class NavbarComponent implements OnInit {
   changeTheme(theme: string): void {
     this.isLoading = true; 
   
+    this.loadingTheme = theme;
+
     setTimeout(() => {
-      this.themeService.changeTheme(theme); // Aplica o tema
+      this.themeService.changeTheme(theme); 
       this.isLoading = false; 
     }, 1500);
   }
