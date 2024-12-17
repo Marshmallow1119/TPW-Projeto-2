@@ -101,13 +101,22 @@ style="padding: 0.25rem 0; min-height: 50px;">
           }">
             Saldo: {{ user.balance | currency:'EUR' }}
           </span>
-          <button *ngSwitchCase="'individual'" class="btn btn-outline-success me-2" data-bs-toggle="modal" data-bs-target="#addFundsModal">
+          <button *ngSwitchCase="'individual'" class="btn btn-outline-success me-2" data-bs-toggle="modal" data-bs-target="#addFundsModal" [ngClass]="{
+            'btn-outline-dark': theme !== 'christmas',
+            'btn-outline-light': theme === 'christmas'
+          }" >
             <i class="fa fa-plus"></i>
           </button>
-          <a *ngSwitchCase="'individual'" routerLink="/manage_cart" class="btn btn-outline-dark me-2">
+          <a *ngSwitchCase="'individual'" routerLink="/manage_cart" class="btn btn-outline-dark me-2" [ngClass]="{
+            'btn-outline-dark': theme !== 'christmas',
+            'btn-outline-light': theme === 'christmas'
+          }">
             <i class="fa fa-shopping-cart"></i>
           </a>
-          <a *ngSwitchCase="'individual'" routerLink="/favorites" class="btn btn-outline-dark me-2">
+          <a *ngSwitchCase="'individual'" routerLink="/favorites" class="btn btn-outline-dark me-2" [ngClass]="{
+            'btn-outline-dark': theme !== 'christmas',
+            'btn-outline-light': theme === 'christmas'
+          }">
             <i class="fa fa-heart text-danger"></i>
           </a>
 
@@ -130,7 +139,10 @@ style="padding: 0.25rem 0; min-height: 50px;">
         </a>
 
           <!-- Admin User Options -->
-          <a *ngSwitchCase="'admin'" routerLink="/admin/add/company" class="btn btn-outline-dark me-2">
+          <a *ngSwitchCase="'admin'" routerLink="/admin/add/company" class="btn btn-outline-dark me-2" [ngClass]="{
+            'btn-outline-dark': theme !== 'christmas',
+            'btn-outline-light': theme === 'christmas'
+          }">
             <i class="fa fa-plus"></i> Adicionar Empresa
           </a>
 
@@ -181,7 +193,10 @@ style="padding: 0.25rem 0; min-height: 50px;">
               </li>
             </ul>
           </li>
-          <a *ngSwitchCase="'admin'" routerLink="/profile" class="btn btn-outline-dark me-2">
+          <a *ngSwitchCase="'admin'" routerLink="/profile" class="btn btn-outline-dark me-2" [ngClass]="{
+            'btn-outline-dark': theme !== 'christmas',
+            'btn-outline-light': theme === 'christmas'
+          }">
             <i class="fa fa-user"></i>
           </a>
         </ng-container>
