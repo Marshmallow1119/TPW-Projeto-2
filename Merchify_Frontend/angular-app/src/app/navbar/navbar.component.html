@@ -256,13 +256,6 @@ style="padding: 0.25rem 0; min-height: 50px;">
           </a>
         </ng-container>
 
-        <!-- Logout -->
-        <a (click)="logout()" class="btn btn-outline-dark" [ngClass]="{
-          'btn-outline-dark': theme !== 'christmas',
-          'btn-outline-light text-white': theme === 'christmas'
-        }">
-          <i class="fas fa-sign-out-alt"></i>
-        </a>
       </div>
     </div>
 
@@ -301,6 +294,15 @@ style="padding: 0.25rem 0; min-height: 50px;">
           </div>
     
     <app-theme-button></app-theme-button>
+    <!-- Botão de Logout -->
+    <a (click)="logout()" 
+       class="btn btn-outline-dark ms-3" 
+       [ngClass]="{
+          'btn-outline-dark': theme !== 'christmas',
+          'btn-outline-light text-white': theme === 'christmas'
+       }">
+       <i class="fas fa-sign-out-alt"></i>
+    </a>
 
   </div>
 </nav>
