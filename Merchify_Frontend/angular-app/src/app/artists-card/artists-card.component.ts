@@ -4,20 +4,33 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FavoritesService } from '../favorites.service';
 import { AuthService } from '../auth.service';
+import { User } from '../models/user';
 
 @Component({
   selector: 'app-artists-card',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './artists-card.component.html',
-  styleUrl: './artists-card.component.css'
+  styleUrls: ['./artists-card.component.css']
 })
+
 export class ArtistsCardComponent {
   @Input() artist!: Artist;
   @Input() isAuthenticated: boolean = false;
-  @Input() userType: string = ''
+  @Input() user: User | null = null;
+  @Input() userType: string = '';
+  isAuthenticaded: boolean = false;
 
-  constructor(private favoriteService: FavoritesService, private authService: AuthService, private router: Router) {}
+
+  constructor(private favoriteService: FavoritesService, private authService: AuthService, private router: Router) {
+    this.authService.user$.subscribe((user) => {
+      this.user = user;
+      if (this.authService.isAuthenticated()) {
+        this.isAuthenticaded = true;
+        this.userType = user?.user_type || '';
+      }
+    });
+  }
 
   toggleFavorite(event: Event, artistId: number): void {
     event.preventDefault(); 

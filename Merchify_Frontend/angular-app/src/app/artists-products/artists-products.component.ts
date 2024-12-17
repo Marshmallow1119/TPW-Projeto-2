@@ -4,6 +4,9 @@ import { CommonModule } from '@angular/common';
 import { FiltroComponent } from '../filtro/filtro.component';
 import { ArtistsCardProductsComponent } from '../artists-card-products/artists-card-products.component';
 import { ProdutosArtistaService } from '../produtos-artista.service';
+import { User } from '../models/user';
+import { AuthService } from '../auth.service';
+
 
 @Component({
   standalone: true,
@@ -17,18 +20,25 @@ export class ArtistsProductsComponent implements OnInit {
   products: any[] = []; 
   filteredProducts: any[] = []; 
   isAuthenticated: boolean = false; 
-  user: any = { user_type: '' };
+  user: User | null = null;
   showArtistFilter: boolean = false;
   genres: string[] = [];
   colors: string[] = []; 
+  userType: string = '';
 
   constructor(
     private route: ActivatedRoute,
-    private produtosArtistaService: ProdutosArtistaService
+    private produtosArtistaService: ProdutosArtistaService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.loadArtistAndProducts();
+    this.authService.user$.subscribe((user) => {
+      this.user = user;
+      this.isAuthenticated = this.authService.isAuthenticated();
+      this.userType = user?.user_type || '';
+    });
   }
 
   async loadArtistAndProducts(): Promise<void> {

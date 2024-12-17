@@ -7,6 +7,8 @@ import { CommonModule } from '@angular/common';
 import { ArtistsService } from '../artists.service';
 import { Artist } from '../models/artista';
 import { FavoritesService } from '../favorites.service';
+import { AuthService } from '../auth.service';
+import { User } from '../models/user';
 
 interface favoriteProducts {
   product_id: number;
@@ -27,16 +29,20 @@ export class ProductsPageComponent implements OnInit {
   artists: Artist[] = [];
   filteredProducts: Product[] = [];
   filters: any = {}; 
+  user: User | null = null;
+
 
   constructor(private favoritesService: FavoritesService) {}
 
   private productService: ProductsService = inject(ProductsService);
   private artistsService: ArtistsService = inject(ArtistsService);
-  user: any = { is_authenticated: true, user_type: 'individual' }; 
+  private authService: AuthService = inject(AuthService);
   
   async ngOnInit(): Promise<void> {
     await this.loadProductsAndArtistsData();
-    
+    this.authService.user$.subscribe((user) => {
+      this.user = user;
+    });
   }
 
   private async loadProductsAndArtistsData(): Promise<void> {

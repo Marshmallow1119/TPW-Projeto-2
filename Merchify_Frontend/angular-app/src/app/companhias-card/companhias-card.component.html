@@ -24,6 +24,7 @@
     </div>
   </a>
   <i
+    *ngIf="!isAuthenticated || user?.user_type === 'individual'"
     class="fa fa-heart favorite-icon"
     [ngClass]="{ filled: company.is_favorited }"
     (click)="toggleFavorite($event)"

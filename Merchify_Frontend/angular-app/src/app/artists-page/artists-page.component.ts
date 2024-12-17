@@ -5,6 +5,8 @@ import { Artist } from '../models/artista';
 import { ArtistsService } from '../artists.service';
 import { RouterModule } from '@angular/router';
 import { FavoritesService } from '../favorites.service';
+import { User } from '../models/user';
+import { AuthService } from '../auth.service';
 
 interface FavoriteArtist {
   id: number;
@@ -22,12 +24,18 @@ interface FavoriteArtist {
 export class ArtistsPageComponent implements OnInit {
   artists: Artist[] = [];
   isAuthenticated: boolean = false;
-  userType: string = 'individual'; 
+  user: User | null = null;
+  userType: string = '';
 
-  constructor(private artistsService: ArtistsService, private favoriteService: FavoritesService) {}
+  constructor(private artistsService: ArtistsService, private favoriteService: FavoritesService, private authService: AuthService) {
+    this.authService.user$.subscribe((user) => {
+      this.user = user;
+      this.isAuthenticated = this.authService.isAuthenticated();
+      this.userType = user?.user_type || '';
+    });
+  }
 
   async ngOnInit(): Promise<void> {
-    try {
       this.artists = await this.artistsService.getArtistas();
       let favoriteArtists: FavoriteArtist[] = await this.favoriteService.getFavorites("artists");
       console.log('Artistas favoritos:', favoriteArtists);
@@ -35,8 +43,6 @@ export class ArtistsPageComponent implements OnInit {
         artist.is_favorited = favoriteArtists.some(favoriteArtist => favoriteArtist.artist.id === artist.id);
       }
       console.log('Artistas carregados:', this.artists);
-    } catch (error) {
-      console.error('Error fetching Artistas:', error);
     }
   }
-}
+
