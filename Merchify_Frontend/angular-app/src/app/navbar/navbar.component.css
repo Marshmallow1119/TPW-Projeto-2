@@ -143,7 +143,7 @@
     .navbar-christmas .nav-link,
     .navbar-christmas .navbar-text,
     .navbar-christmas .btn-outline-light {
-      color: #ffffff !important; /* Texto e links brancos */
+      color: #ffffff !important;
     }
     
     .navbar-christmas .nav-link.active {
@@ -152,7 +152,7 @@
     }
     
     .navbar-christmas .fa-paint-brush {
-      color: #000000 !important; 
+      color: #ffffff !important; 
       padding-left: 0px;
     }
 
@@ -168,13 +168,15 @@
     .border-white {
       border: 1px solid #ffffff 
     }
-    .fa-paint-brush{
-      padding-left: 0px;
-    }
-    
+
     .bg-white {
       background-color: #ffffff !important;
     }
+
+    .navbar-christmas .theme-button {
+      background-color: transparent !important; /* Garante fundo transparente */
+    }
+
     
     .text-black {
       color: #000000 !important;
