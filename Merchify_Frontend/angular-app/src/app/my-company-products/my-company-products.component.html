@@ -33,36 +33,79 @@
             />
             <div class="p-3 text-center product-info">
               <h5 class="product-name">{{ product.name }}</h5>
-              <p class="product-price">{{ product.price | currency }}</p>
-              <p class="product-description">
+              <div class="text-center">
+                <!-- Preço Original -->
+                <span
+                  *ngIf="product.is_on_promotion"
+                  class="text-muted small promotion-price me-2"
+                >
+                  {{ product.old_price | number: '1.2-2' }}€
+                </span>
+              
+                <!-- Preço Promocional -->
+                <span class="text-danger fw-bold">
+                  {{ product.price | number: '1.2-2' }}€
+                </span>
+              
+                <!-- Rótulo 'PROMOÇÃO' -->
+                <div *ngIf="product.is_on_promotion" class="text-warning small fw-bold">
+                  PROMOÇÃO
+                </div>
+              </div>
+                            <p class="product-description">
                 {{ product.description | slice: 0:50 }}...
               </p>
             </div>
           </a>
   
           <!-- Botões de Ações -->
-          <div class="d-flex justify-content-center mt-2">
-            <button
-              class="btn btn-sm btn-success me-2"
-              (click)="openStockModal(product)"
-            >
-              <i class="fas fa-plus me-1" style="color: black;"></i> Stock
-            </button>
-  
-            <a
-              [routerLink]="['/companies', company?.id, 'products', product.id, 'edit']"
-              class="btn btn-sm btn-warning me-2"
-            >
-              <i class="fas fa-edit me-1" style="color: black;"></i>Editar
-            </a>
-  
-            <button
-              class="btn btn-sm btn-danger"
-              (click)="onDeleteProduct(product.id)"
-            >
-              <i class="bi bi-trash"></i> Eliminar
-            </button>
-          </div>
+          <!-- Botões de Ações -->
+<div class="d-flex flex-column gap-2 mt-2">
+  <!-- Primeira Linha de Botões -->
+  <div class="d-flex justify-content-center align-items-center gap-2">
+    <button
+      class="btn btn-sm btn-success w-100"
+      (click)="openStockModal(product)"
+    >
+      <i class="fas fa-plus me-1" style="color: black;"></i> Stock
+    </button>
+
+    <a
+      [routerLink]="['/companies', company?.id, 'products', product.id, 'edit']"
+      class="btn btn-sm btn-warning w-100"
+      style="background-color: rgb(243, 150, 29); color: white;"
+    >
+      <i class="fas fa-edit me-1" style="color: black;"></i> Editar
+    </a>
+
+    <button
+      *ngIf="!product.is_on_promotion"
+      class="btn btn-sm btn-warning w-100"
+      (click)="openPromotionModal(product)"
+    >
+      <i class="fas fa-percent"></i> Promoção
+    </button>
+
+    <button
+      *ngIf="product.is_on_promotion"
+      class="btn btn-sm btn-danger w-100"
+      (click)="confirmCancelPromotion(product)"
+    >
+      <i class="fas fa-times-circle"></i> Cancel
+    </button>
+  </div>
+
+  <!-- Botão Eliminar em Linha Separada -->
+  <div class="d-flex justify-content-center">
+    <button
+      class="btn btn-sm btn-danger w-100"
+      (click)="onDeleteProduct(product.id)"
+    >
+      <i class="bi bi-trash"></i> Eliminar
+    </button>
+  </div>
+</div>
+
         </div>
       </div>
     </div>
@@ -75,3 +118,36 @@
   (saveChangesEvent)="onSaveStockChanges($event)"
 ></app-size-stock-modal>
 
+
+<div
+  class="modal fade show"
+  *ngIf="selectedProductForPromotion"
+  tabindex="-1"
+  role="dialog"
+  style="display: block; background-color: rgba(0, 0, 0, 0.5);"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Promoção - {{ selectedProductForPromotion.name }}</h5>
+        <button type="button" class="btn-close" (click)="closePromotionModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Preço Atual:</strong> {{ selectedProductForPromotion.price | number: '1.2-2' }}€</p>
+        <div class="form-group">
+          <label for="newPrice">Novo Preço:</label>
+          <input
+            type="number"
+            id="newPrice"
+            [(ngModel)]="newPromotionPrice"
+            class="form-control"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closePromotionModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="applyPromotion()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>

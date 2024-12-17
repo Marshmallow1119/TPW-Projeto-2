@@ -18,9 +18,9 @@ export class AdminProductsTableComponent implements OnInit {
   products: Product[] = [];
   errorMessage: string | null = null;
   selectedProduct: Product | null = null;
-  selectedProductForPromotion: any = null; // Produto selecionado para promoção
-  newPromotionPrice: number | null = null; // Novo preço inserido no modal
-  isStockModalOpen: boolean = false; // Track modal state
+  selectedProductForPromotion: any = null; 
+  newPromotionPrice: number | null = null; 
+  isStockModalOpen: boolean = false; 
   
   constructor(private productService: ProductsService) {}
 

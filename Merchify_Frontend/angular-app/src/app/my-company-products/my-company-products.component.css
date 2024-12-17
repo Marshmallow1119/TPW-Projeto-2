@@ -46,3 +46,17 @@
     margin-top: auto;
     padding-bottom: 20px;
 }
+
+.text-danger {
+    color: #dc3545; /* Cor vermelha */
+  }
+  
+  .text-warning {
+    color: #ffc107; /* Cor amarela */
+  }
+  
+  .promotion-price {
+    text-decoration: line-through; /* Linha sobre o preço original */
+    color: #6c757d; /* Cor cinza */
+  }
+  

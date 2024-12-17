@@ -7,12 +7,14 @@ import { CONFIG } from '../config';
 import { RouterModule } from '@angular/router'; // Importação necessária
 import { ProductsService } from '../products.service';
 import { SizeStockModalComponent } from '../size-stock-modal/size-stock-modal.component';
+import { FormsModule } from '@angular/forms';
 
 
 
 @Component({
   selector: 'app-my-company-products',
-  imports: [CommonModule, RouterModule, SizeStockModalComponent],
+  standalone: true,
+  imports: [CommonModule, RouterModule, SizeStockModalComponent, FormsModule],
   templateUrl: './my-company-products.component.html',
   styleUrl: './my-company-products.component.css'
 })
@@ -24,6 +26,9 @@ export class MyCompanyProductsComponent {
   selectedProduct: Product | null = null;
   baseUrl: string = CONFIG.baseUrl;
   isStockModalOpen: boolean = false;
+  newPromotionPrice: number | null = null; 
+  selectedProductForPromotion: any = null; 
+
 
 
   constructor(
@@ -129,5 +134,57 @@ export class MyCompanyProductsComponent {
     }
   }
   
+  openPromotionModal(product: any): void {
+    this.selectedProductForPromotion = product;
+    this.newPromotionPrice = null;
+  }
+  
+  closePromotionModal(): void {
+    this.selectedProductForPromotion = null;
+    this.newPromotionPrice = null;
+  }
 
+  confirmCancelPromotion(product: Product): void {
+    this.cancelPromotion(product);
+  }
+
+  async applyPromotion(): Promise<void> {
+    if (this.newPromotionPrice === null || this.newPromotionPrice <= 0) {
+      alert('Por favor, insira um novo preço válido.');
+      return;
+    }
+  
+    if (this.selectedProductForPromotion) {
+      try {
+        const product = this.selectedProductForPromotion;
+  
+        await this.productsService.addPromotion(product, this.newPromotionPrice);
+  
+        alert('Promoção aplicada com sucesso!');
+        console.log('is_on_sale:', product.is_on_promotion);
+        this.closePromotionModal();
+        this.loadCompanyProducts(); 
+      } catch (error) {
+        console.error('Erro ao aplicar promoção:', error);
+        alert('Erro ao aplicar promoção.');
+      }
+    }
+  }
+  
+  
+  async cancelPromotion(product: Product): Promise<void> {
+    const confirmation = confirm('Tem a certeza que deseja retirar a promoção?');
+    if (!confirmation) return;
+  
+    try {
+      await this.productsService.cancelPromotion(product);
+  
+      alert('Promoção cancelada com sucesso!');
+      this.loadCompanyProducts(); 
+    } catch (error) {
+      console.error('Erro ao cancelar promoção:', error);
+      alert('Erro ao cancelar promoção.');
+    }
+  }
+  
 }
