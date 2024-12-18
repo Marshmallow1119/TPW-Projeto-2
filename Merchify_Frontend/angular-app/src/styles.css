@@ -346,3 +346,33 @@ body.dark-theme .btn-secondary:hover {
     color: #fff !important;
   }
 
+
+body.dark-theme .dark-theme-link {
+  color: #ffffff !important; /* Texto branco */
+  background-color: transparent !important; /* Fundo transparente */
+  border-color: #ffffff; /* Borda branca */
+}
+
+body.dark-theme .dark-theme-link:hover {
+  background-color: #222222 !important; /* Fundo escuro ao passar o mouse */
+  color: #ffffff !important; /* Texto branco */
+}
+
+body.dark-theme .dark-theme-file {
+  background-color: #343a40 !important; /* Fundo escuro */
+  color: #ffffff !important; /* Texto branco */
+  font-weight: bold;;
+  border: 1px solid #495057; /* Borda escura */
+}
+
+body.dark-theme .dark-theme-file::file-selector-button {
+  background-color: #495057 !important; /* Botão de seleção de arquivo */
+  color: #ffffff !important; /* Texto branco no botão */
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+body.dark-theme .dark-theme-file::file-selector-button:hover {
+  background-color: #6c757d !important; 
+}

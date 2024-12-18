@@ -1,104 +1,96 @@
-
-
 /* Container Styling */
 .container {
-    max-width: 800px;
-    margin: auto;
-  }
-  
-  /* Title Styling */
-  .title {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333;
-  }
+  max-width: 800px;
+  margin: auto;
+}
 
-  
-  /* Content Box */
-  .content {
-    background-color: #f8f9fa;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Form Grid Layout */
+/* Title Styling */
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Content Box */
+.content {
+  background-color: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Grid Layout */
+.user-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.input-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-box .details {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.form-control {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.form-control:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0px 0px 4px rgba(0, 123, 255, 0.2);
+}
+
+/* Error Message Styling */
+.invalid-feedback {
+  font-size: 0.875rem;
+  color: #dc3545;
+  margin-top: 0.5rem; /* Added spacing for error messages */
+}
+
+.alert-danger {
+  margin-top: 1rem; /* Spacing for the general error message */
+}
+
+/* Button Styling */
+.btn-primary {
+  margin-top: 1rem;
+  background-color: #740000;
+  border: none;
+  padding: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-outline-secondary {
+  color: #000; /* Black text for the button */
+  border-color: #000; /* Black border */
+}
+
+.btn-outline-secondary:hover {
+  color: #fff;
+  background-color: #000;
+  border-color: #000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   .user-details {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: 1fr; /* Single column on smaller screens */
   }
-  
-  .input-box {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .input-box .details {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #555;
-  }
-
-    
-  .input-box .details .dark-theme {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #fff !important;
-  }
-
-
-  
-  .form-control {
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 0.75rem;
-    font-size: 1rem;
-    transition: border-color 0.3s ease-in-out;
-  }
-  
-  .form-control:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0px 0px 4px rgba(0, 123, 255, 0.2);
-  }
-  
-  /* Error Message Styling */
-  .invalid-feedback {
-    font-size: 0.875rem;
-    color: #dc3545;
-  }
-  
-  /* Button Styling */
-  .btn-primary {
-    margin-top: 1rem;
-    background-color: #740000;
-    border: none;
-    padding: 0.75rem;
-    font-size: 1.1rem;
-    font-weight: bold;
-    transition: background-color 0.3s ease-in-out;
-  }
-  
-  .btn-primary:hover {
-    background-color: #0056b3;
-  }
-  
-  .btn-outline-secondary {
-    color: #6c757d;
-    border-color: #6c757d;
-  }
-  
-  .btn-outline-secondary:hover {
-    color: #fff;
-    background-color: #6c757d;
-    border-color: #6c757d;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .user-details {
-      grid-template-columns: 1fr; /* Single column on smaller screens */
-    }
-  }
-  
+}

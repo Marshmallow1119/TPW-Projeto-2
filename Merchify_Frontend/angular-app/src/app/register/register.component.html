@@ -1,6 +1,6 @@
 <div class="container mt-5">
   <div class="mb-3">
-    <a routerLink="/login" class="btn btn-outline-secondary">
+    <a routerLink="/login" class="btn btn-outline-secondary text-dark dark-theme-link">
       <i class="bi bi-arrow-left"></i> Voltar para o Login
     </a>
   </div>
@@ -17,13 +17,13 @@
             class="form-control"
             [formControlName]="field.name"
           />
-          <!-- File Input -->
           <input
             *ngIf="field.type === 'file'"
             type="file"
-            class="form-control"
+            class="form-control dark-theme-file"
             (change)="onFileChange($event)"
           />
+
 
           <!-- Display validation errors -->
           <div *ngIf="registerForm.get(field.name)?.touched" class="invalid-feedback d-block">
@@ -40,7 +40,7 @@
       </div>
 
       <!-- General Error Message -->
-      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+      <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
 
       <!-- Submit Button -->
       <button type="submit" class="btn btn-primary w-100">
