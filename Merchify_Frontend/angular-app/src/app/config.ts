@@ -15,7 +15,7 @@ const PYTHONANYWHERE_CONFIG: AppConfig = {
 };
 
 const VERCEL_CONFIG: AppConfig = {
-  baseUrl: 'https://alof.pythonanywhere.com/ws', // API running on PythonAnywhere
+  baseUrl: 'https://alof.pythonanywhere.com/ws', 
 };
 
 export const CONFIG: AppConfig = determineEnvironment();
