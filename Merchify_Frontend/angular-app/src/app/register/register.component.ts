@@ -16,15 +16,15 @@ export class RegisterComponent {
   errorMessage: string | null = null;
 
   formFields = [
-    { name: 'first_name', label: 'Primeiro Nome', type: 'text', error: 'First name is required.' },
-    { name: 'last_name', label: 'Último Nome', type: 'text', error: 'Last name is required.' },
-    { name: 'username', label: 'Username', type: 'text', error: 'Username is required.' },
-    { name: 'email', label: 'Email', type: 'email', error: 'Valid email is required.' },
-    { name: 'address', label: 'Morada', type: 'text', error: '' },
-    { name: 'phone', label: 'Telemóvel', type: 'text', error: 'Enter a valid phone number.' },
-    { name: 'country', label: 'País', type: 'text', error: 'Country is required.' },
-    { name: 'password1', label: 'Password', type: 'password', error: 'Password is required.' },
-    { name: 'password2', label: 'Confirme a Password', type: 'password', error: 'Confirm your password.' },
+    { name: 'first_name', label: 'Primeiro Nome', type: 'text', error: 'Primeiro nome é obrigatório.' },
+    { name: 'last_name', label: 'Último Nome', type: 'text', error: 'Último nome é obrigatório.' },
+    { name: 'username', label: 'Nome de Utilizador', type: 'text', error: 'Nome de utilizador é obrigatório.' },
+    { name: 'email', label: 'Email', type: 'email', error: 'Um email válido é obrigatório.' },
+    { name: 'address', label: 'Morada', type: 'text', error: 'Uma morada válida é obrigatório' },
+    { name: 'phone', label: 'Telemóvel', type: 'text', error: 'Insira um número de telefone válido.' },
+    { name: 'country', label: 'País', type: 'text', error: 'País é obrigatório.' },
+    { name: 'password1', label: 'Password', type: 'password', error: 'Password é obrigatória.' },
+    { name: 'password2', label: 'Confirme a Password', type: 'password', error: 'Confirme a password.' },
     { name: 'image', label: 'Foto de Perfil', type: 'file', error: '' },
   ];
 
@@ -49,7 +49,8 @@ export class RegisterComponent {
 
   onSubmit(): void {
     if (this.registerForm.invalid) {
-      this.errorMessage = 'Please fill out all required fields correctly.';
+      this.errorMessage = 'Por favor preencha todos os campos.';
+      this.registerForm.markAllAsTouched(); 
       return;
     }
 
@@ -72,7 +73,7 @@ export class RegisterComponent {
         if (err.error.errors) {
           this.setFieldErrors(err.error.errors);
         } else {
-          this.errorMessage = err.error.message || 'Registration failed. Try again.';
+          this.errorMessage = err.error.message || 'Ocorreu um erro ao registar.Tente novamente.';
         }
       },
     });

@@ -543,37 +543,37 @@ def register_view(request):
     errors = {}
 
     if 'first_name' not in data or not data['first_name']:
-        errors['first_name'] = 'First name is required.'
+        errors['first_name'] = 'Primeiro nome é um campo obrigatório.'
 
 
     if 'last_name' not in data or not data['last_name']:
-        errors['last_name'] = 'Last name is required.'
+        errors['last_name'] = 'Último nome é um campo obrigatório.'
 
     if 'username' not in data or not data['username']:
-        errors['username'] = 'Username is required.'
+        errors['username'] = 'Nome de utilizador é um campo obrigatório.'
 
 
     if 'email' not in data or not data['email']:
-        errors['email'] = 'Email is required.'
+        errors['email'] = 'Email é um campo obrigatório.'
 
     if 'phone' not in data or not data['phone']:
-        errors['phone'] = 'Phone number is required.'
+        errors['phone'] = 'Telefone é um campo obrigatório.'
 
     if 'country' not in data or not data['country']:
-        errors['country'] = 'Country is required.'
+        errors['country'] = 'País é um campo obrigatório.'
 
     if 'password1' not in data or not data['password1']:
-        errors['password1'] = 'Password is required.'
+        errors['password1'] = 'Password é um campo obrigatório.'
 
     if 'password2' not in data or not data['password2']:
-        errors['password2'] = 'Confirm password is required.'
+        errors['password2'] = 'Confirmação de password é um campo obrigatório.'
     
     if data.get('password1') != data.get('password2'):
-        errors['password2'] = "Passwords do not match."
+        errors['password2'] = "As passwords não coincidem."
 
     phone_pattern = r'^[9|2][0-9]{8}$'
     if not re.match(phone_pattern, data.get('phone', '')):
-        errors['phone'] = 'Enter a valid phone number starting with 9 or 2 and having 9 digits.'
+        errors['phone'] = 'Número de telefone inválido. Deve conter 9 dígitos e começar por 9 ou 2.'
 
     if errors:
         return Response({'errors': errors}, status=status.HTTP_400_BAD_REQUEST)
@@ -599,7 +599,7 @@ def register_view(request):
         refresh = RefreshToken.for_user(user)
 
         return Response({
-            'message': 'User registered successfully!',
+            'message': 'Utilizador registado com sucesso!',
             'access': str(refresh.access_token),
             'user': UserSerializer(user).data,
             'refresh': str(refresh),
@@ -629,7 +629,7 @@ def ban_user(request, user_id):
     else:
         user.banned = True
     user.save()
-    return JsonResponse({'message': 'User banned successfully!'})
+    return JsonResponse({'message': 'Utilizador banido com sucesso!'})
 
 
 @api_view(['POST'])

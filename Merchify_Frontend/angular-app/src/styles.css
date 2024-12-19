@@ -348,26 +348,26 @@ body.dark-theme .btn-secondary:hover {
 
 
 body.dark-theme .dark-theme-link {
-  color: #ffffff !important; /* Texto branco */
-  background-color: transparent !important; /* Fundo transparente */
-  border-color: #ffffff; /* Borda branca */
+  color: #ffffff !important; 
+  background-color: transparent !important; 
+  border-color: #ffffff;
 }
 
 body.dark-theme .dark-theme-link:hover {
-  background-color: #222222 !important; /* Fundo escuro ao passar o mouse */
-  color: #ffffff !important; /* Texto branco */
+  background-color: #222222 !important; 
+  color: #ffffff !important; 
 }
 
 body.dark-theme .dark-theme-file {
-  background-color: #343a40 !important; /* Fundo escuro */
-  color: #ffffff !important; /* Texto branco */
+  background-color: #343a40 !important; 
+  color: #ffffff !important;
   font-weight: bold;;
-  border: 1px solid #495057; /* Borda escura */
+  border: 1px solid #495057; 
 }
 
 body.dark-theme .dark-theme-file::file-selector-button {
-  background-color: #495057 !important; /* Botão de seleção de arquivo */
-  color: #ffffff !important; /* Texto branco no botão */
+  background-color: #495057 !important;
+  color: #ffffff !important; 
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 4px;

@@ -9,29 +9,27 @@
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
       <div class="user-details">
         <div class="input-box" *ngFor="let field of formFields">
-          <span class="details">{{ field.label }}</span>
-          <!-- Input Fields -->
+          <label [for]="field.name" class="details">{{ field.label }}</label>
           <input
             *ngIf="field.type !== 'file'"
             [type]="field.type"
             class="form-control"
+            [id]="field.name"
             [formControlName]="field.name"
           />
           <input
             *ngIf="field.type === 'file'"
             type="file"
             class="form-control dark-theme-file"
+            [id]="field.name"
             (change)="onFileChange($event)"
           />
 
 
-          <!-- Display validation errors -->
           <div *ngIf="registerForm.get(field.name)?.touched" class="invalid-feedback d-block">
-            <!-- Required Field Error -->
             <span *ngIf="registerForm.get(field.name)?.hasError('required')">
               {{ field.error }}
             </span>
-            <!-- Server-Side Error -->
             <span *ngIf="registerForm.get(field.name)?.hasError('serverError')">
               {{ registerForm.get(field.name)?.getError('serverError') }}
             </span>
@@ -39,10 +37,8 @@
         </div>
       </div>
 
-      <!-- General Error Message -->
       <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
 
-      <!-- Submit Button -->
       <button type="submit" class="btn btn-primary w-100">
         Register
       </button>
